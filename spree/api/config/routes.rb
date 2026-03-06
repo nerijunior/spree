@@ -90,9 +90,31 @@ Spree::Core::Engine.add_routes do
         resources :feeds, only: [:show], controller: 'data_feeds', param: :slug
       end
 
-      # Webhooks (outside of store namespace — no API key authentication)
-      namespace :webhooks do
-        post 'payments/:payment_method_id', to: 'payments#create', as: :payment_webhook
+      namespace :admin do
+        # Products
+        resources :products do
+          member do
+            post :clone
+          end
+          resources :variants, controller: 'products/variants'
+          resources :assets, controller: 'products/assets', only: [:index, :create, :update, :destroy]
+        end
+
+        # Variants > Prices
+        resources :variants, only: [] do
+          resources :prices, controller: 'variants/prices', only: [:index, :create, :update, :destroy]
+        end
+
+        # Taxonomies > Taxons
+        resources :taxonomies do
+          resources :taxons, controller: 'taxonomies/taxons'
+        end
+
+        # Taxons (flat, top-level)
+        resources :taxons, only: [:index, :show]
+
+        # Option Types (with nested option_values in payload)
+        resources :option_types
       end
     end
   end
