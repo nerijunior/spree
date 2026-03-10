@@ -6,8 +6,7 @@ module Spree
           attributes created_at: :iso8601, updated_at: :iso8601
 
           many :option_values,
-               resource: Spree.api.admin_option_value_serializer,
-               if: proc { expand?('option_values') }
+               resource: Spree.api.admin_option_value_serializer
         end
       end
     end

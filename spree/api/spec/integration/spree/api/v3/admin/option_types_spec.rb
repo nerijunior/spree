@@ -26,7 +26,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
       response '200', 'option types found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
 
-        schema SwaggerSchemaHelpers.paginated('AdminOptionType')
+        schema SwaggerSchemaHelpers.paginated('OptionType')
 
         run_test! do |response|
           data = JSON.parse(response.body)
@@ -37,6 +37,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
 
       response '401', 'unauthorized' do
         let(:'x-spree-api-key') { 'invalid' }
+        let(:Authorization) { 'Bearer invalid' }
 
         schema '$ref' => '#/components/schemas/ErrorResponse'
 
@@ -84,7 +85,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:body) { { name: 'material', presentation: 'Material' } }
 
-        schema '$ref' => '#/components/schemas/AdminOptionType'
+        schema '$ref' => '#/components/schemas/OptionType'
 
         run_test! do |response|
           data = JSON.parse(response.body)
@@ -120,7 +121,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:id) { option_type.prefixed_id }
 
-        schema '$ref' => '#/components/schemas/AdminOptionType'
+        schema '$ref' => '#/components/schemas/OptionType'
 
         run_test! do |response|
           data = JSON.parse(response.body)
@@ -176,7 +177,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
         let(:id) { option_type.prefixed_id }
         let(:body) { { presentation: 'Updated Presentation' } }
 
-        schema '$ref' => '#/components/schemas/AdminOptionType'
+        schema '$ref' => '#/components/schemas/OptionType'
 
         run_test! do |response|
           data = JSON.parse(response.body)
