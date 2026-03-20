@@ -65,9 +65,9 @@ function useOrder(orderId: string) {
           'shipments.stock_location',
           'payments',
           'payments.payment_method',
-          'bill_address',
-          'ship_address',
-          'user',
+          'billing_address',
+          'shipping_address',
+          'customer',
           'adjustments',
         ],
       }),
@@ -423,7 +423,7 @@ function LineItemsCard({ order }: { order: Order }) {
                       {item.display_additional_tax_total}
                     </td>
                     <td className="p-3 text-right whitespace-nowrap">
-                      {Number.parseFloat(item.promo_total) !== 0 ? item.display_promo_total : '—'}
+                      {Number.parseFloat(item.discount_total) !== 0 ? item.display_discount_total : '—'}
                     </td>
                     <td className="p-3 text-right font-medium whitespace-nowrap">
                       {item.display_total}
@@ -1003,8 +1003,8 @@ function OrderSummaryCard({ order }: { order: Order }) {
           <SummaryRow label="Shipping" value={order.display_ship_total} />
         )}
 
-        {Number.parseFloat(order.promo_total) !== 0 && (
-          <SummaryRow label="Promotions" value={order.display_promo_total} />
+        {Number.parseFloat(order.discount_total) !== 0 && (
+          <SummaryRow label="Promotions" value={order.display_discount_total} />
         )}
 
         {Number.parseFloat(order.adjustment_total) !== 0 && (
@@ -1058,7 +1058,7 @@ function AddressBlock({
           <div>{address.address1}</div>
           {address.address2 && <div>{address.address2}</div>}
           <div>
-            {[address.city, address.state_text, address.zipcode].filter(Boolean).join(', ')}
+            {[address.city, address.state_text, address.postal_code].filter(Boolean).join(', ')}
           </div>
           <div>{address.country_name}</div>
           {address.phone && <div>{address.phone}</div>}
@@ -1078,7 +1078,7 @@ function EditAddressDialog({
   onOpenChange,
 }: {
   orderId: string
-  type: 'ship_address' | 'bill_address'
+  type: 'shipping_address' | 'billing_address'
   address: Address | null | undefined
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -1092,11 +1092,11 @@ function EditAddressDialog({
     const fd = new FormData(e.currentTarget)
     mutation.mutate(
       {
-        firstname: fd.get('firstname') as string,
-        lastname: fd.get('lastname') as string,
+        first_name: fd.get('first_name') as string,
+        last_name: fd.get('last_name') as string,
         address1: fd.get('address1') as string,
         city: fd.get('city') as string,
-        zipcode: fd.get('zipcode') as string,
+        postal_code: fd.get('postal_code') as string,
         country_iso: fd.get('country_iso') as string,
         state_abbr: fd.get('state_abbr') as string,
         phone: fd.get('phone') as string,
@@ -1105,7 +1105,7 @@ function EditAddressDialog({
     )
   }
 
-  const title = type === 'ship_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
+  const title = type === 'shipping_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -1122,13 +1122,13 @@ function EditAddressDialog({
                   <FieldLabel htmlFor={`${type}-fn`}>First Name</FieldLabel>
                   <Input
                     id={`${type}-fn`}
-                    name="firstname"
-                    defaultValue={address?.firstname ?? ''}
+                    name="first_name"
+                    defaultValue={address?.first_name ?? ''}
                   />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor={`${type}-ln`}>Last Name</FieldLabel>
-                  <Input id={`${type}-ln`} name="lastname" defaultValue={address?.lastname ?? ''} />
+                  <Input id={`${type}-ln`} name="last_name" defaultValue={address?.last_name ?? ''} />
                 </Field>
               </div>
               <Field>
@@ -1142,7 +1142,7 @@ function EditAddressDialog({
                 </Field>
                 <Field>
                   <FieldLabel htmlFor={`${type}-zip`}>Zip Code</FieldLabel>
-                  <Input id={`${type}-zip`} name="zipcode" defaultValue={address?.zipcode ?? ''} />
+                  <Input id={`${type}-zip`} name="postal_code" defaultValue={address?.postal_code ?? ''} />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -1187,8 +1187,8 @@ function EditAddressDialog({
 
 function CustomerCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
-  const user = order.user
-  const [editAddress, setEditAddress] = useState<'ship_address' | 'bill_address' | null>(null)
+  const user = order.customer
+  const [editAddress, setEditAddress] = useState<'shipping_address' | 'billing_address' | null>(null)
 
   return (
     <>
@@ -1203,11 +1203,11 @@ function CustomerCard({ order }: { order: Order }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setEditAddress('ship_address')}>
+                <DropdownMenuItem onClick={() => setEditAddress('shipping_address')}>
                   <PencilIcon className="size-4" />
                   Edit Shipping Address
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setEditAddress('bill_address')}>
+                <DropdownMenuItem onClick={() => setEditAddress('billing_address')}>
                   <PencilIcon className="size-4" />
                   Edit Billing Address
                 </DropdownMenuItem>
@@ -1239,8 +1239,8 @@ function CustomerCard({ order }: { order: Order }) {
             <span className="text-sm text-muted-foreground">No customer information</span>
           )}
 
-          <AddressBlock title="Shipping Address" address={order.ship_address} />
-          <AddressBlock title="Billing Address" address={order.bill_address} />
+          <AddressBlock title="Shipping Address" address={order.shipping_address} />
+          <AddressBlock title="Billing Address" address={order.billing_address} />
         </CardContent>
       </Card>
 
@@ -1248,7 +1248,7 @@ function CustomerCard({ order }: { order: Order }) {
         <EditAddressDialog
           orderId={orderId}
           type={editAddress}
-          address={editAddress === 'ship_address' ? order.ship_address : order.bill_address}
+          address={editAddress === 'shipping_address' ? order.shipping_address : order.billing_address}
           open={!!editAddress}
           onOpenChange={(open) => !open && setEditAddress(null)}
         />
@@ -1264,7 +1264,7 @@ function CustomerCard({ order }: { order: Order }) {
 function SpecialInstructionsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
   const [editing, setEditing] = useState(false)
-  const mutation = useOrderMutation(orderId, (params: { special_instructions: string }) =>
+  const mutation = useOrderMutation(orderId, (params: { customer_note: string }) =>
     adminClient.orders.update(orderId, params),
   )
 
@@ -1272,7 +1272,7 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
     mutation.mutate(
-      { special_instructions: fd.get('special_instructions') as string },
+      { customer_note: fd.get('customer_note') as string },
       { onSuccess: () => setEditing(false) },
     )
   }
@@ -1290,7 +1290,7 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
       <CardContent>
         {editing ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <Textarea name="special_instructions" defaultValue={order.special_instructions ?? ''} />
+            <Textarea name="customer_note" defaultValue={order.customer_note ?? ''} />
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" size="sm" onClick={() => setEditing(false)}>
                 Cancel
@@ -1300,9 +1300,9 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
               </Button>
             </div>
           </form>
-        ) : order.special_instructions ? (
+        ) : order.customer_note ? (
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {order.special_instructions}
+            {order.customer_note}
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">None</p>
