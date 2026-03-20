@@ -61,15 +61,15 @@ function useOrder(orderId: string) {
     queryFn: () =>
       adminClient.orders.get(orderId, {
         expand: [
-          'line_items',
-          'shipments',
-          'shipments.shipping_method',
-          'shipments.stock_location',
+          'items',
+          'fulfillments',
+          'fulfillments.delivery_method',
+          'fulfillments.stock_location',
           'payments',
           'payments.payment_method',
-          'bill_address',
-          'ship_address',
-          'user',
+          'billing_address',
+          'shipping_address',
+          'customer',
           'adjustments',
         ],
       }),
@@ -180,8 +180,8 @@ function OrderHeader({ order }: { order: Order }) {
 
       <h1 className="text-2xl font-medium">{order.number}</h1>
 
-      {order.payment_state && <StatusBadge status={order.payment_state} />}
-      {order.shipment_state && <StatusBadge status={order.shipment_state} />}
+      {order.payment_status && <StatusBadge status={order.payment_status} />}
+      {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
 
       {order.completed_at && (
         <span className="text-sm text-muted-foreground">
@@ -213,7 +213,7 @@ function OrderHeader({ order }: { order: Order }) {
                 <DropdownMenuSeparator />
               </>
             )}
-            {order.state !== 'canceled' && (
+            {(order as any).state !== 'canceled' && (
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={() => {
@@ -361,7 +361,7 @@ function EditQuantityDialog({
 function LineItemsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
 
-  const items = order.line_items ?? []
+  const items = order.items ?? []
   const [addOpen, setAddOpen] = useState(false)
   const [editItem, setEditItem] = useState<{ id: string; quantity: number } | null>(null)
 
@@ -431,7 +431,7 @@ function LineItemsCard({ order }: { order: Order }) {
                       {item.display_additional_tax_total}
                     </td>
                     <td className="p-3 text-right whitespace-nowrap">
-                      {Number.parseFloat(item.promo_total) !== 0 ? item.display_promo_total : '—'}
+                      {Number.parseFloat(item.discount_total) !== 0 ? item.display_discount_total : '—'}
                     </td>
                     <td className="p-3 text-right font-medium whitespace-nowrap">
                       {item.display_total}
@@ -556,7 +556,7 @@ function EditTrackingDialog({
 function ShipmentsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
 
-  const shipments = order.shipments ?? []
+  const fulfillments = order.fulfillments ?? []
   const [editTracking, setEditTracking] = useState<{
     id: string
     tracking: string | null
@@ -569,7 +569,7 @@ function ShipmentsCard({ order }: { order: Order }) {
     adminClient.orders.shipments.cancel(orderId, shipmentId, {}),
   )
 
-  if (shipments.length === 0) return null
+  if (fulfillments.length === 0) return null
 
   return (
     <>
@@ -580,16 +580,16 @@ function ShipmentsCard({ order }: { order: Order }) {
             Shipments
           </CardTitle>
           <CardAction className="flex items-center gap-2">
-            <Badge variant="info">{shipments.length}</Badge>
-            {order.shipment_state && <StatusBadge status={order.shipment_state} />}
+            <Badge variant="info">{fulfillments.length}</Badge>
+            {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
           </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {shipments.map((shipment) => (
+          {fulfillments.map((shipment) => (
             <div key={shipment.id} className="rounded-lg border p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={shipment.state} />
+                  <StatusBadge status={shipment.status} />
                   <span className="text-sm font-medium">{shipment.number}</span>
                 </div>
                 <DropdownMenu>
@@ -607,7 +607,7 @@ function ShipmentsCard({ order }: { order: Order }) {
                       <PencilIcon className="size-4" />
                       {shipment.tracking ? 'Edit Tracking' : 'Add Tracking'}
                     </DropdownMenuItem>
-                    {shipment.state === 'ready' && (
+                    {shipment.status === 'ready' && (
                       <DropdownMenuItem
                         onClick={() => {
                           if (window.confirm('Ship this shipment?')) {
@@ -619,7 +619,7 @@ function ShipmentsCard({ order }: { order: Order }) {
                         Ship
                       </DropdownMenuItem>
                     )}
-                    {['pending', 'ready'].includes(shipment.state) && (
+                    {['pending', 'ready'].includes(shipment.status) && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -639,9 +639,9 @@ function ShipmentsCard({ order }: { order: Order }) {
                 </DropdownMenu>
               </div>
 
-              {shipment.shipping_method && (
+              {shipment.delivery_method && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{shipment.shipping_method.name}</span>
+                  <span className="text-muted-foreground">{shipment.delivery_method.name}</span>
                   <span>{shipment.display_cost}</span>
                 </div>
               )}
@@ -671,9 +671,9 @@ function ShipmentsCard({ order }: { order: Order }) {
                 </div>
               )}
 
-              {shipment.shipped_at && (
+              {shipment.fulfilled_at && (
                 <span className="text-xs text-muted-foreground">
-                  Shipped {timeAgo(shipment.shipped_at)}
+                  Shipped {timeAgo(shipment.fulfilled_at)}
                 </span>
               )}
             </div>
@@ -721,7 +721,7 @@ function PaymentsCard({ order }: { order: Order }) {
         </CardTitle>
         <CardAction className="flex items-center gap-2">
           <Badge variant="info">{payments.length}</Badge>
-          {order.payment_state && <StatusBadge status={order.payment_state} />}
+          {order.payment_status && <StatusBadge status={order.payment_status} />}
         </CardAction>
       </CardHeader>
       <div className="overflow-x-auto">
@@ -741,15 +741,15 @@ function PaymentsCard({ order }: { order: Order }) {
                 <td className="p-3 pl-5 font-medium">{payment.number}</td>
                 <td className="p-3 text-muted-foreground">{payment.payment_method?.name ?? '—'}</td>
                 <td className="p-3">
-                  <StatusBadge status={payment.state} />
+                  <StatusBadge status={payment.status} />
                 </td>
                 <td className="p-3 text-right font-medium whitespace-nowrap">
                   {payment.display_amount}
                 </td>
                 <td className="p-3 pr-5">
-                  {(payment.state === 'checkout' ||
-                    payment.state === 'pending' ||
-                    payment.state === 'completed') && (
+                  {(payment.status === 'checkout' ||
+                    payment.status === 'pending' ||
+                    payment.status === 'completed') && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-xs">
@@ -757,7 +757,7 @@ function PaymentsCard({ order }: { order: Order }) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {(payment.state === 'checkout' || payment.state === 'pending') && (
+                        {(payment.status === 'checkout' || payment.status === 'pending') && (
                           <DropdownMenuItem
                             onClick={() => {
                               if (window.confirm('Capture this payment?')) {
@@ -769,9 +769,9 @@ function PaymentsCard({ order }: { order: Order }) {
                             Capture
                           </DropdownMenuItem>
                         )}
-                        {(payment.state === 'checkout' ||
-                          payment.state === 'pending' ||
-                          payment.state === 'completed') && (
+                        {(payment.status === 'checkout' ||
+                          payment.status === 'pending' ||
+                          payment.status === 'completed') && (
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
                             onClick={() => {
@@ -1012,12 +1012,12 @@ function OrderSummaryCard({ order }: { order: Order }) {
 
         <SummaryRow label="Subtotal" value={order.display_item_total} />
 
-        {Number.parseFloat(order.ship_total) > 0 && (
-          <SummaryRow label="Shipping" value={order.display_ship_total} />
+        {Number.parseFloat(order.delivery_total) > 0 && (
+          <SummaryRow label="Shipping" value={order.display_delivery_total} />
         )}
 
-        {Number.parseFloat(order.promo_total) !== 0 && (
-          <SummaryRow label="Promotions" value={order.display_promo_total} />
+        {Number.parseFloat(order.discount_total) !== 0 && (
+          <SummaryRow label="Promotions" value={order.display_discount_total} />
         )}
 
         {Number.parseFloat(order.adjustment_total) !== 0 && (
@@ -1071,7 +1071,7 @@ function AddressBlock({
           <div>{address.address1}</div>
           {address.address2 && <div>{address.address2}</div>}
           <div>
-            {[address.city, address.state_text, address.zipcode].filter(Boolean).join(', ')}
+            {[address.city, address.state_text, address.postal_code].filter(Boolean).join(', ')}
           </div>
           <div>{address.country_name}</div>
           {address.phone && <div>{address.phone}</div>}
@@ -1091,7 +1091,7 @@ function EditAddressDialog({
   onOpenChange,
 }: {
   orderId: string
-  type: 'ship_address' | 'bill_address'
+  type: 'shipping_address' | 'billing_address'
   address: Address | null | undefined
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -1106,11 +1106,11 @@ function EditAddressDialog({
     const fd = new FormData(e.currentTarget)
     mutation.mutate(
       {
-        firstname: fd.get('firstname') as string,
-        lastname: fd.get('lastname') as string,
+        first_name: fd.get('first_name') as string,
+        last_name: fd.get('last_name') as string,
         address1: fd.get('address1') as string,
         city: fd.get('city') as string,
-        zipcode: fd.get('zipcode') as string,
+        postal_code: fd.get('postal_code') as string,
         country_iso: fd.get('country_iso') as string,
         state_abbr: fd.get('state_abbr') as string,
         phone: fd.get('phone') as string,
@@ -1119,7 +1119,7 @@ function EditAddressDialog({
     )
   }
 
-  const title = type === 'ship_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
+  const title = type === 'shipping_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -1136,13 +1136,13 @@ function EditAddressDialog({
                   <FieldLabel htmlFor={`${type}-fn`}>First Name</FieldLabel>
                   <Input
                     id={`${type}-fn`}
-                    name="firstname"
-                    defaultValue={address?.firstname ?? ''}
+                    name="first_name"
+                    defaultValue={address?.first_name ?? ''}
                   />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor={`${type}-ln`}>Last Name</FieldLabel>
-                  <Input id={`${type}-ln`} name="lastname" defaultValue={address?.lastname ?? ''} />
+                  <Input id={`${type}-ln`} name="last_name" defaultValue={address?.last_name ?? ''} />
                 </Field>
               </div>
               <Field>
@@ -1156,7 +1156,7 @@ function EditAddressDialog({
                 </Field>
                 <Field>
                   <FieldLabel htmlFor={`${type}-zip`}>Zip Code</FieldLabel>
-                  <Input id={`${type}-zip`} name="zipcode" defaultValue={address?.zipcode ?? ''} />
+                  <Input id={`${type}-zip`} name="postal_code" defaultValue={address?.postal_code ?? ''} />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -1201,8 +1201,8 @@ function EditAddressDialog({
 
 function CustomerCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
-  const user = order.user
-  const [editAddress, setEditAddress] = useState<'ship_address' | 'bill_address' | null>(null)
+  const user = order.customer
+  const [editAddress, setEditAddress] = useState<'shipping_address' | 'billing_address' | null>(null)
 
   return (
     <>
@@ -1217,11 +1217,11 @@ function CustomerCard({ order }: { order: Order }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setEditAddress('ship_address')}>
+                <DropdownMenuItem onClick={() => setEditAddress('shipping_address')}>
                   <PencilIcon className="size-4" />
                   Edit Shipping Address
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setEditAddress('bill_address')}>
+                <DropdownMenuItem onClick={() => setEditAddress('billing_address')}>
                   <PencilIcon className="size-4" />
                   Edit Billing Address
                 </DropdownMenuItem>
@@ -1253,8 +1253,8 @@ function CustomerCard({ order }: { order: Order }) {
             <span className="text-sm text-muted-foreground">No customer information</span>
           )}
 
-          <AddressBlock title="Shipping Address" address={order.ship_address} />
-          <AddressBlock title="Billing Address" address={order.bill_address} />
+          <AddressBlock title="Shipping Address" address={order.shipping_address} />
+          <AddressBlock title="Billing Address" address={order.billing_address} />
         </CardContent>
       </Card>
 
@@ -1262,7 +1262,7 @@ function CustomerCard({ order }: { order: Order }) {
         <EditAddressDialog
           orderId={orderId}
           type={editAddress}
-          address={editAddress === 'ship_address' ? order.ship_address : order.bill_address}
+          address={editAddress === 'shipping_address' ? order.shipping_address : order.billing_address}
           open={!!editAddress}
           onOpenChange={(open) => !open && setEditAddress(null)}
         />
@@ -1279,7 +1279,7 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
 
   const [editing, setEditing] = useState(false)
-  const mutation = useOrderMutation(orderId, (params: { special_instructions: string }) =>
+  const mutation = useOrderMutation(orderId, (params: { customer_note: string }) =>
     adminClient.orders.update(orderId, params),
   )
 
@@ -1287,7 +1287,7 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
     mutation.mutate(
-      { special_instructions: fd.get('special_instructions') as string },
+      { customer_note: fd.get('customer_note') as string },
       { onSuccess: () => setEditing(false) },
     )
   }
@@ -1305,7 +1305,7 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
       <CardContent>
         {editing ? (
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <Textarea name="special_instructions" defaultValue={order.special_instructions ?? ''} />
+            <Textarea name="customer_note" defaultValue={order.customer_note ?? ''} />
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" size="sm" onClick={() => setEditing(false)}>
                 Cancel
@@ -1315,9 +1315,9 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
               </Button>
             </div>
           </form>
-        ) : order.special_instructions ? (
+        ) : order.customer_note ? (
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {order.special_instructions}
+            {order.customer_note}
           </p>
         ) : (
           <p className="text-sm text-muted-foreground">None</p>

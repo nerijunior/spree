@@ -1,4 +1,4 @@
-import type { Image, Product as BaseProduct, Variant as BaseVariant } from '@spree/admin-sdk'
+import type { Media, Product as BaseProduct, Variant as BaseVariant } from '@spree/admin-sdk'
 
 // Extended types for fields not yet in generated types
 type Variant = BaseVariant & {
@@ -372,7 +372,7 @@ function MediaCard({ productId }: { productId: string }) {
             {assets.map((asset) => (
               <MediaThumbnail
                 key={asset.id}
-                asset={asset as Image}
+                asset={asset as unknown as Media}
                 onDelete={() => handleDeleteAsset(asset.id)}
               />
             ))}
@@ -431,7 +431,7 @@ function MediaThumbnail({
   asset,
   onDelete,
 }: {
-  asset: Image
+  asset: Media
   onDelete: () => void
 }) {
   const imageUrl = asset.small_url || asset.mini_url || asset.original_url

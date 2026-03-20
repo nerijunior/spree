@@ -59,10 +59,10 @@ function useOrder(orderId: string) {
     queryFn: () =>
       adminClient.orders.get(orderId, {
         expand: [
-          'line_items',
-          'shipments',
-          'shipments.shipping_method',
-          'shipments.stock_location',
+          'items',
+          'fulfillments',
+          'fulfillments.delivery_method',
+          'fulfillments.stock_location',
           'payments',
           'payments.payment_method',
           'billing_address',
@@ -175,8 +175,8 @@ function OrderHeader({ order }: { order: Order }) {
 
       <h1 className="text-2xl font-medium">{order.number}</h1>
 
-      {order.payment_state && <StatusBadge status={order.payment_state} />}
-      {order.shipment_state && <StatusBadge status={order.shipment_state} />}
+      {order.payment_status && <StatusBadge status={order.payment_status} />}
+      {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
 
       {order.completed_at && (
         <span className="text-sm text-muted-foreground">
@@ -208,7 +208,7 @@ function OrderHeader({ order }: { order: Order }) {
                 <DropdownMenuSeparator />
               </>
             )}
-            {order.state !== 'canceled' && (
+            {(order as any).state !== 'canceled' && (
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={() => {
@@ -353,7 +353,7 @@ function EditQuantityDialog({
 
 function LineItemsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
-  const items = order.line_items ?? []
+  const items = order.items ?? []
   const [addOpen, setAddOpen] = useState(false)
   const [editItem, setEditItem] = useState<{ id: string; quantity: number } | null>(null)
 
@@ -546,7 +546,7 @@ function EditTrackingDialog({
 
 function ShipmentsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
-  const shipments = order.shipments ?? []
+  const fulfillments = order.fulfillments ?? []
   const [editTracking, setEditTracking] = useState<{
     id: string
     tracking: string | null
@@ -559,7 +559,7 @@ function ShipmentsCard({ order }: { order: Order }) {
     adminClient.orders.shipments.cancel(orderId, shipmentId),
   )
 
-  if (shipments.length === 0) return null
+  if (fulfillments.length === 0) return null
 
   return (
     <>
@@ -570,16 +570,16 @@ function ShipmentsCard({ order }: { order: Order }) {
             Shipments
           </CardTitle>
           <CardAction className="flex items-center gap-2">
-            <Badge variant="info">{shipments.length}</Badge>
-            {order.shipment_state && <StatusBadge status={order.shipment_state} />}
+            <Badge variant="info">{fulfillments.length}</Badge>
+            {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
           </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {shipments.map((shipment) => (
+          {fulfillments.map((shipment) => (
             <div key={shipment.id} className="rounded-lg border p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={shipment.state} />
+                  <StatusBadge status={shipment.status} />
                   <span className="text-sm font-medium">{shipment.number}</span>
                 </div>
                 <DropdownMenu>
@@ -597,7 +597,7 @@ function ShipmentsCard({ order }: { order: Order }) {
                       <PencilIcon className="size-4" />
                       {shipment.tracking ? 'Edit Tracking' : 'Add Tracking'}
                     </DropdownMenuItem>
-                    {shipment.state === 'ready' && (
+                    {shipment.status === 'ready' && (
                       <DropdownMenuItem
                         onClick={() => {
                           if (window.confirm('Ship this shipment?')) {
@@ -609,7 +609,7 @@ function ShipmentsCard({ order }: { order: Order }) {
                         Ship
                       </DropdownMenuItem>
                     )}
-                    {['pending', 'ready'].includes(shipment.state) && (
+                    {['pending', 'ready'].includes(shipment.status) && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -629,9 +629,9 @@ function ShipmentsCard({ order }: { order: Order }) {
                 </DropdownMenu>
               </div>
 
-              {shipment.shipping_method && (
+              {shipment.delivery_method && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{shipment.shipping_method.name}</span>
+                  <span className="text-muted-foreground">{shipment.delivery_method.name}</span>
                   <span>{shipment.display_cost}</span>
                 </div>
               )}
@@ -661,9 +661,9 @@ function ShipmentsCard({ order }: { order: Order }) {
                 </div>
               )}
 
-              {shipment.shipped_at && (
+              {shipment.fulfilled_at && (
                 <span className="text-xs text-muted-foreground">
-                  Shipped {timeAgo(shipment.shipped_at)}
+                  Shipped {timeAgo(shipment.fulfilled_at)}
                 </span>
               )}
             </div>
@@ -710,7 +710,7 @@ function PaymentsCard({ order }: { order: Order }) {
         </CardTitle>
         <CardAction className="flex items-center gap-2">
           <Badge variant="info">{payments.length}</Badge>
-          {order.payment_state && <StatusBadge status={order.payment_state} />}
+          {order.payment_status && <StatusBadge status={order.payment_status} />}
         </CardAction>
       </CardHeader>
       <div className="overflow-x-auto">
@@ -730,15 +730,15 @@ function PaymentsCard({ order }: { order: Order }) {
                 <td className="p-3 pl-5 font-medium">{payment.number}</td>
                 <td className="p-3 text-muted-foreground">{payment.payment_method?.name ?? '—'}</td>
                 <td className="p-3">
-                  <StatusBadge status={payment.state} />
+                  <StatusBadge status={payment.status} />
                 </td>
                 <td className="p-3 text-right font-medium whitespace-nowrap">
                   {payment.display_amount}
                 </td>
                 <td className="p-3 pr-5">
-                  {(payment.state === 'checkout' ||
-                    payment.state === 'pending' ||
-                    payment.state === 'completed') && (
+                  {(payment.status === 'checkout' ||
+                    payment.status === 'pending' ||
+                    payment.status === 'completed') && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-xs">
@@ -746,7 +746,7 @@ function PaymentsCard({ order }: { order: Order }) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        {(payment.state === 'checkout' || payment.state === 'pending') && (
+                        {(payment.status === 'checkout' || payment.status === 'pending') && (
                           <DropdownMenuItem
                             onClick={() => {
                               if (window.confirm('Capture this payment?')) {
@@ -758,9 +758,9 @@ function PaymentsCard({ order }: { order: Order }) {
                             Capture
                           </DropdownMenuItem>
                         )}
-                        {(payment.state === 'checkout' ||
-                          payment.state === 'pending' ||
-                          payment.state === 'completed') && (
+                        {(payment.status === 'checkout' ||
+                          payment.status === 'pending' ||
+                          payment.status === 'completed') && (
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
                             onClick={() => {
@@ -999,8 +999,8 @@ function OrderSummaryCard({ order }: { order: Order }) {
 
         <SummaryRow label="Subtotal" value={order.display_item_total} />
 
-        {Number.parseFloat(order.ship_total) > 0 && (
-          <SummaryRow label="Shipping" value={order.display_ship_total} />
+        {Number.parseFloat(order.delivery_total) > 0 && (
+          <SummaryRow label="Shipping" value={order.display_delivery_total} />
         )}
 
         {Number.parseFloat(order.discount_total) !== 0 && (

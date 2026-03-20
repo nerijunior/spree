@@ -371,7 +371,7 @@ function MediaCard({ productId }: { productId: string }) {
             {assets.map((asset) => (
               <MediaThumbnail
                 key={asset.id}
-                asset={asset as Media}
+                asset={asset as unknown as Media}
                 onDelete={() => handleDeleteAsset(asset.id)}
               />
             ))}
