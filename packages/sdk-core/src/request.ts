@@ -193,8 +193,17 @@ export function createRequestFn(
           throw new SpreeError(errorBody, response.status);
         }
 
-        // Handle 202 Accepted / 204 No Content (empty body)
-        if (response.status === 202 || response.status === 204) {
+        // Handle 204 No Content (empty body)
+        if (response.status === 204) {
+          return undefined as T;
+        }
+
+        // Handle 202 Accepted — may or may not have a body
+        if (response.status === 202) {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return response.json() as Promise<T>;
+          }
           return undefined as T;
         }
 
