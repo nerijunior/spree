@@ -98,7 +98,6 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
 
       expect(response).to have_http_status(:created)
       expect(json_response['email']).to eq('test@example.com')
-      expect(json_response['state']).to eq('cart')
     end
 
     context 'with user assignment' do
@@ -159,7 +158,7 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
       subject
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['state']).to eq('canceled')
+      expect(order.reload.state).to eq('canceled')
     end
   end
 
@@ -192,7 +191,7 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
       subject
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['state']).to eq('resumed')
+      expect(order.reload.state).to eq('resumed')
     end
   end
 

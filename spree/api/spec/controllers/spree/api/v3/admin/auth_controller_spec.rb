@@ -14,6 +14,7 @@ RSpec.describe Spree::Api::V3::Admin::AuthController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(json_response['token']).to be_present
+        expect(json_response['refresh_token']).to be_present
         expect(json_response['user']).to be_present
         expect(json_response['user']['email']).to eq(existing_admin.email)
       end
@@ -128,26 +129,27 @@ RSpec.describe Spree::Api::V3::Admin::AuthController, type: :controller do
   end
 
   describe 'POST #refresh' do
-    context 'with valid admin JWT token' do
-      before { request.headers['Authorization'] = "Bearer #{admin_jwt_token}" }
+    let(:refresh_token) { Spree::RefreshToken.create_for(admin_user, request_env: { ip_address: '127.0.0.1', user_agent: 'test' }) }
 
-      it 'returns a new token' do
-        post :refresh
+    context 'with valid refresh token' do
+      it 'returns a new access token and rotated refresh token' do
+        post :refresh, params: { refresh_token: refresh_token.token }
 
         expect(response).to have_http_status(:ok)
         expect(json_response['token']).to be_present
-        expect(json_response['token']).not_to eq(admin_jwt_token)
+        expect(json_response['refresh_token']).to be_present
+        expect(json_response['refresh_token']).not_to eq(refresh_token.token)
       end
 
       it 'returns user data' do
-        post :refresh
+        post :refresh, params: { refresh_token: refresh_token.token }
 
         expect(json_response['user']).to be_present
         expect(json_response['user']['email']).to eq(admin_user.email)
       end
 
       it 'returns a JWT with admin audience' do
-        post :refresh
+        post :refresh, params: { refresh_token: refresh_token.token }
 
         token = json_response['token']
         secret = Rails.application.secret_key_base
@@ -157,92 +159,23 @@ RSpec.describe Spree::Api::V3::Admin::AuthController, type: :controller do
         expect(payload['user_type']).to eq('admin')
         expect(payload['user_id']).to eq(admin_user.id)
       end
-
-      it 'returns user data in the response' do
-        post :refresh
-
-        expect(json_response['user']).to have_key('id')
-        expect(json_response['user']).to have_key('email')
-      end
     end
 
-    context 'without token' do
+    context 'without refresh token' do
       it 'returns unauthorized' do
         post :refresh
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
+        expect(json_response['error']['code']).to eq('invalid_refresh_token')
       end
     end
 
-    context 'with invalid token' do
-      before { request.headers['Authorization'] = 'Bearer invalid_garbage_token' }
-
+    context 'with invalid refresh token' do
       it 'returns unauthorized' do
-        post :refresh
+        post :refresh, params: { refresh_token: 'invalid_token' }
 
         expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
-      end
-    end
-
-    context 'with expired token' do
-      let(:expired_token) do
-        Spree::Api::V3::TestingSupport.generate_jwt(
-          admin_user,
-          expiration: -1.hour.to_i,
-          audience: Spree::Api::V3::JwtAuthentication::JWT_AUDIENCE_ADMIN
-        )
-      end
-
-      before { request.headers['Authorization'] = "Bearer #{expired_token}" }
-
-      it 'returns unauthorized' do
-        post :refresh
-
-        expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
-      end
-    end
-
-    context 'with store API token (wrong audience)' do
-      let(:store_token) do
-        Spree::Api::V3::TestingSupport.generate_jwt(
-          admin_user,
-          audience: Spree::Api::V3::JwtAuthentication::JWT_AUDIENCE_STORE
-        )
-      end
-
-      before { request.headers['Authorization'] = "Bearer #{store_token}" }
-
-      it 'returns unauthorized' do
-        post :refresh
-
-        expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
-      end
-    end
-
-    context 'with secret API key only (no JWT)' do
-      before { request.headers['X-Spree-Api-Key'] = secret_api_key.plaintext_token }
-
-      it 'returns unauthorized because refresh requires JWT' do
-        post :refresh
-
-        expect(response).to have_http_status(:unauthorized)
-        expect(json_response['error']['code']).to eq('authentication_required')
-      end
-    end
-
-    context 'with tampered token' do
-      let(:tampered_token) { admin_jwt_token + 'tampered' }
-
-      before { request.headers['Authorization'] = "Bearer #{tampered_token}" }
-
-      it 'returns unauthorized' do
-        post :refresh
-
-        expect(response).to have_http_status(:unauthorized)
+        expect(json_response['error']['code']).to eq('invalid_refresh_token')
       end
     end
   end

@@ -80,37 +80,45 @@ RSpec.describe 'Admin Authentication API', type: :request, swagger_doc: 'api-ref
   path '/api/v3/admin/auth/refresh' do
     post 'Refresh token' do
       tags 'Authentication'
+      consumes 'application/json'
       produces 'application/json'
-      security [api_key: [], bearer_auth: []]
-      description 'Generates a new JWT token for the authenticated admin user'
+      security [api_key: []]
+      description 'Rotates a refresh token and returns a new JWT access token'
 
       sdk_example <<~JS
         const auth = await client.admin.auth.refresh({
-          bearerToken: '<token>',
+          refresh_token: 'rt_xxx',
         })
       JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
-      parameter name: :Authorization, in: :header, type: :string, required: true,
-                description: 'Bearer token for admin authentication'
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        properties: {
+          refresh_token: { type: :string, description: 'Refresh token obtained from login' }
+        },
+        required: %w[refresh_token]
+      }
 
       response '200', 'token refreshed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
-        let(:Authorization) { "Bearer #{admin_jwt_token}" }
+        let(:refresh_token) { Spree::RefreshToken.create_for(admin_user, request_env: { ip_address: '127.0.0.1', user_agent: 'test' }) }
+        let(:body) { { refresh_token: refresh_token.token } }
 
         schema '$ref' => '#/components/schemas/AuthResponse'
 
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['token']).to be_present
+          expect(data['refresh_token']).to be_present
           expect(data['user']).to be_present
           expect(data['user']['email']).to eq(admin_user.email)
         end
       end
 
-      response '401', 'missing or invalid token' do
+      response '401', 'missing or invalid refresh token' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
-        let(:Authorization) { 'Bearer invalid_token' }
+        let(:body) { { refresh_token: 'invalid_token' } }
 
         schema '$ref' => '#/components/schemas/ErrorResponse'
 

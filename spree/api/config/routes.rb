@@ -155,6 +155,11 @@ Spree::Core::Engine.add_routes do
           resources :adjustments, controller: 'orders/adjustments', only: [:index, :show, :create, :update, :destroy]
         end
       end
+
+      # Webhooks (outside of store namespace — no API key authentication)
+      namespace :webhooks do
+        post 'payments/:payment_method_id', to: 'payments#create', as: :payment_webhook
+      end
     end
   end
 end

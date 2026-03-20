@@ -66,7 +66,7 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['state']).to be_present
+          expect(data['status']).to be_present
         end
       end
     end

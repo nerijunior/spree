@@ -26,7 +26,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::PaymentsController, type: :control
 
       expect(response).to have_http_status(:ok)
       expect(json_response['id']).to eq(payment.prefixed_id)
-      expect(json_response['state']).to be_present
+      expect(json_response['status']).to be_present
     end
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::PaymentsController, type: :control
       }, as: :json
 
       expect(response).to have_http_status(:created)
-      expect(json_response['state']).to be_present
+      expect(json_response['status']).to be_present
     end
   end
 

@@ -86,7 +86,7 @@ RSpec.describe Spree::Api::V3::Admin::OptionTypesController, type: :controller d
       }, as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['presentation']).to eq('Updated Presentation')
+      expect(json_response['label']).to eq('Updated Presentation')
       expect(json_response['option_values'].length).to eq(2)
 
       # option_value_2 was not in the payload, so it should be deleted

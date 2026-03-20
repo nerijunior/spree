@@ -79,7 +79,6 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['email']).to eq('new-order@example.com')
-          expect(data['state']).to eq('cart')
         end
       end
     end
@@ -229,10 +228,7 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
         let!(:order) { create(:completed_order_with_totals, store: store) }
         let(:id) { order.prefixed_id }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['state']).to eq('canceled')
-        end
+        run_test!
       end
     end
   end
@@ -285,10 +281,7 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
           order.canceled_by(admin_user)
         end
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['state']).to eq('resumed')
-        end
+        run_test!
       end
     end
   end

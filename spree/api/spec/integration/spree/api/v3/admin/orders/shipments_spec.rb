@@ -125,7 +125,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['state']).to eq('shipped')
+          expect(data['status']).to eq('shipped')
         end
       end
     end
@@ -153,7 +153,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['state']).to eq('canceled')
+          expect(data['status']).to eq('canceled')
         end
       end
     end
@@ -185,7 +185,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(%w[pending ready]).to include(data['state'])
+          expect(%w[pending ready]).to include(data['status'])
         end
       end
     end

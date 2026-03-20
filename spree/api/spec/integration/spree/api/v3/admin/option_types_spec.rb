@@ -90,7 +90,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['name']).to eq('material')
-          expect(data['presentation']).to eq('Material')
+          expect(data['label']).to eq('Material')
         end
       end
 
@@ -181,7 +181,7 @@ RSpec.describe 'Admin Option Types API', type: :request, swagger_doc: 'api-refer
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['presentation']).to eq('Updated Presentation')
+          expect(data['label']).to eq('Updated Presentation')
         end
       end
 

@@ -27,7 +27,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
       expect(response).to have_http_status(:ok)
       expect(json_response['id']).to eq(shipment.prefixed_id)
       expect(json_response['number']).to eq(shipment.number)
-      expect(json_response['state']).to eq(shipment.state)
+      expect(json_response['status']).to eq(shipment.state)
     end
   end
 
@@ -54,7 +54,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
       }, as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['state']).to eq('shipped')
+      expect(json_response['status']).to eq('shipped')
     end
   end
 
@@ -66,7 +66,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
       }, as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['state']).to eq('canceled')
+      expect(json_response['status']).to eq('canceled')
     end
   end
 
@@ -80,7 +80,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
       }, as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(%w[pending ready]).to include(json_response['state'])
+      expect(%w[pending ready]).to include(json_response['status'])
     end
   end
 

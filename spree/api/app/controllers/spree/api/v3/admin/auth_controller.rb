@@ -6,8 +6,7 @@ module Spree
           rate_limit to: Spree::Api::Config[:rate_limit_login], within: Spree::Api::Config[:rate_limit_window].seconds, store: Rails.cache, only: :create, with: RATE_LIMIT_RESPONSE
           rate_limit to: Spree::Api::Config[:rate_limit_refresh], within: Spree::Api::Config[:rate_limit_window].seconds, store: Rails.cache, only: :refresh, with: RATE_LIMIT_RESPONSE
 
-          skip_before_action :authenticate_admin!, only: [:create]
-          before_action :require_authentication!, only: [:refresh]
+          skip_before_action :authenticate_admin!, only: [:create, :refresh]
 
           # POST /api/v3/admin/auth/login
           def create
@@ -18,11 +17,7 @@ module Spree
 
             if result.success?
               user = result.value
-              token = generate_jwt(user, audience: JWT_AUDIENCE_ADMIN)
-              render json: {
-                token: token,
-                user: admin_user_serializer.new(user, params: serializer_params).to_h
-              }
+              render json: auth_response(user)
             else
               render_error(
                 code: ERROR_CODES[:authentication_failed],
@@ -34,10 +29,33 @@ module Spree
 
           # POST /api/v3/admin/auth/refresh
           def refresh
-            token = generate_jwt(current_user, audience: JWT_AUDIENCE_ADMIN)
+            refresh_token_value = params[:refresh_token]
+
+            if refresh_token_value.blank?
+              return render_error(
+                code: ERROR_CODES[:invalid_refresh_token],
+                message: 'refresh_token is required',
+                status: :unauthorized
+              )
+            end
+
+            refresh_token = Spree::RefreshToken.active.find_by(token: refresh_token_value)
+
+            if refresh_token.nil?
+              return render_error(
+                code: ERROR_CODES[:invalid_refresh_token],
+                message: 'Invalid or expired refresh token',
+                status: :unauthorized
+              )
+            end
+
+            user = refresh_token.user
+            new_refresh_token = refresh_token.rotate!(request_env: request_env_for_token)
+
             render json: {
-              token: token,
-              user: admin_user_serializer.new(current_user, params: serializer_params).to_h
+              token: generate_jwt(user, audience: JWT_AUDIENCE_ADMIN),
+              refresh_token: new_refresh_token.token,
+              user: admin_user_serializer.new(user, params: serializer_params).to_h
             }
           end
 
@@ -70,6 +88,23 @@ module Spree
               currency: current_currency,
               user: current_user,
               includes: []
+            }
+          end
+
+          def auth_response(user)
+            refresh_token = Spree::RefreshToken.create_for(user, request_env: request_env_for_token)
+
+            {
+              token: generate_jwt(user, audience: JWT_AUDIENCE_ADMIN),
+              refresh_token: refresh_token.token,
+              user: admin_user_serializer.new(user, params: serializer_params).to_h
+            }
+          end
+
+          def request_env_for_token
+            {
+              ip_address: request.remote_ip,
+              user_agent: request.user_agent&.truncate(255)
             }
           end
 
