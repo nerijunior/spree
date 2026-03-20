@@ -27,7 +27,7 @@ module Spree
           end
 
           def serializer_class
-            Spree.api.admin_image_serializer
+            Spree.api.admin_asset_serializer
           end
 
           def set_parent

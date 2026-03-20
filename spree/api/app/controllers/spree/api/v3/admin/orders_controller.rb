@@ -30,15 +30,10 @@ module Spree
           # PATCH /api/v3/admin/orders/:id
           def update
             with_order_lock do
-              result = Spree.order_update_service.call(
-                order: @resource,
-                params: order_update_params
-              )
-
-              if result.success?
+              if @resource.update(order_update_params)
                 render json: serialize_resource(@resource.reload)
               else
-                render_result_error(result)
+                render_validation_error(@resource.errors)
               end
             end
           end
