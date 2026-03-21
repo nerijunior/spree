@@ -78,16 +78,15 @@ jobs:
         run: npm install -g npm@latest
         working-directory: .
 
-      - name: Auto-bump patch version
+      - name: Bump version above published
         run: |
-          CURRENT=$(node -p "require('./package.json').version")
           PUBLISHED=$(npm view @spree/docs version 2>/dev/null || echo "0.0.0")
-          if [ "$CURRENT" = "$PUBLISHED" ]; then
-            npm version patch --no-git-tag-version
-            echo "Bumped from $CURRENT to $(node -p "require('./package.json').version")"
-          else
-            echo "Current version $CURRENT not yet published, using as-is"
-          fi
+          echo "Published version: $PUBLISHED"
+          # Set package.json to published version, then bump patch
+          npm version "$PUBLISHED" --no-git-tag-version --allow-same-version
+          npm version patch --no-git-tag-version
+          NEW=$(node -p "require('./package.json').version")
+          echo "Publishing version: $NEW"
 
       - name: Build and Publish
         run: node scripts/build.js && npm publish --provenance --access public
