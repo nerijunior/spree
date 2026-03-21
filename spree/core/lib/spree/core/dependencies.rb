@@ -103,7 +103,10 @@ module Spree
         products_finder: 'Spree::Products::Find',
         taxon_finder: 'Spree::Taxons::Find',
         line_item_by_variant_finder: 'Spree::LineItems::FindByVariant',
-        variant_finder: 'Spree::Variants::Find'
+        variant_finder: 'Spree::Variants::Find',
+
+        # search
+        search_product_presenter: 'Spree::SearchProvider::ProductPresenter'
       }.freeze
 
       include Spree::DependenciesHelper

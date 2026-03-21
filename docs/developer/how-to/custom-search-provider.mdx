@@ -135,7 +135,7 @@ The `ProductPresenter` returns an array of documents. For a store with US (USD/E
 
 ## Step 4: Implement Bulk Reindex
 
-Use `ProductPresenter::REQUIRED_PRELOADS` to avoid N+1 queries:
+Use `preload_associations_lazily` to avoid N+1 queries:
 
 ```ruby app/models/my_app/search_provider/typesense.rb
 def reindex(scope = nil)
@@ -143,9 +143,9 @@ def reindex(scope = nil)
   ensure_index_settings!
 
   scope.reorder(id: :asc)
-       .preload(*Spree::SearchProvider::ProductPresenter::REQUIRED_PRELOADS)
+       .preload_associations_lazily
        .find_in_batches(batch_size: 500) do |batch|
-    documents = batch.flat_map { |p| Spree::SearchProvider::ProductPresenter.new(p, store).call }
+    documents = batch.flat_map { |p| presenter_class.new(p, store).call }
     index_batch(documents)
   end
 end

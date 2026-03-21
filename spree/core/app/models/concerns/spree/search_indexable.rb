@@ -29,7 +29,7 @@ module Spree
     #   => { id: 1, name: "Shirt", price_USD: 19.99, ... }
     def search_presentation(store = nil)
       store ||= Spree::Current.store
-      Spree::SearchProvider::ProductPresenter.new(self, store).call
+      Spree::Dependencies.search_product_presenter_class.new(self, store).call
     end
 
     # Remove this record from search index synchronously (inline, no job).

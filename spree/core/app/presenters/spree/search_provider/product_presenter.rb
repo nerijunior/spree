@@ -1,12 +1,6 @@
 module Spree
   module SearchProvider
     class ProductPresenter
-      # Associations needed by this presenter — used by reindex and rake task for preloading
-      REQUIRED_PRELOADS = [
-        :taxons, :option_types, :primary_media, :store_products,
-        { variants_including_master: [:prices, :option_values] }
-      ].freeze
-
       attr_reader :product, :store
 
       def initialize(product, store)
