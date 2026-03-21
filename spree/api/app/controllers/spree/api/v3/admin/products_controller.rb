@@ -3,13 +3,6 @@ module Spree
     module V3
       module Admin
         class ProductsController < ResourceController
-          # Sort values that require special scopes
-          CUSTOM_SORT_SCOPES = {
-            'price' => :ascend_by_price,
-            '-price' => :descend_by_price,
-            'best_selling' => :by_best_selling
-          }.freeze
-
           # PATCH /api/v3/admin/products/:id
           def update
             if @resource.update(update_params)
@@ -51,30 +44,24 @@ module Spree
             ]
           end
 
-          def collection_distinct?
-            !custom_sort_requested?
-          end
+          # Use SearchProvider::Database for collection to handle price/best_selling
+          # sorting correctly (counts before sorting, avoiding PG/Mobility issues).
+          def collection
+            return @collection if @collection.present?
 
-          def apply_collection_sort(collection)
-            sort_value = sort_param
-            return collection unless sort_value.present?
+            filters = params[:q]&.to_unsafe_h || params[:q] || {}
 
-            scope_method = CUSTOM_SORT_SCOPES[sort_value]
-            return collection unless scope_method
+            result = search_provider.search_and_filter(
+              scope: scope.includes(collection_includes).preload_associations_lazily.accessible_by(current_ability, :show),
+              query: nil,
+              filters: filters,
+              sort: sort_param,
+              page: page,
+              limit: limit
+            )
 
-            sorted = collection.reorder(nil)
-            sort_value == 'best_selling' ? sorted.distinct(false).send(scope_method) : sorted.send(scope_method)
-          end
-
-          def ransack_params
-            rp = super
-
-            if sort_param.present? && CUSTOM_SORT_SCOPES.key?(sort_param)
-              rp = rp.is_a?(Hash) ? rp.dup : rp.to_unsafe_h
-              rp.delete('s')
-            end
-
-            rp
+            @pagy = result.pagy
+            @collection = result.products
           end
 
           def permitted_params
@@ -95,6 +82,10 @@ module Spree
 
           private
 
+          def search_provider
+            @search_provider ||= Spree::SearchProvider::Database.new(current_store)
+          end
+
           def update_params
             p = permitted_params.to_h.with_indifferent_access
 
@@ -107,10 +98,6 @@ module Spree
             end
 
             p
-          end
-
-          def custom_sort_requested?
-            CUSTOM_SORT_SCOPES.key?(sort_param)
           end
         end
       end
