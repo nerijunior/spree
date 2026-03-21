@@ -13,7 +13,8 @@ RSpec.describe 'Products API', type: :request, swagger_doc: 'api-reference/store
   let(:option_value_small) { create(:option_value, option_type: option_type, name: 'small', presentation: 'S') }
 
   let!(:product) do
-    create(:product, stores: [store], status: 'active', taxons: [child_taxon]).tap do |p|
+    create(:product, stores: [store], status: 'active', taxons: [child_taxon],
+           description: '<p>A <strong>comfortable</strong> cotton t-shirt.</p>').tap do |p|
       p.option_types << option_type
       create(:variant, product: p, option_values: [option_value_small])
     end
@@ -131,6 +132,8 @@ RSpec.describe 'Products API', type: :request, swagger_doc: 'api-reference/store
           expect(data['id']).to eq(product.prefixed_id)
           expect(data['name']).to eq(product.name)
           expect(data['slug']).to eq(product.slug)
+          expect(data['description']).to eq('A comfortable cotton t-shirt.')
+          expect(data['description_html']).to eq('<p>A <strong>comfortable</strong> cotton t-shirt.</p>')
         end
       end
 

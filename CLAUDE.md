@@ -27,6 +27,7 @@ Current plans:
 - `6.0-search-provider.md` — Pluggable SearchProvider interface (Database default, Meilisearch/Elasticsearch/Algolia adapters), MetafieldDefinition faceting, autocomplete endpoint
 - `6.0-tax-provider.md` — Per-Market TaxProvider, replaces TaxRate.adjust + Calculator, TaxZone for internal provider only
 - `6.0-delivery-rate-provider.md` — Per-DeliveryMethod DeliveryRateProvider, replaces Estimator + Calculator, DeliveryZone with postal code support
+- `6.0-rich-text-descriptions.md` — Drop ActionText storage, store HTML in text columns, sanitize on write, serve `description` + `description_html` in API
 - `5.x-store-api-bridges.md` — Bridge 6.0 naming into 5.5 Store API (fulfillments, delivery, status, remove master_variant)
 - `5.x-store-api-naming-standardization.md` — Standardize API naming against industry (address fields, discounts, customer_note, label, brand/last4, etc.)
 - `spree-starter-and-create-spree-app.md` — Replace monorepo server/ with spree-starter template repo, always include backend/ in create-spree-app, add spree eject

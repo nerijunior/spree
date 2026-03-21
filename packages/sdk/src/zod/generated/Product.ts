@@ -10,7 +10,6 @@ import { VariantSchema } from './Variant';
 export const ProductSchema = z.object({
   id: z.string(),
   name: z.string(),
-  description: z.string().nullable(),
   slug: z.string(),
   meta_description: z.string().nullable(),
   meta_keywords: z.string().nullable(),
@@ -22,6 +21,8 @@ export const ProductSchema = z.object({
   in_stock: z.boolean(),
   backorderable: z.boolean(),
   available: z.boolean(),
+  description: z.string().nullable(),
+  description_html: z.string().nullable(),
   default_variant_id: z.string(),
   thumbnail_url: z.string().nullable(),
   tags: z.array(z.string()),
