@@ -463,9 +463,9 @@ await client.customer.addresses.update('addr_xxx', { city: 'Brooklyn' }, options
 // Delete address
 await client.customer.addresses.delete('addr_xxx', options);
 
-// Mark as default billing or shipping address
-await client.customer.addresses.markAsDefault('addr_xxx', 'billing', options);
-await client.customer.addresses.markAsDefault('addr_xxx', 'shipping', options);
+// Set as default billing or shipping address
+await client.customer.addresses.update('addr_xxx', { is_default_billing: true }, options);
+await client.customer.addresses.update('addr_xxx', { is_default_shipping: true }, options);
 ```
 
 ### Customer Password Resets
@@ -563,7 +563,7 @@ The SDK uses a resource builder pattern for nested resources:
 | `carts` | `payments` | `list`, `get`, `create` |
 | `carts` | `paymentSessions` | `create`, `get`, `update`, `complete` |
 | `carts` | `storeCredits` | `apply`, `remove` |
-| `customer` | `addresses` | `list`, `get`, `create`, `update`, `delete`, `markAsDefault` |
+| `customer` | `addresses` | `list`, `get`, `create`, `update`, `delete` |
 | `customer` | `passwordResets` | `create`, `update` |
 | `customer` | `creditCards` | `list`, `get`, `delete` |
 | `customer` | `giftCards` | `list`, `get` |

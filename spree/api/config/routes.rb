@@ -53,10 +53,8 @@ Spree::Core::Engine.add_routes do
         # Orders (single order lookup, guest-accessible via order token)
         resources :orders, only: [:show]
 
-        # Customer (current user profile)
+        # Customers
         resources :customers, only: [:create]
-        get 'customer', to: 'customers#show'
-        patch 'customer', to: 'customers#update'
 
         # Current customer profile and nested resources (/customers/me/...)
         namespace :customer, path: 'customers/me' do
@@ -66,11 +64,7 @@ Spree::Core::Engine.add_routes do
           resources :password_resets, only: [:create, :update]
 
           resources :orders, only: [:index, :show]
-          resources :addresses, only: [:index, :show, :create, :update, :destroy] do
-            member do
-              patch :mark_as_default
-            end
-          end
+          resources :addresses, only: [:index, :show, :create, :update, :destroy]
           resources :credit_cards, only: [:index, :show, :destroy]
           resources :gift_cards, only: [:index, :show]
           resources :payment_setup_sessions, only: [:create, :show] do

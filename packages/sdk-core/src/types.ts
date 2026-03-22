@@ -64,4 +64,8 @@ export interface AddressParams {
   state_name?: string;
   /** When true, relaxes validation requirements (name, phone, postal_code, street) */
   quick_checkout?: boolean;
+  /** Set as default billing address */
+  is_default_billing?: boolean;
+  /** Set as default shipping address */
+  is_default_shipping?: boolean;
 }

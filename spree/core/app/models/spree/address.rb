@@ -106,12 +106,26 @@ module Spree
     end
 
     def user_default_billing?
-      user.present? && id == user.bill_address_id
+      Spree::Deprecation.warn('Spree::Address#user_default_billing? is deprecated and will be removed in Spree 6.0. Use #is_default_billing? instead.')
+      is_default_billing?
     end
 
     def user_default_shipping?
+      Spree::Deprecation.warn('Spree::Address#user_default_shipping? is deprecated and will be removed in Spree 6.0. Use #is_default_shipping? instead.')
+      is_default_shipping?
+    end
+
+    # In 6.0 these become real columns on Address, replacing User#bill_address_id / ship_address_id.
+    # For now they delegate to the User FK so the API shape is stable.
+    def is_default_billing?
+      user.present? && id == user.bill_address_id
+    end
+    alias_method :is_default_billing, :is_default_billing?
+
+    def is_default_shipping?
       user.present? && id == user.ship_address_id
     end
+    alias_method :is_default_shipping, :is_default_shipping?
 
     # first_name / last_name aliases are defined via alias_attribute above
 
