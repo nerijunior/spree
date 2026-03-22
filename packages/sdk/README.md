@@ -299,17 +299,10 @@ await client.carts.storeCredits.remove('cart_xxx', options);
 ```typescript
 const options = { spreeToken: cart.token };
 
-// Get available payment methods for the current checkout
-const methods = await client.carts.paymentMethods.list('cart_xxx', options);
-// Each method includes `session_required` flag:
+// Payment methods and payments are included in the cart response.
+// Each payment method includes `session_required` flag:
 // - true  -> use paymentSessions (Stripe, Adyen, PayPal, etc.)
 // - false -> use payments.create (Check, Cash on Delivery, Bank Transfer, etc.)
-
-// List payments on the cart
-const payments = await client.carts.payments.list('cart_xxx', options);
-
-// Get a specific payment
-const payment = await client.carts.payments.get('cart_xxx', paymentId, options);
 
 // Create a payment for a non-session payment method
 // (e.g. Check, Cash on Delivery, Bank Transfer, Purchase Order)
@@ -559,8 +552,7 @@ The SDK uses a resource builder pattern for nested resources:
 | `carts` | `items` | `create`, `update`, `delete` |
 | `carts` | `couponCodes` | `apply`, `remove` |
 | `carts` | `fulfillments` | `list`, `update` |
-| `carts` | `paymentMethods` | `list` |
-| `carts` | `payments` | `list`, `get`, `create` |
+| `carts` | `payments` | `create` |
 | `carts` | `paymentSessions` | `create`, `get`, `update`, `complete` |
 | `carts` | `storeCredits` | `apply`, `remove` |
 | `customer` | `addresses` | `list`, `get`, `create`, `update`, `delete` |
@@ -578,7 +570,7 @@ Example:
 await client.carts.items.create(cartId, params, options);
 await client.carts.couponCodes.apply(cartId, code, options);
 await client.carts.fulfillments.update(cartId, fulfillmentId, params, options);
-await client.carts.payments.list(cartId, options);
+await client.carts.payments.create(cartId, params, options);
 await client.carts.paymentSessions.create(cartId, params, options);
 await client.carts.storeCredits.apply(cartId, amount, options);
 

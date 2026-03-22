@@ -38,7 +38,6 @@ import type {
   Market,
   Category,
   Payment,
-  PaymentMethod,
   PaymentSession,
   PaymentSetupSession,
   Fulfillment,
@@ -476,51 +475,9 @@ export class StoreClient {
     },
 
     /**
-     * Nested resource: Payment methods
-     */
-    paymentMethods: {
-      /**
-       * List available payment methods for the cart
-       * @param cartId - Cart prefixed ID
-       */
-      list: (cartId: string, options?: RequestOptions): Promise<ListResponse<PaymentMethod>> =>
-        this.request<ListResponse<PaymentMethod>>(
-          'GET',
-          `/carts/${cartId}/payment_methods`,
-          options
-        ),
-    },
-
-    /**
      * Nested resource: Payments
      */
     payments: {
-      /**
-       * List payments for the cart
-       * @param cartId - Cart prefixed ID
-       */
-      list: (cartId: string, options?: RequestOptions): Promise<ListResponse<Payment>> =>
-        this.request<ListResponse<Payment>>(
-          'GET',
-          `/carts/${cartId}/payments`,
-          options
-        ),
-
-      /**
-       * Get a payment by ID
-       * @param cartId - Cart prefixed ID
-       */
-      get: (
-        cartId: string,
-        paymentId: string,
-        options?: RequestOptions
-      ): Promise<Payment> =>
-        this.request<Payment>(
-          'GET',
-          `/carts/${cartId}/payments/${paymentId}`,
-          options
-        ),
-
       /**
        * Create a payment for a non-session payment method (e.g. Check, Cash on Delivery, Bank Transfer).
        * For session-based payment methods (e.g. Stripe, PayPal), use carts.paymentSessions.create() instead.
@@ -676,7 +633,7 @@ export class StoreClient {
      * Get current customer profile
      */
     get: (options?: RequestOptions): Promise<Customer> =>
-      this.request<Customer>('GET', '/customer', options),
+      this.request<Customer>('GET', '/customers/me', options),
 
     /**
      * Update current customer profile
@@ -697,7 +654,7 @@ export class StoreClient {
       },
       options?: RequestOptions
     ): Promise<Customer> =>
-      this.request<Customer>('PATCH', '/customer', {
+      this.request<Customer>('PATCH', '/customers/me', {
         ...options,
         body: params,
       }),
@@ -754,19 +711,6 @@ export class StoreClient {
        * Delete an address
        */
       delete: (id: string, options?: RequestOptions): Promise<void> =>
-
-      /**
-       * Mark an address as default billing or shipping
-       */
-      markAsDefault: (
-        id: string,
-        kind: 'billing' | 'shipping',
-        options?: RequestOptions
-      ): Promise<Address> =>
-        this.request<Address>('PATCH', `/customer/addresses/${id}/mark_as_default`, {
-          ...options,
-          body: { kind },
-        }),
         this.request<void>('DELETE', `/customers/me/addresses/${id}`, options),
     },
 

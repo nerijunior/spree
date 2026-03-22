@@ -6,78 +6,10 @@ RSpec.describe Spree::Api::V3::Store::Carts::PaymentsController, type: :controll
   include_context 'API v3 Store'
 
   let(:order) { create(:order_with_line_items, user: user, store: store, state: 'payment') }
-  let(:payment_method) { create(:credit_card_payment_method, stores: [store]) }
-  let!(:payment) { create(:payment, order: order, payment_method: payment_method, amount: order.total) }
 
   before do
     request.headers['X-Spree-Api-Key'] = api_key.token
     request.headers['Authorization'] = "Bearer #{jwt_token}"
-  end
-
-  describe 'GET #index' do
-    it 'returns a list of payments for the cart' do
-      get :index, params: { cart_id: order.prefixed_id }
-
-      expect(response).to have_http_status(:ok)
-      expect(json_response['data'].size).to eq(1)
-      expect(json_response['data'].first['id']).to eq(payment.prefixed_id)
-    end
-
-    it 'includes payment method information' do
-      get :index, params: { cart_id: order.prefixed_id }
-
-      expect(json_response['data'].first['payment_method_id']).to eq(payment_method.prefixed_id)
-    end
-
-    context 'with spree token (guest)' do
-      let(:guest_order) { create(:order_with_line_items, user: nil, store: store, state: 'payment') }
-      let!(:guest_payment) { create(:payment, order: guest_order, payment_method: payment_method) }
-
-      before { request.headers['Authorization'] = nil }
-
-      it 'returns payments with valid spree token' do
-        request.headers['x-spree-token'] = guest_order.token
-        get :index, params: { cart_id: guest_order.prefixed_id }
-
-        expect(response).to have_http_status(:ok)
-        expect(json_response['data'].size).to eq(1)
-      end
-
-      it 'returns forbidden without spree token' do
-        get :index, params: { cart_id: guest_order.prefixed_id }
-
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-  end
-
-  describe 'GET #show' do
-    it 'returns a single payment' do
-      get :show, params: { cart_id: order.prefixed_id, id: payment.to_param }
-
-      expect(response).to have_http_status(:ok)
-      expect(json_response['id']).to eq(payment.prefixed_id)
-      expect(json_response['status']).to eq(payment.state)
-      expect(json_response['amount']).to eq(payment.amount.to_s)
-    end
-
-    context 'error handling' do
-      it 'returns not found for non-existent payment' do
-        get :show, params: { cart_id: order.prefixed_id, id: 'py_invalid' }
-
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it 'returns not found for payment from another order' do
-        other_user = create(:user)
-        other_order = create(:order_with_line_items, user: other_user, store: store, state: 'payment')
-        other_payment = create(:payment, order: other_order, payment_method: payment_method, amount: other_order.total)
-
-        get :show, params: { cart_id: order.prefixed_id, id: other_payment.to_param }
-
-        expect(response).to have_http_status(:not_found)
-      end
-    end
   end
 
   describe 'POST #create' do

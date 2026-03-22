@@ -260,51 +260,7 @@ export const handlers = [
     HttpResponse.json(fixtures.cart)
   ),
 
-  // Carts > Payment Methods
-  http.get(`${API_PREFIX}/carts/:cartId/payment_methods`, () =>
-    HttpResponse.json({ data: [], meta: { count: 0 } })
-  ),
-
   // Carts > Payments
-  http.get(`${API_PREFIX}/carts/:cartId/payments`, () =>
-    HttpResponse.json({
-      data: [{
-        id: 'py_1',
-        payment_method_id: 'pm_1',
-        state: 'checkout',
-        response_code: null,
-        number: 'P1234',
-        amount: '19.99',
-        display_amount: '$19.99',
-        source_type: 'credit_card',
-        source_id: 'card_1',
-        source: { id: 'card_1', brand: 'visa', last4: '4242', name: 'Test User', month: '12', year: '2028' },
-        created_at: '2026-02-17T00:00:00.000Z',
-        updated_at: '2026-02-17T00:00:00.000Z',
-        payment_method: { id: 'pm_1', name: 'Credit Card', description: null, type: 'Spree::Gateway::Bogus', session_required: true },
-      }],
-      meta: { count: 1 },
-    })
-  ),
-
-  http.get(`${API_PREFIX}/carts/:cartId/payments/:id`, () =>
-    HttpResponse.json({
-      id: 'py_1',
-      payment_method_id: 'pm_1',
-      state: 'checkout',
-      response_code: null,
-      number: 'P1234',
-      amount: '19.99',
-      display_amount: '$19.99',
-      source_type: 'credit_card',
-      source_id: 'card_1',
-      source: { id: 'card_1', brand: 'visa', last4: '4242', name: 'Test User', month: '12', year: '2028' },
-      created_at: '2026-02-17T00:00:00.000Z',
-      updated_at: '2026-02-17T00:00:00.000Z',
-      payment_method: { id: 'pm_1', name: 'Credit Card', description: null, type: 'Spree::Gateway::Bogus', session_required: true },
-    })
-  ),
-
   http.post(`${API_PREFIX}/carts/:cartId/payments`, () =>
     HttpResponse.json({
       id: 'py_2',

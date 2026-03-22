@@ -129,13 +129,6 @@ describe('carts', () => {
     });
   });
 
-  describe('paymentMethods', () => {
-    it('lists payment methods', async () => {
-      const result = await client.carts.paymentMethods.list('cart_1', opts);
-      expect(result.data).toBeDefined();
-    });
-  });
-
   describe('storeCredits', () => {
     it('applies store credit', async () => {
       const result = await client.carts.storeCredits.apply('cart_1', 10, opts);
