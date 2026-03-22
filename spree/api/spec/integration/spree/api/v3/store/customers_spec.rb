@@ -94,7 +94,7 @@ RSpec.describe 'Customers API', type: :request, swagger_doc: 'api-reference/stor
     end
   end
 
-  path '/api/v3/store/customer' do
+  path '/api/v3/store/customers/me' do
     get 'Get current customer profile' do
       tags 'Customers'
       produces 'application/json'

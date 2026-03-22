@@ -7,7 +7,7 @@ RSpec.describe 'Gift Cards API', type: :request, swagger_doc: 'api-reference/sto
 
   let!(:gift_card) { create(:gift_card, user: user, store: store) }
 
-  path '/api/v3/store/customer/gift_cards' do
+  path '/api/v3/store/customers/me/gift_cards' do
     get 'List gift cards' do
       tags 'Customers'
       produces 'application/json'
@@ -55,7 +55,7 @@ RSpec.describe 'Gift Cards API', type: :request, swagger_doc: 'api-reference/sto
     end
   end
 
-  path '/api/v3/store/customer/gift_cards/{id}' do
+  path '/api/v3/store/customers/me/gift_cards/{id}' do
     get 'Get a gift card' do
       tags 'Customers'
       produces 'application/json'

@@ -58,8 +58,11 @@ Spree::Core::Engine.add_routes do
         get 'customer', to: 'customers#show'
         patch 'customer', to: 'customers#update'
 
-        # Customer nested resources
-        namespace :customer, path: 'customer' do
+        # Current customer profile and nested resources (/customers/me/...)
+        namespace :customer, path: 'customers/me' do
+          get '/', action: :show, controller: '/spree/api/v3/store/customers'
+          patch '/', action: :update, controller: '/spree/api/v3/store/customers'
+
           resources :password_resets, only: [:create, :update]
 
           resources :orders, only: [:index, :show]

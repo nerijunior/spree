@@ -9,7 +9,7 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
   let!(:state) { create(:state, country: country) }
   let!(:address) { create(:address, user: user, country: country, state: state) }
 
-  path '/api/v3/store/customer/addresses' do
+  path '/api/v3/store/customers/me/addresses' do
     get 'List customer addresses' do
       tags 'Customers'
       produces 'application/json'
@@ -136,7 +136,7 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
     end
   end
 
-  path '/api/v3/store/customer/addresses/{id}' do
+  path '/api/v3/store/customers/me/addresses/{id}' do
     get 'Get an address' do
       tags 'Customers'
       produces 'application/json'

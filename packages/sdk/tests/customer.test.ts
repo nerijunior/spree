@@ -31,7 +31,7 @@ describe('customer', () => {
     it('sends phone, accepts_email_marketing, and metadata', async () => {
       let capturedBody: Record<string, unknown> = {};
       server.use(
-        http.patch(`${API_PREFIX}/customer`, async ({ request }) => {
+        http.patch(`${API_PREFIX}/customers/me`, async ({ request }) => {
           capturedBody = await request.json() as Record<string, unknown>;
           return HttpResponse.json({ ...fixtures.user, phone: '+1234567890', accepts_email_marketing: true });
         })

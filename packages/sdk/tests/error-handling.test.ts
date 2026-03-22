@@ -38,7 +38,7 @@ describe('error handling', () => {
 
   it('throws SpreeError with details on 422', async () => {
     server.use(
-      http.post(`${API_PREFIX}/customer/addresses`, () =>
+      http.post(`${API_PREFIX}/customers/me/addresses`, () =>
         HttpResponse.json(
           {
             error: {
@@ -98,7 +98,7 @@ describe('error handling', () => {
 
   it('throws SpreeError on 401 unauthorized', async () => {
     server.use(
-      http.get(`${API_PREFIX}/customer`, () =>
+      http.get(`${API_PREFIX}/customers/me`, () =>
         HttpResponse.json(
           {
             error: {

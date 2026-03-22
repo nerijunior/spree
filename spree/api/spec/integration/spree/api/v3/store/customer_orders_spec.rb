@@ -7,7 +7,7 @@ RSpec.describe 'Customer Orders API', type: :request, swagger_doc: 'api-referenc
 
   let(:user) { create(:user_with_addresses) }
 
-  path '/api/v3/store/customer/orders' do
+  path '/api/v3/store/customers/me/orders' do
     get 'List orders' do
       tags 'Customer'
       produces 'application/json'
@@ -48,7 +48,7 @@ RSpec.describe 'Customer Orders API', type: :request, swagger_doc: 'api-referenc
     end
   end
 
-  path '/api/v3/store/customer/orders/{id}' do
+  path '/api/v3/store/customers/me/orders/{id}' do
     get 'Get an order' do
       tags 'Customer'
       produces 'application/json'

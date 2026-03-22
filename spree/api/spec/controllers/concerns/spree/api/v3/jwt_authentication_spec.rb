@@ -2,7 +2,7 @@ require 'spec_helper'
 
 # Test JWT authentication concerns.
 # Token generation tested via AuthController (login).
-# Token verification/extraction tested via CustomersController (GET /customer requires JWT).
+# Token verification/extraction tested via CustomersController (GET /customers/me requires JWT).
 RSpec.describe 'Spree::Api::V3::JwtAuthentication' do
   describe 'token generation' do
     # Use AuthController for testing token generation (login creates JWT)
@@ -43,7 +43,7 @@ RSpec.describe 'Spree::Api::V3::JwtAuthentication' do
 
     it 'extracts token from Authorization Bearer header', type: :request do
       jwt = generate_jwt(user)
-      get '/api/v3/store/customer', headers: headers.merge('Authorization' => "Bearer #{jwt}")
+      get '/api/v3/store/customers/me', headers: headers.merge('Authorization' => "Bearer #{jwt}")
 
       expect(response).to have_http_status(:ok)
     end
@@ -54,7 +54,7 @@ RSpec.describe 'Spree::Api::V3::JwtAuthentication' do
         Rails.application.secret_key_base,
         'HS256'
       )
-      get '/api/v3/store/customer', headers: headers.merge('Authorization' => "Bearer #{bad_token}")
+      get '/api/v3/store/customers/me', headers: headers.merge('Authorization' => "Bearer #{bad_token}")
 
       expect(response).to have_http_status(:unauthorized)
     end
@@ -65,21 +65,21 @@ RSpec.describe 'Spree::Api::V3::JwtAuthentication' do
         Rails.application.secret_key_base,
         'HS256'
       )
-      get '/api/v3/store/customer', headers: headers.merge('Authorization' => "Bearer #{bad_token}")
+      get '/api/v3/store/customers/me', headers: headers.merge('Authorization' => "Bearer #{bad_token}")
 
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'rejects expired tokens', type: :request do
       expired_token = generate_jwt(user, expiration: -1.hour.to_i)
-      get '/api/v3/store/customer', headers: headers.merge('Authorization' => "Bearer #{expired_token}")
+      get '/api/v3/store/customers/me', headers: headers.merge('Authorization' => "Bearer #{expired_token}")
 
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'does not extract token from query params on non-digitals controllers', type: :request do
       jwt = generate_jwt(user)
-      get '/api/v3/store/customer', params: { token: jwt }, headers: headers
+      get '/api/v3/store/customers/me', params: { token: jwt }, headers: headers
 
       expect(response).to have_http_status(:unauthorized)
     end

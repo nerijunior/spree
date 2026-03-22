@@ -13,7 +13,7 @@ RSpec.describe 'Payment Setup Sessions API', type: :request, swagger_doc: 'api-r
            external_data: { 'client_secret' => 'secret_123' })
   end
 
-  path '/api/v3/store/customer/payment_setup_sessions' do
+  path '/api/v3/store/customers/me/payment_setup_sessions' do
     post 'Create payment setup session' do
       tags 'Customers'
       consumes 'application/json'
@@ -75,7 +75,7 @@ RSpec.describe 'Payment Setup Sessions API', type: :request, swagger_doc: 'api-r
     end
   end
 
-  path '/api/v3/store/customer/payment_setup_sessions/{id}' do
+  path '/api/v3/store/customers/me/payment_setup_sessions/{id}' do
     parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
     parameter name: 'Authorization', in: :header, type: :string, required: true
     parameter name: :id, in: :path, type: :string, required: true,
@@ -118,7 +118,7 @@ RSpec.describe 'Payment Setup Sessions API', type: :request, swagger_doc: 'api-r
     end
   end
 
-  path '/api/v3/store/customer/payment_setup_sessions/{id}/complete' do
+  path '/api/v3/store/customers/me/payment_setup_sessions/{id}/complete' do
     parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
     parameter name: 'Authorization', in: :header, type: :string, required: true
     parameter name: :id, in: :path, type: :string, required: true,

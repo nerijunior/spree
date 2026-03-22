@@ -19,7 +19,7 @@ describe('customer.passwordResets', () => {
     it('sends email in request body', async () => {
       let capturedBody: Record<string, unknown> = {};
       server.use(
-        http.post(`${API_PREFIX}/customer/password_resets`, async ({ request }) => {
+        http.post(`${API_PREFIX}/customers/me/password_resets`, async ({ request }) => {
           capturedBody = await request.json() as Record<string, unknown>;
           return HttpResponse.json(
             { message: 'If an account exists for that email, password reset instructions have been sent.' },
@@ -53,7 +53,7 @@ describe('customer.passwordResets', () => {
     it('sends token in URL path', async () => {
       let capturedUrl = '';
       server.use(
-        http.patch(`${API_PREFIX}/customer/password_resets/:token`, ({ request }) => {
+        http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, ({ request }) => {
           capturedUrl = request.url;
           return HttpResponse.json({ token: 'new-jwt-token', user: { id: 'user_1', email: 'test@example.com', first_name: null, last_name: null } });
         })
@@ -65,12 +65,12 @@ describe('customer.passwordResets', () => {
         password_confirmation: 'newsecurepassword',
       });
 
-      expect(capturedUrl).toContain('/customer/password_resets/my-reset-token');
+      expect(capturedUrl).toContain('/customers/me/password_resets/my-reset-token');
     });
 
     it('throws SpreeError on invalid token', async () => {
       server.use(
-        http.patch(`${API_PREFIX}/customer/password_resets/:token`, () =>
+        http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, () =>
           HttpResponse.json(
             { error: { code: 'password_reset_token_invalid', message: 'Password reset token is invalid or has expired.' } },
             { status: 422 }
