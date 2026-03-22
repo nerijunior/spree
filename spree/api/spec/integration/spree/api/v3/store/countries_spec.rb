@@ -15,7 +15,7 @@ RSpec.describe 'Countries API', type: :request, swagger_doc: 'api-reference/stor
 
   path '/api/v3/store/countries' do
     get 'List countries' do
-      tags 'Internationalization'
+      tags 'Markets'
       produces 'application/json'
       security [api_key: []]
       description 'Returns countries available in the store. Use ?expand=market to include market details (currency, locale, tax_inclusive).'
@@ -66,7 +66,7 @@ RSpec.describe 'Countries API', type: :request, swagger_doc: 'api-reference/stor
 
   path '/api/v3/store/countries/{iso}' do
     get 'Get a country' do
-      tags 'Internationalization'
+      tags 'Markets'
       produces 'application/json'
       security [api_key: []]
       description 'Returns a single country by ISO code. Supports ?expand=states for address forms and ?expand=market for market details.'

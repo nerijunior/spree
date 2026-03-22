@@ -9,7 +9,7 @@ RSpec.describe 'Customer Orders API', type: :request, swagger_doc: 'api-referenc
 
   path '/api/v3/store/customers/me/orders' do
     get 'List orders' do
-      tags 'Customer'
+      tags 'Customers'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns a paginated list of completed orders for the authenticated customer.'
@@ -50,7 +50,7 @@ RSpec.describe 'Customer Orders API', type: :request, swagger_doc: 'api-referenc
 
   path '/api/v3/store/customers/me/orders/{id}' do
     get 'Get an order' do
-      tags 'Customer'
+      tags 'Customers'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns a single completed order for the authenticated customer.'
