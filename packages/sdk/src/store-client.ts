@@ -40,7 +40,6 @@ import type {
   Payment,
   PaymentSession,
   PaymentSetupSession,
-  Fulfillment,
   Wishlist,
   WishlistItem,
   Address,
@@ -445,17 +444,6 @@ export class StoreClient {
      * Nested resource: Fulfillments
      */
     fulfillments: {
-      /**
-       * List fulfillments with delivery rates for the cart
-       * @param cartId - Cart prefixed ID
-       */
-      list: (cartId: string, options?: RequestOptions): Promise<ListResponse<Fulfillment>> =>
-        this.request<ListResponse<Fulfillment>>(
-          'GET',
-          `/carts/${cartId}/fulfillments`,
-          options
-        ),
-
       /**
        * Select a delivery rate for a specific fulfillment.
        * Returns the updated cart with recalculated totals.

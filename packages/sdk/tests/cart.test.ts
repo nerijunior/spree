@@ -113,11 +113,6 @@ describe('carts', () => {
   });
 
   describe('fulfillments', () => {
-    it('lists fulfillments', async () => {
-      const result = await client.carts.fulfillments.list('cart_1', opts);
-      expect(result.data).toBeDefined();
-    });
-
     it('selects a delivery rate', async () => {
       const result = await client.carts.fulfillments.update(
         'cart_1',

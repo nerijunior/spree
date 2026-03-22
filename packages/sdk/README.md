@@ -270,9 +270,7 @@ await client.carts.couponCodes.remove('cart_xxx', 'SAVE20', options);
 ```typescript
 const options = { spreeToken: cart.token };
 
-// List fulfillments for the cart
-const fulfillments = await client.carts.fulfillments.list('cart_xxx', options);
-
+// Fulfillments are included in the cart response.
 // Select a delivery rate
 await client.carts.fulfillments.update('cart_xxx', fulfillmentId, {
   selected_delivery_rate_id: 'rate_xxx',
@@ -551,7 +549,7 @@ The SDK uses a resource builder pattern for nested resources:
 |-----------------|-----------------|-------------------|
 | `carts` | `items` | `create`, `update`, `delete` |
 | `carts` | `couponCodes` | `apply`, `remove` |
-| `carts` | `fulfillments` | `list`, `update` |
+| `carts` | `fulfillments` | `update` |
 | `carts` | `payments` | `create` |
 | `carts` | `paymentSessions` | `create`, `get`, `update`, `complete` |
 | `carts` | `storeCredits` | `apply`, `remove` |

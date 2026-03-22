@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidateTag } from 'next/cache';
-import type { Cart, Order, Fulfillment, CreateCartParams, UpdateCartParams, ListResponse } from '@spree/sdk';
+import type { Cart, Order, CreateCartParams, UpdateCartParams } from '@spree/sdk';
 import { getClient } from '../config';
 import {
   getCartToken, getCartId,
@@ -166,15 +166,6 @@ export async function updateCart(
   const result = await getClient().carts.update(cartId, params, options);
   revalidateTag('checkout');
   return result;
-}
-
-/**
- * Get fulfillments with delivery rates for the current cart.
- */
-export async function getFulfillments(): Promise<ListResponse<Fulfillment>> {
-  const options = await getCartOptions();
-  const cartId = await requireCartId();
-  return getClient().carts.fulfillments.list(cartId, options);
 }
 
 /**

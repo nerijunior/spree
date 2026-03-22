@@ -9,37 +9,6 @@ RSpec.describe 'Cart Fulfillments API', type: :request, swagger_doc: 'api-refere
   let!(:fulfillment) { order.shipments.first }
   let(:cart_id) { order.prefixed_id }
 
-  path '/api/v3/store/carts/{cart_id}/fulfillments' do
-    get 'List fulfillments' do
-      tags 'Carts'
-      produces 'application/json'
-      security [api_key: [], bearer_auth: []]
-      description 'Returns all fulfillments with delivery rates for the cart.'
-
-      sdk_example <<~JS
-        const fulfillments = await client.carts.fulfillments.list('cart_abc123', {
-          bearerToken: '<token>',
-        })
-      JS
-
-      parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
-      parameter name: 'Authorization', in: :header, type: :string, required: false
-      parameter name: :cart_id, in: :path, type: :string, required: true, description: 'Cart prefixed ID (e.g., cart_abc123)'
-      parameter name: 'x-spree-token', in: :header, type: :string, required: false, description: 'Order token for guest access'
-
-      response '200', 'fulfillments found' do
-        let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { "Bearer #{jwt_token}" }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['data']).to be_an(Array)
-          expect(data['data'].size).to be >= 1
-        end
-      end
-    end
-  end
-
   path '/api/v3/store/carts/{cart_id}/fulfillments/{id}' do
     patch 'Select delivery rate for fulfillment' do
       tags 'Carts'

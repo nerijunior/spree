@@ -19,41 +19,6 @@ RSpec.describe Spree::Api::V3::Store::Carts::FulfillmentsController, type: :cont
     request.headers['Authorization'] = "Bearer #{jwt_token}"
   end
 
-  describe 'GET #index' do
-    it 'returns a list of fulfillments for the cart' do
-      get :index, params: { cart_id: order.prefixed_id }
-
-      expect(response).to have_http_status(:ok)
-      expect(json_response['data'].size).to eq(order.shipments.count)
-      expect(json_response['data'].first['id']).to eq(fulfillment.prefixed_id)
-    end
-
-    context 'with spree token (guest)' do
-      let(:guest_order) do
-        create(:order_with_line_items, user: nil, store: store, state: 'delivery').tap do |o|
-          o.create_proposed_shipments
-          o.reload
-        end
-      end
-
-      before { request.headers['Authorization'] = nil }
-
-      it 'returns fulfillments with valid spree token' do
-        request.headers['x-spree-token'] = guest_order.token
-        get :index, params: { cart_id: guest_order.prefixed_id }
-
-        expect(response).to have_http_status(:ok)
-        expect(json_response['data']).to be_present
-      end
-
-      it 'returns forbidden without spree token' do
-        get :index, params: { cart_id: guest_order.prefixed_id }
-
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-  end
-
   describe 'PATCH #update' do
     context 'when selecting a different delivery rate' do
       let(:cheaper_shipping_method) { create(:shipping_method, name: 'Cheap Shipping') }

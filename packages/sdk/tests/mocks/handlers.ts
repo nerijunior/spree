@@ -252,10 +252,6 @@ export const handlers = [
   ),
 
   // Carts > Fulfillments
-  http.get(`${API_PREFIX}/carts/:cartId/fulfillments`, () =>
-    HttpResponse.json({ data: [], meta: { count: 0 } })
-  ),
-
   http.patch(`${API_PREFIX}/carts/:cartId/fulfillments/:id`, () =>
     HttpResponse.json(fixtures.cart)
   ),

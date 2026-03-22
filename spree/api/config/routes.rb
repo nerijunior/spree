@@ -39,7 +39,7 @@ Spree::Core::Engine.add_routes do
           end
           resources :items, only: [:create, :update, :destroy], controller: 'carts/items'
           resources :coupon_codes, only: [:create, :destroy], controller: 'carts/coupon_codes'
-          resources :fulfillments, only: [:index, :update], controller: 'carts/fulfillments'
+          resources :fulfillments, only: [:update], controller: 'carts/fulfillments'
           resources :payments, only: [:create], controller: 'carts/payments'
           resources :payment_sessions, only: [:create, :show, :update], controller: 'carts/payment_sessions' do
             member do
