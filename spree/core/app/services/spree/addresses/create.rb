@@ -8,8 +8,8 @@ module Spree
 
       def call(address_params: {}, user: nil, **opts)
         order = opts[:order]
-        default_billing = opts.fetch(:default_billing, false)
-        default_shipping = opts.fetch(:default_shipping, false)
+        default_billing = address_params.key?(:is_default_billing) ? address_params.delete(:is_default_billing) : opts.fetch(:default_billing, false)
+        default_shipping = address_params.key?(:is_default_shipping) ? address_params.delete(:is_default_shipping) : opts.fetch(:default_shipping, false)
 
         address_params = fill_country_and_state_ids(address_params)
 

@@ -20,7 +20,6 @@ export {
   clearCart,
   associateCart,
   updateCart,
-  getFulfillments,
   selectDeliveryRate,
   applyCoupon,
   removeCoupon,

@@ -113,11 +113,6 @@ describe('carts', () => {
   });
 
   describe('fulfillments', () => {
-    it('lists fulfillments', async () => {
-      const result = await client.carts.fulfillments.list('cart_1', opts);
-      expect(result.data).toBeDefined();
-    });
-
     it('selects a delivery rate', async () => {
       const result = await client.carts.fulfillments.update(
         'cart_1',
@@ -126,13 +121,6 @@ describe('carts', () => {
         opts
       );
       expect(result.id).toBe('cart_1');
-    });
-  });
-
-  describe('paymentMethods', () => {
-    it('lists payment methods', async () => {
-      const result = await client.carts.paymentMethods.list('cart_1', opts);
-      expect(result.data).toBeDefined();
     });
   });
 

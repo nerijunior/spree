@@ -9,40 +9,6 @@ RSpec.describe 'Cart Payments API', type: :request, swagger_doc: 'api-reference/
   let(:cart_id) { order.prefixed_id }
 
   path '/api/v3/store/carts/{cart_id}/payments' do
-    get 'List payments' do
-      tags 'Carts'
-      produces 'application/json'
-      security [api_key: [], bearer_auth: []]
-      description 'Returns all payments for the cart.'
-
-      sdk_example <<~JS
-        const payments = await client.carts.payments.list('cart_abc123', {
-          bearerToken: '<token>',
-        })
-      JS
-
-      parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
-      parameter name: 'Authorization', in: :header, type: :string, required: false
-      parameter name: :cart_id, in: :path, type: :string, required: true, description: 'Cart prefixed ID (e.g., cart_abc123)'
-      parameter name: 'x-spree-token', in: :header, type: :string, required: false
-
-      response '200', 'payments listed' do
-        let!(:payment) do
-          pm = create(:check_payment_method, stores: [store])
-          create(:payment, order: order, payment_method: pm, amount: order.total, state: 'checkout')
-        end
-        let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { "Bearer #{jwt_token}" }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['data'].size).to eq(1)
-          expect(data['data'][0]['id']).to eq(payment.prefixed_id)
-          expect(data['meta']['count']).to eq(1)
-        end
-      end
-    end
-
     post 'Create payment' do
       let(:check_method) { create(:check_payment_method, stores: [store]) }
 

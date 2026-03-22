@@ -68,25 +68,14 @@ RSpec.configure do |config|
         }
       ],
       tags: [
-        { name: 'Authentication', description: 'Customer authentication and registration' },
-        { name: 'Store', description: 'Store information and settings' },
-        { name: 'Product Catalog', description: 'Products, taxonomies, and categories' },
-        { name: 'Internationalization', description: 'Countries, currencies, and locales available in the store' },
-        { name: 'Cart', description: 'Shopping cart management' },
-        { name: 'Checkout', description: 'Checkout flow and order updates' },
+        { name: 'Authentication', description: 'Customer authentication (login, logout, token refresh)' },
+        { name: 'Product Catalog', description: 'Products and categories' },
+        { name: 'Carts', description: 'Shopping cart management' },
         { name: 'Orders', description: 'Order lookup' },
         { name: 'Customers', description: 'Customer account, addresses, saved payment methods, and order history' },
+        { name: 'Markets', description: 'Markets, countries, currencies, and locales' },
         { name: 'Wishlists', description: 'Customer wishlists' },
-        { name: 'Digitals', description: 'Digital product downloads' },
-        { name: 'Markets', description: 'Market information and resolution' }
-      ],
-      'x-tagGroups': [
-        { name: 'Store', tags: %w[Store Internationalization Markets] },
-        { name: 'Catalog', tags: ['Product Catalog'] },
-        { name: 'Cart', tags: ['Cart'] },
-        { name: 'Checkout', tags: ['Checkout'] },
-        { name: 'Orders', tags: ['Orders'] },
-        { name: 'Customer', tags: %w[Authentication Customers Wishlists Digitals] }
+        { name: 'Digitals', description: 'Digital product downloads' }
       ],
       components: {
         securitySchemes: {

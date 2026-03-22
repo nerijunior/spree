@@ -5,9 +5,9 @@ module Spree
         module Customer
           class AddressesController < ResourceController
             prepend_before_action :require_authentication!
-            before_action :set_resource, only: [:show, :update, :destroy, :mark_as_default]
+            before_action :set_resource, only: [:show, :update, :destroy]
 
-            # POST /api/v3/store/customer/addresses
+            # POST /api/v3/store/customers/me/addresses
             def create
               result = Spree.address_create_service.call(
                 address_params: permitted_params,
@@ -21,25 +21,7 @@ module Spree
               end
             end
 
-            # PATCH /api/v3/store/customer/addresses/:id/mark_as_default
-            def mark_as_default
-              kind = params[:kind].to_s
-
-              unless %w[billing shipping].include?(kind)
-                return render_error(
-                  code: ERROR_CODES[:invalid_request],
-                  message: 'kind must be billing or shipping',
-                  status: :unprocessable_content
-                )
-              end
-
-              attribute = kind == 'billing' ? :bill_address_id : :ship_address_id
-              current_user.update!(attribute => @resource.id)
-
-              render json: serialize_resource(@resource.reload)
-            end
-
-            # PATCH /api/v3/store/customer/addresses/:id
+            # PATCH /api/v3/store/customers/me/addresses/:id
             def update
               result = Spree.address_update_service.call(
                 address: @resource,
@@ -74,7 +56,8 @@ module Spree
             def permitted_params
               params.permit(
                 :first_name, :last_name, :address1, :address2, :city,
-                :postal_code, :phone, :company, :country_iso, :state_abbr, :state_name
+                :postal_code, :phone, :company, :country_iso, :state_abbr, :state_name,
+                :is_default_billing, :is_default_shipping
               )
             end
           end

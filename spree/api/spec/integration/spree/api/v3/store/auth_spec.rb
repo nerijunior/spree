@@ -124,4 +124,48 @@ RSpec.describe 'Authentication API', type: :request, swagger_doc: 'api-reference
       end
     end
   end
+
+  path '/api/v3/store/auth/logout' do
+    post 'Logout' do
+      tags 'Authentication'
+      consumes 'application/json'
+      produces 'application/json'
+      security [api_key: [], bearer_auth: []]
+      description 'Revokes the refresh token, effectively logging the customer out.'
+
+      sdk_example <<~JS
+        await client.auth.logout({
+          refresh_token: 'rt_xxx',
+        })
+      JS
+
+      parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
+      parameter name: 'Authorization', in: :header, type: :string, required: true
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        properties: {
+          refresh_token: { type: :string, description: 'Refresh token to revoke' }
+        }
+      }
+
+      response '204', 'logout successful' do
+        let(:'x-spree-api-key') { api_key.token }
+        let(:'Authorization') { "Bearer #{jwt_token}" }
+        let(:refresh_token_record) { Spree::RefreshToken.create_for(existing_user) }
+        let(:body) { { refresh_token: refresh_token_record.token } }
+
+        run_test! do
+          expect(Spree::RefreshToken.find_by(token: refresh_token_record.token)).to be_nil
+        end
+      end
+
+      response '204', 'logout without refresh token (no-op)' do
+        let(:'x-spree-api-key') { api_key.token }
+        let(:'Authorization') { "Bearer #{jwt_token}" }
+        let(:body) { {} }
+
+        run_test!
+      end
+    end
+  end
 end

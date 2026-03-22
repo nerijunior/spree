@@ -9,7 +9,7 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
   let!(:state) { create(:state, country: country) }
   let!(:address) { create(:address, user: user, country: country, state: state) }
 
-  path '/api/v3/store/customer/addresses' do
+  path '/api/v3/store/customers/me/addresses' do
     get 'List customer addresses' do
       tags 'Customers'
       produces 'application/json'
@@ -92,7 +92,9 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
           company: { type: :string, example: 'Acme Inc' },
           country_iso: { type: :string, example: 'US', description: 'ISO 3166-1 alpha-2 country code (e.g., "US", "DE")' },
           state_abbr: { type: :string, example: 'NY', description: 'ISO 3166-2 subdivision code without country prefix (e.g., "CA", "NY")' },
-          state_name: { type: :string, example: 'New York', description: 'State name - for countries without predefined states' }
+          state_name: { type: :string, example: 'New York', description: 'State name - for countries without predefined states' },
+          is_default_billing: { type: :boolean, example: true, description: 'Set as default billing address' },
+          is_default_shipping: { type: :boolean, example: true, description: 'Set as default shipping address' }
         },
         required: %w[first_name last_name address1 city postal_code country_iso]
       }
@@ -136,7 +138,7 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
     end
   end
 
-  path '/api/v3/store/customer/addresses/{id}' do
+  path '/api/v3/store/customers/me/addresses/{id}' do
     get 'Get an address' do
       tags 'Customers'
       produces 'application/json'
@@ -198,7 +200,9 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
           first_name: { type: :string, example: 'John' },
           last_name: { type: :string, example: 'Doe' },
           address1: { type: :string, example: '456 Oak Ave' },
-          city: { type: :string, example: 'Los Angeles' }
+          city: { type: :string, example: 'Los Angeles' },
+          is_default_billing: { type: :boolean, example: true, description: 'Set as default billing address' },
+          is_default_shipping: { type: :boolean, example: true, description: 'Set as default shipping address' }
         }
       }
 
@@ -252,68 +256,4 @@ RSpec.describe 'Addresses API', type: :request, swagger_doc: 'api-reference/stor
     end
   end
 
-  path '/api/v3/store/customer/addresses/{id}/mark_as_default' do
-    patch 'Mark address as default' do
-      tags 'Customers'
-      consumes 'application/json'
-      produces 'application/json'
-      security [api_key: [], bearer_auth: []]
-      description 'Sets the address as the default billing or shipping address for the customer'
-
-      sdk_example <<~JS
-        const address = await client.customer.addresses.markAsDefault('addr_abc123', 'billing', {
-          bearerToken: '<token>',
-        })
-      JS
-
-      parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
-      parameter name: 'Authorization', in: :header, type: :string, required: true
-      parameter name: :id, in: :path, type: :string, required: true
-      parameter name: :body, in: :body, schema: {
-        type: :object,
-        properties: {
-          kind: { type: :string, enum: %w[billing shipping], example: 'billing',
-                  description: 'Address kind: billing or shipping' }
-        },
-        required: ['kind']
-      }
-
-      response '200', 'address marked as default' do
-        let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:id) { address.to_param }
-        let(:body) { { kind: 'billing' } }
-
-        schema '$ref' => '#/components/schemas/Address'
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['id']).to eq(address.prefixed_id)
-          expect(user.reload.bill_address_id).to eq(address.id)
-        end
-      end
-
-      response '422', 'invalid kind parameter' do
-        let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:id) { address.to_param }
-        let(:body) { { kind: 'invalid' } }
-
-        schema '$ref' => '#/components/schemas/ErrorResponse'
-
-        run_test!
-      end
-
-      response '404', 'address not found' do
-        let(:'x-spree-api-key') { api_key.token }
-        let(:'Authorization') { "Bearer #{jwt_token}" }
-        let(:id) { 'non-existent' }
-        let(:body) { { kind: 'billing' } }
-
-        schema '$ref' => '#/components/schemas/ErrorResponse'
-
-        run_test!
-      end
-    end
-  end
 end

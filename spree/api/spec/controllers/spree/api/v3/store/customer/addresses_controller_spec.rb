@@ -174,63 +174,108 @@ RSpec.describe Spree::Api::V3::Store::Customer::AddressesController, type: :cont
     end
   end
 
-  describe 'PATCH #mark_as_default' do
-    it 'sets address as default billing address' do
-      patch :mark_as_default, params: { id: address.prefixed_id, kind: 'billing' }
+  describe 'is_default_billing / is_default_shipping' do
+    describe 'response serialization' do
+      it 'includes is_default_billing and is_default_shipping in index response' do
+        user.update!(bill_address: address)
 
-      expect(response).to have_http_status(:ok)
-      expect(user.reload.bill_address_id).to eq(address.id)
-    end
+        get :index
 
-    it 'sets address as default shipping address' do
-      patch :mark_as_default, params: { id: address.prefixed_id, kind: 'shipping' }
+        addr = json_response['data'].find { |a| a['id'] == address.prefixed_id }
+        expect(addr['is_default_billing']).to eq(true)
+        expect(addr['is_default_shipping']).to eq(false)
+      end
 
-      expect(response).to have_http_status(:ok)
-      expect(user.reload.ship_address_id).to eq(address.id)
-    end
+      it 'includes is_default_billing and is_default_shipping in show response' do
+        get :show, params: { id: address.prefixed_id }
 
-    it 'returns the address' do
-      patch :mark_as_default, params: { id: address.prefixed_id, kind: 'billing' }
-
-      expect(json_response['id']).to eq(address.prefixed_id)
-    end
-
-    context 'with invalid kind' do
-      it 'returns error' do
-        patch :mark_as_default, params: { id: address.prefixed_id, kind: 'invalid' }
-
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(json_response['error']['code']).to eq('invalid_request')
+        expect(json_response).to have_key('is_default_billing')
+        expect(json_response).to have_key('is_default_shipping')
       end
     end
 
-    context 'with missing kind' do
-      it 'returns error' do
-        patch :mark_as_default, params: { id: address.prefixed_id }
+    describe 'POST #create' do
+      let(:address_params) do
+        {
+          first_name: 'Jane',
+          last_name: 'Smith',
+          address1: '456 Oak Ave',
+          city: 'Chicago',
+          postal_code: '60601',
+          phone: '555-9999',
+          country_iso: country.iso,
+          state_abbr: state.abbr
+        }
+      end
 
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(json_response['error']['code']).to eq('invalid_request')
+      it 'sets default billing on create' do
+        post :create, params: address_params.merge(is_default_billing: true)
+
+        expect(response).to have_http_status(:created)
+        new_address = Spree::Address.find_by_prefix_id(json_response['id'])
+        expect(user.reload.bill_address_id).to eq(new_address.id)
+        expect(json_response['is_default_billing']).to eq(true)
+      end
+
+      it 'sets default shipping on create' do
+        post :create, params: address_params.merge(is_default_shipping: true)
+
+        expect(response).to have_http_status(:created)
+        new_address = Spree::Address.find_by_prefix_id(json_response['id'])
+        expect(user.reload.ship_address_id).to eq(new_address.id)
+        expect(json_response['is_default_shipping']).to eq(true)
+      end
+
+      it 'sets both defaults on create' do
+        post :create, params: address_params.merge(is_default_billing: true, is_default_shipping: true)
+
+        expect(response).to have_http_status(:created)
+        new_address = Spree::Address.find_by_prefix_id(json_response['id'])
+        expect(user.reload.bill_address_id).to eq(new_address.id)
+        expect(user.reload.ship_address_id).to eq(new_address.id)
       end
     end
 
-    context 'when address belongs to another user' do
-      let(:other_user) { create(:user) }
-      let(:other_address) { create(:address, user: other_user) }
+    describe 'PATCH #update' do
+      it 'sets address as default billing' do
+        patch :update, params: { id: address.prefixed_id, is_default_billing: true }
 
-      it 'returns not found' do
-        patch :mark_as_default, params: { id: other_address.prefixed_id, kind: 'billing' }
-
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
+        expect(user.reload.bill_address_id).to eq(address.id)
+        expect(json_response['is_default_billing']).to eq(true)
       end
-    end
 
-    context 'without authentication' do
-      before { request.headers['Authorization'] = nil }
+      it 'sets address as default shipping' do
+        patch :update, params: { id: address.prefixed_id, is_default_shipping: true }
 
-      it 'returns unauthorized' do
-        patch :mark_as_default, params: { id: address.prefixed_id, kind: 'billing' }
+        expect(response).to have_http_status(:ok)
+        expect(user.reload.ship_address_id).to eq(address.id)
+        expect(json_response['is_default_shipping']).to eq(true)
+      end
 
-        expect(response).to have_http_status(:unauthorized)
+      it 'sets both defaults at once' do
+        patch :update, params: { id: address.prefixed_id, is_default_billing: true, is_default_shipping: true }
+
+        expect(response).to have_http_status(:ok)
+        expect(user.reload.bill_address_id).to eq(address.id)
+        expect(user.reload.ship_address_id).to eq(address.id)
+      end
+
+      it 'sets default and updates fields in one request' do
+        patch :update, params: { id: address.prefixed_id, is_default_billing: true, city: 'Boston' }
+
+        expect(response).to have_http_status(:ok)
+        expect(user.reload.bill_address_id).to eq(address.id)
+        expect(address.reload.city).to eq('Boston')
+      end
+
+      it 'does not change defaults when not passed' do
+        user.update!(bill_address: address)
+
+        patch :update, params: { id: address.prefixed_id, city: 'Denver' }
+
+        expect(response).to have_http_status(:ok)
+        expect(user.reload.bill_address_id).to eq(address.id)
       end
     end
   end

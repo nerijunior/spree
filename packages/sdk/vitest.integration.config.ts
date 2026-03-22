@@ -10,12 +10,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    exclude: ['tests/integration/**', 'node_modules/**'],
-    setupFiles: ['./tests/setup.ts'],
-    coverage: {
-      provider: 'v8',
-      include: ['src/**/*.ts'],
-      exclude: ['src/types/**'],
-    },
+    include: ['tests/integration/**/*.test.ts'],
+    globalSetup: ['./tests/integration/global-setup.ts'],
+    testTimeout: 15_000,
+    // Run sequentially — tests share server + SQLite database
+    fileParallelism: false,
   },
 });

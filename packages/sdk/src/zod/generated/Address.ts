@@ -17,6 +17,8 @@ export const AddressSchema = z.object({
   state_text: z.string().nullable(),
   state_abbr: z.string().nullable(),
   quick_checkout: z.boolean(),
+  is_default_billing: z.boolean(),
+  is_default_shipping: z.boolean(),
   state_name: z.string().nullable(),
 });
 

@@ -8,8 +8,8 @@ module Spree
 
       def call(address:, address_params:, **opts)
         order = opts[:order]
-        default_billing = opts.fetch(:default_billing, false)
-        default_shipping = opts.fetch(:default_shipping, false)
+        default_billing = address_params.key?(:is_default_billing) ? address_params.delete(:is_default_billing) : opts.fetch(:default_billing, false)
+        default_shipping = address_params.key?(:is_default_shipping) ? address_params.delete(:is_default_shipping) : opts.fetch(:default_shipping, false)
         address_changes_except = opts.fetch(:address_changes_except, [])
         create_new_address_on_update = opts.fetch(:create_new_address_on_update, false)
         Spree::Deprecation.warn('Spree::Addresses::Update create_new_address_on_update parameter is deprecated and will be removed in Spree 5.5.') if create_new_address_on_update

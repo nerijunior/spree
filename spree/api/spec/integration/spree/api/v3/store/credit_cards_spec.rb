@@ -7,7 +7,7 @@ RSpec.describe 'Credit Cards API', type: :request, swagger_doc: 'api-reference/s
 
   let!(:credit_card) { create(:credit_card, user: user) }
 
-  path '/api/v3/store/customer/credit_cards' do
+  path '/api/v3/store/customers/me/credit_cards' do
     get 'List saved credit cards' do
       tags 'Customers'
       produces 'application/json'
@@ -55,7 +55,7 @@ RSpec.describe 'Credit Cards API', type: :request, swagger_doc: 'api-reference/s
     end
   end
 
-  path '/api/v3/store/customer/credit_cards/{id}' do
+  path '/api/v3/store/customers/me/credit_cards/{id}' do
     get 'Get a credit card' do
       tags 'Customers'
       produces 'application/json'

@@ -252,59 +252,11 @@ export const handlers = [
   ),
 
   // Carts > Fulfillments
-  http.get(`${API_PREFIX}/carts/:cartId/fulfillments`, () =>
-    HttpResponse.json({ data: [], meta: { count: 0 } })
-  ),
-
   http.patch(`${API_PREFIX}/carts/:cartId/fulfillments/:id`, () =>
     HttpResponse.json(fixtures.cart)
   ),
 
-  // Carts > Payment Methods
-  http.get(`${API_PREFIX}/carts/:cartId/payment_methods`, () =>
-    HttpResponse.json({ data: [], meta: { count: 0 } })
-  ),
-
   // Carts > Payments
-  http.get(`${API_PREFIX}/carts/:cartId/payments`, () =>
-    HttpResponse.json({
-      data: [{
-        id: 'py_1',
-        payment_method_id: 'pm_1',
-        state: 'checkout',
-        response_code: null,
-        number: 'P1234',
-        amount: '19.99',
-        display_amount: '$19.99',
-        source_type: 'credit_card',
-        source_id: 'card_1',
-        source: { id: 'card_1', brand: 'visa', last4: '4242', name: 'Test User', month: '12', year: '2028' },
-        created_at: '2026-02-17T00:00:00.000Z',
-        updated_at: '2026-02-17T00:00:00.000Z',
-        payment_method: { id: 'pm_1', name: 'Credit Card', description: null, type: 'Spree::Gateway::Bogus', session_required: true },
-      }],
-      meta: { count: 1 },
-    })
-  ),
-
-  http.get(`${API_PREFIX}/carts/:cartId/payments/:id`, () =>
-    HttpResponse.json({
-      id: 'py_1',
-      payment_method_id: 'pm_1',
-      state: 'checkout',
-      response_code: null,
-      number: 'P1234',
-      amount: '19.99',
-      display_amount: '$19.99',
-      source_type: 'credit_card',
-      source_id: 'card_1',
-      source: { id: 'card_1', brand: 'visa', last4: '4242', name: 'Test User', month: '12', year: '2028' },
-      created_at: '2026-02-17T00:00:00.000Z',
-      updated_at: '2026-02-17T00:00:00.000Z',
-      payment_method: { id: 'pm_1', name: 'Credit Card', description: null, type: 'Spree::Gateway::Bogus', session_required: true },
-    })
-  ),
-
   http.post(`${API_PREFIX}/carts/:cartId/payments`, () =>
     HttpResponse.json({
       id: 'py_2',
@@ -411,68 +363,68 @@ export const handlers = [
   ),
 
   // Customer
-  http.get(`${API_PREFIX}/customer`, () =>
+  http.get(`${API_PREFIX}/customers/me`, () =>
     HttpResponse.json(fixtures.user)
   ),
 
-  http.patch(`${API_PREFIX}/customer`, () =>
+  http.patch(`${API_PREFIX}/customers/me`, () =>
     HttpResponse.json({ ...fixtures.user, first_name: 'Updated' })
   ),
 
   // Customer > Orders
-  http.get(`${API_PREFIX}/customer/orders`, () =>
+  http.get(`${API_PREFIX}/customers/me/orders`, () =>
     HttpResponse.json({ data: [fixtures.order], meta: paginationMeta })
   ),
 
-  http.get(`${API_PREFIX}/customer/orders/:id`, () =>
+  http.get(`${API_PREFIX}/customers/me/orders/:id`, () =>
     HttpResponse.json(fixtures.order)
   ),
 
   // Customer > Addresses
-  http.get(`${API_PREFIX}/customer/addresses`, () =>
+  http.get(`${API_PREFIX}/customers/me/addresses`, () =>
     HttpResponse.json({ data: [fixtures.address], meta: paginationMeta })
   ),
 
-  http.get(`${API_PREFIX}/customer/addresses/:id`, () =>
+  http.get(`${API_PREFIX}/customers/me/addresses/:id`, () =>
     HttpResponse.json(fixtures.address)
   ),
 
-  http.post(`${API_PREFIX}/customer/addresses`, () =>
+  http.post(`${API_PREFIX}/customers/me/addresses`, () =>
     HttpResponse.json(fixtures.address)
   ),
 
-  http.patch(`${API_PREFIX}/customer/addresses/:id`, () =>
+  http.patch(`${API_PREFIX}/customers/me/addresses/:id`, () =>
     HttpResponse.json({ ...fixtures.address, city: 'Updated City' })
   ),
 
-  http.delete(`${API_PREFIX}/customer/addresses/:id`, () =>
+  http.delete(`${API_PREFIX}/customers/me/addresses/:id`, () =>
     new HttpResponse(null, { status: 204 })
   ),
 
   // Customer > Credit Cards
-  http.get(`${API_PREFIX}/customer/credit_cards`, () =>
+  http.get(`${API_PREFIX}/customers/me/credit_cards`, () =>
     HttpResponse.json({ data: [], meta: paginationMeta })
   ),
 
-  http.get(`${API_PREFIX}/customer/credit_cards/:id`, () =>
+  http.get(`${API_PREFIX}/customers/me/credit_cards/:id`, () =>
     HttpResponse.json({ id: 'cc_1', last4: '1234' })
   ),
 
-  http.delete(`${API_PREFIX}/customer/credit_cards/:id`, () =>
+  http.delete(`${API_PREFIX}/customers/me/credit_cards/:id`, () =>
     new HttpResponse(null, { status: 204 })
   ),
 
   // Customer > Gift Cards
-  http.get(`${API_PREFIX}/customer/gift_cards`, () =>
+  http.get(`${API_PREFIX}/customers/me/gift_cards`, () =>
     HttpResponse.json({ data: [], meta: paginationMeta })
   ),
 
-  http.get(`${API_PREFIX}/customer/gift_cards/:id`, () =>
+  http.get(`${API_PREFIX}/customers/me/gift_cards/:id`, () =>
     HttpResponse.json({ id: 'gc_1', code: 'GIFT123', balance: '50.00' })
   ),
 
   // Customer > Payment Setup Sessions
-  http.post(`${API_PREFIX}/customer/payment_setup_sessions`, () =>
+  http.post(`${API_PREFIX}/customers/me/payment_setup_sessions`, () =>
     HttpResponse.json({
       id: 'pss_1',
       status: 'pending',
@@ -489,7 +441,7 @@ export const handlers = [
     }, { status: 201 })
   ),
 
-  http.get(`${API_PREFIX}/customer/payment_setup_sessions/:id`, () =>
+  http.get(`${API_PREFIX}/customers/me/payment_setup_sessions/:id`, () =>
     HttpResponse.json({
       id: 'pss_1',
       status: 'pending',
@@ -506,7 +458,7 @@ export const handlers = [
     })
   ),
 
-  http.patch(`${API_PREFIX}/customer/payment_setup_sessions/:id/complete`, () =>
+  http.patch(`${API_PREFIX}/customers/me/payment_setup_sessions/:id/complete`, () =>
     HttpResponse.json({
       id: 'pss_1',
       status: 'completed',
@@ -524,14 +476,14 @@ export const handlers = [
   ),
 
   // Customer > Password Resets
-  http.post(`${API_PREFIX}/customer/password_resets`, () =>
+  http.post(`${API_PREFIX}/customers/me/password_resets`, () =>
     HttpResponse.json(
       { message: 'If an account exists for that email, password reset instructions have been sent.' },
       { status: 202 }
     )
   ),
 
-  http.patch(`${API_PREFIX}/customer/password_resets/:token`, () =>
+  http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, () =>
     HttpResponse.json({ token: 'new-jwt-token', user: fixtures.user })
   ),
 
