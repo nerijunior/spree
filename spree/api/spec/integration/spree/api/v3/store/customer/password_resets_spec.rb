@@ -7,7 +7,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
 
   let(:existing_user) { create(:user, email: 'customer@example.com', password: 'password123') }
 
-  path '/api/v3/store/customer/password_resets' do
+  path '/api/v3/store/customers/me/password_resets' do
     post 'Request a password reset' do
       tags 'Password Resets'
       consumes 'application/json'
@@ -73,7 +73,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
     end
   end
 
-  path '/api/v3/store/customer/password_resets/{token}' do
+  path '/api/v3/store/customers/me/password_resets/{token}' do
     patch 'Reset password with token' do
       tags 'Password Resets'
       consumes 'application/json'
