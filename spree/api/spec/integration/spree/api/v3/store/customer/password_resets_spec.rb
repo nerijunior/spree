@@ -9,7 +9,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
 
   path '/api/v3/store/customers/me/password_resets' do
     post 'Request a password reset' do
-      tags 'Password Resets'
+      tags 'Authentication'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: []]
@@ -75,7 +75,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
 
   path '/api/v3/store/customers/me/password_resets/{token}' do
     patch 'Reset password with token' do
-      tags 'Password Resets'
+      tags 'Authentication'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: []]

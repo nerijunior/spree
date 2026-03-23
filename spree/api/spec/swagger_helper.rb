@@ -77,6 +77,16 @@ RSpec.configure do |config|
         { name: 'Wishlists', description: 'Customer wishlists' },
         { name: 'Digitals', description: 'Digital product downloads' }
       ],
+      'x-tagGroups': [
+        { name: 'Authentication', tags: ['Authentication'] },
+        { name: 'Product Catalog', tags: ['Product Catalog'] },
+        { name: 'Carts', tags: ['Carts'] },
+        { name: 'Orders', tags: ['Orders'] },
+        { name: 'Customers', tags: ['Customers'] },
+        { name: 'Markets', tags: ['Markets'] },
+        { name: 'Wishlists', tags: ['Wishlists'] },
+        { name: 'Digitals', tags: ['Digitals'] }
+      ],
       components: {
         securitySchemes: {
           api_key: {
