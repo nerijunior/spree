@@ -58,3 +58,4 @@ server/
 packages/*/package-lock.json
 .turbo
 packages/*/dist
+.claude/worktrees

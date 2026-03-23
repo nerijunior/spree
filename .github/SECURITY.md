@@ -6,8 +6,8 @@ The following versions are actively maintained and receive security patches.
 
 | Version | End of life |
 | ------- | ------------ |
-| 5.x     | 26.03.2028  |
-| 4.10    | 06.09.2027  |
+| 5.x     | 26.03.2027  |
+| 4.10    | 06.09.2026  |
 
 Versions that are not listed above will not receive any security patches or fixes.
 

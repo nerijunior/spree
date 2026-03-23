@@ -40,8 +40,8 @@ Each SSO integration needs to be scoped individually. The integration plan depen
   - Each provider has unique configuration details, such as OAuth endpoints, certificates, tenant IDs, and federation settings. You’ll need to gather these to complete integration.
 - **Existing or planned Spree customizations**
   - Custom authentication flows, extended user models, or unique admin permissions may affect how SSO is integrated. These should be reviewed before implementation.
-- **Spree and Ruby on Rails versions**
-  - Compatibility matters. Integration strategies can differ depending on whether you’re on the latest Spree release and which Rails version your project runs on.
+- **Spree version**
+  - Compatibility matters. Integration strategies can differ depending on whether you’re on the latest Spree release.
 - **Use case: single tenant vs. multi-tenant**
   - Single-tenant stores usually need straightforward workforce SSO. Multi-tenant or SaaS-style deployments may require isolated tenant directories and more complex provisioning.
 - **Identity governance requirements** (role-based access, just-in-time provisioning)
