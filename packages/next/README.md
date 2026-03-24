@@ -145,8 +145,10 @@ import {
   getCheckout,
   updateCheckout,
   selectDeliveryRate,
-  applyCoupon,
-  removeCoupon,
+  applyDiscountCode,
+  removeDiscountCode,
+  applyGiftCard,
+  removeGiftCard,
   complete,
 } from '@spree/next';
 
@@ -155,8 +157,10 @@ const checkout = await getCheckout();
 // checkout.fulfillments
 await updateCheckout({ shipping_address: { ... }, billing_address: { ... } });
 await selectDeliveryRate(fulfillmentId, rateId);
-await applyCoupon('SAVE20');
-await removeCoupon('SAVE20');
+await applyDiscountCode('SAVE20');
+await removeDiscountCode('SAVE20');
+await applyGiftCard('GC-ABCD-1234');
+await removeGiftCard('gc_abc123'); // ID from cart.gift_card.id
 await complete();
 ```
 

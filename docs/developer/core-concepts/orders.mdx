@@ -239,24 +239,24 @@ Apply or remove promotional coupon codes during checkout:
 <CodeGroup>
 
 ```typescript SDK
-// Apply a coupon
-await client.carts.couponCodes.apply(cartId, 'SAVE20')
+// Apply a discount code
+await client.carts.discountCodes.apply(cartId, 'SAVE20')
 
-// Remove a coupon
-await client.carts.couponCodes.remove(cartId, 'SAVE20')
+// Remove a discount code
+await client.carts.discountCodes.remove(cartId, 'SAVE20')
 ```
 
 ```bash cURL
-# Apply a coupon
-curl -X POST 'https://api.mystore.com/api/v3/store/carts/cart_xxx/coupon_codes' \
-  -H 'Authorization: Bearer spree_pk_xxx' \
+# Apply a discount code
+curl -X POST 'https://api.mystore.com/api/v3/store/carts/cart_xxx/discount_codes' \
+  -H 'X-Spree-Api-Key: pk_xxx' \
   -H 'X-Spree-Token: abc123' \
   -H 'Content-Type: application/json' \
   -d '{ "code": "SAVE20" }'
 
-# Remove a coupon
-curl -X DELETE 'https://api.mystore.com/api/v3/store/carts/cart_xxx/coupon_codes/SAVE20' \
-  -H 'Authorization: Bearer spree_pk_xxx' \
+# Remove a discount code
+curl -X DELETE 'https://api.mystore.com/api/v3/store/carts/cart_xxx/discount_codes/SAVE20' \
+  -H 'X-Spree-Api-Key: pk_xxx' \
   -H 'X-Spree-Token: abc123'
 ```
 

@@ -20,7 +20,7 @@ Current plans:
 - `6.0-stock-reservations.md` — Time-limited stock reservations during checkout
 - `6.0-typed-stock-movements.md` — Replace generic StockMovement with typed kinds + concrete FKs
 - `6.0-normalize-state-to-status.md` — Rename state → status on Payment, Shipment, InventoryUnit, ReturnAuthorization, GiftCard
-- `6.0-fulfillment-and-delivery.md` — Shipment→Fulfillment, ShippingMethod→DeliveryMethod, drop ShippingCategory, FulfillmentProvider strategy
+- `6.0-fulfillment-and-delivery.md` — Shipment→Fulfillment, ShippingMethod→DeliveryMethod, drop ShippingCategory, FulfillmentProvider strategy, pickup (merchant StockLocation) + pickup_point (third-party PickupPointProvider)
 - `6.0-returns-exchanges-claims.md` — First-class Return, Exchange, Claim models replacing ReturnAuthorization/Reimbursement chain
 - `6.0-channels-catalogs-b2b.md` — Channel, Catalog, ProductListing (replaces StoreProduct), Company/CompanyLocation/CompanyContact for B2B
 - `6.0-platform-auth.md` — Drop Devise, own auth stack, User→Customer/Staff rename
@@ -30,6 +30,7 @@ Current plans:
 - `6.0-rich-text-descriptions.md` — Drop ActionText storage, store HTML in text columns, sanitize on write, serve `description` + `description_html` in API
 - `5.4-store-api-naming-standardization.md` — Standardize API naming against industry (address fields, discounts, customer_note, label, brand/last4, etc.)
 - `5.4-6.0-eu-legal-compliance.md` — GDPR (data export/anonymization, consent timestamps), Omnibus (PriceHistory, lowest-in-30-days), Consumer Rights (withdrawal period). Core primitives + enterprise hooks.
+
 
 Completed plans:
 - `5.4-store-api-bridges.md` — Bridge 6.0 naming into 5.4 Store API (implemented, PR #13782)

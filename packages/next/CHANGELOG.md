@@ -1,5 +1,24 @@
 # @spree/next
 
+## 0.16.0
+
+### Breaking Changes
+
+- **Renamed `applyCoupon` / `removeCoupon`** to `applyDiscountCode` / `removeDiscountCode`
+- All cart actions now return `CartResponse` instead of `Cart` (includes `warnings` array)
+
+### New Features
+
+- **`applyGiftCard(code)`** — apply gift card to cart
+- **`removeGiftCard(giftCardId)`** — remove gift card by prefixed ID
+- **Cart warnings** — `CartResponse.warnings` array flags items removed due to stock changes
+
+### Types
+
+- New re-exported types: `CartResponse`, `CartWarning`
+
+Requires `@spree/sdk >= 0.16.0`.
+
 ## 0.15.0
 
 ### Minor Changes

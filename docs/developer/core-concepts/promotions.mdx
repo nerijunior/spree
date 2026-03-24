@@ -279,13 +279,13 @@ Customers apply coupon codes during checkout via the Store API:
 <CodeGroup>
 
 ```typescript SDK
-// Apply a coupon code to the cart
-const cart = await client.carts.couponCodes.apply('cart_abc123', 'SUMMER20', {
+// Apply a discount code to the cart
+const cart = await client.carts.discountCodes.apply('cart_abc123', 'SUMMER20', {
   spreeToken: '<token>',
 })
 
-// Remove a coupon code from the cart
-await client.carts.couponCodes.remove('cart_abc123', 'SUMMER20', {
+// Remove a discount code from the cart
+await client.carts.discountCodes.remove('cart_abc123', 'SUMMER20', {
   spreeToken: '<token>',
 })
 ```

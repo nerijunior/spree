@@ -120,19 +120,21 @@ Checkout functions use the implicit cart resolved from cookies. No `orderId` is 
 import {
   getCheckout,
   updateCheckout,
-  getFulfillments,
   selectDeliveryRate,
-  applyCoupon,
-  removeCoupon,
+  applyDiscountCode,
+  removeDiscountCode,
+  applyGiftCard,
+  removeGiftCard,
   complete,
 } from '@spree/next';
 
 const checkout = await getCheckout();
 await updateCheckout({ shipping_address: { ... }, billing_address: { ... } });
-const fulfillments = await getFulfillments();
 await selectDeliveryRate(fulfillmentId, deliveryRateId);
-await applyCoupon('SAVE20');
-await removeCoupon(promotionId);
+await applyDiscountCode('SAVE20');
+await removeDiscountCode('SAVE20');
+await applyGiftCard('GC-ABCD-1234');
+await removeGiftCard('gc_abc123');
 await complete();
 ```
 
