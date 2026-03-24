@@ -27,6 +27,10 @@ RSpec.describe 'Orders API', type: :request, swagger_doc: 'api-reference/store.y
                 description: 'Order prefixed ID'
       parameter name: 'x-spree-token', in: :header, type: :string, required: false,
                 description: 'Order token for guest access'
+      parameter name: :expand, in: :query, type: :string, required: false,
+                description: 'Comma-separated associations to expand (items, fulfillments, payments, discounts, billing_address, shipping_address, gift_card). Use "none" to skip associations.'
+      parameter name: :fields, in: :query, type: :string, required: false,
+                description: 'Comma-separated list of fields to include (e.g., total,amount_due,item_count). id is always included.'
 
       response '200', 'order found (authenticated)' do
         let(:completed_order) { create(:completed_order_with_totals, store: store, user: user) }
