@@ -7,7 +7,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
 
   let(:existing_user) { create(:user, email: 'customer@example.com', password: 'password123') }
 
-  path '/api/v3/store/customers/me/password_resets' do
+  path '/api/v3/store/password_resets' do
     post 'Request a password reset' do
       tags 'Authentication'
       consumes 'application/json'
@@ -16,7 +16,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
       description 'Sends a password reset email if an account exists for the given email address. Always returns 202 Accepted to prevent email enumeration.'
 
       sdk_example <<~JS
-        await client.customer.passwordResets.create({
+        await client.passwordResets.create({
           email: 'customer@example.com',
           redirect_url: 'https://myshop.com/reset-password',
         })
@@ -73,7 +73,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
     end
   end
 
-  path '/api/v3/store/customers/me/password_resets/{token}' do
+  path '/api/v3/store/password_resets/{token}' do
     patch 'Reset password with token' do
       tags 'Authentication'
       consumes 'application/json'
@@ -82,7 +82,7 @@ RSpec.describe 'Password Resets API', type: :request, swagger_doc: 'api-referenc
       description 'Resets the password using a token received via email. Returns a JWT token on success (auto-login).'
 
       sdk_example <<~JS
-        const auth = await client.customer.passwordResets.update(
+        const auth = await client.passwordResets.update(
           'reset-token-from-email',
           {
             password: 'newsecurepassword',

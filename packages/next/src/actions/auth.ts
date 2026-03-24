@@ -145,7 +145,7 @@ export async function requestPasswordReset(
   email: string,
   redirectUrl?: string
 ): Promise<{ message: string }> {
-  return getClient().customer.passwordResets.create({
+  return getClient().passwordResets.create({
     email,
     ...(redirectUrl && { redirect_url: redirectUrl }),
   });
@@ -161,7 +161,7 @@ export async function resetPassword(
   password_confirmation: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const result = await getClient().customer.passwordResets.update(token, {
+    const result = await getClient().passwordResets.update(token, {
       password,
       password_confirmation,
     });

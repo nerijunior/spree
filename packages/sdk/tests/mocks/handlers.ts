@@ -514,15 +514,15 @@ export const handlers = [
     })
   ),
 
-  // Customer > Password Resets
-  http.post(`${API_PREFIX}/customers/me/password_resets`, () =>
+  // Password Resets
+  http.post(`${API_PREFIX}/password_resets`, () =>
     HttpResponse.json(
       { message: 'If an account exists for that email, password reset instructions have been sent.' },
       { status: 202 }
     )
   ),
 
-  http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, () =>
+  http.patch(`${API_PREFIX}/password_resets/:token`, () =>
     HttpResponse.json({ token: 'new-jwt-token', user: fixtures.user })
   ),
 
