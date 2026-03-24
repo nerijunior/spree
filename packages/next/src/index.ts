@@ -21,8 +21,10 @@ export {
   associateCart,
   updateCart,
   selectDeliveryRate,
-  applyCoupon,
-  removeCoupon,
+  applyDiscountCode,
+  removeDiscountCode,
+  applyGiftCard,
+  removeGiftCard,
   complete,
 } from './actions/cart';
 

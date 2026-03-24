@@ -11,7 +11,7 @@ module Spree
       end
 
       def apply
-        if load_gift_card_code
+        if gift_cards_enabled? && load_gift_card_code
 
           if @gift_card.expired?
             set_error_code :gift_card_expired
@@ -47,7 +47,7 @@ module Spree
       end
 
       def remove(coupon_code)
-        if order.gift_card
+        if gift_cards_enabled? && order.gift_card
           result = order.remove_gift_card
 
           if result.success?
@@ -210,6 +210,13 @@ module Spree
 
       def handle_coupon_code(discount, coupon_code)
         Spree::CouponCode.unused.find_by(promotion_id: discount.source.promotion_id, code: coupon_code)&.apply_order!(order)
+      end
+
+      # Whether the coupon handler should also handle gift card codes.
+      # Defaults to true for backwards compatibility. Pass enable_gift_cards: false
+      # when using the dedicated gift card endpoint.
+      def gift_cards_enabled?
+        options.fetch(:enable_gift_cards, true)
       end
 
       def load_gift_card_code

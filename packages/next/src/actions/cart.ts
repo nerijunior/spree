@@ -189,28 +189,57 @@ export async function selectDeliveryRate(
 }
 
 /**
- * Apply a coupon code to the cart.
+ * Apply a discount code to the cart.
  */
-export async function applyCoupon(
+export async function applyDiscountCode(
   code: string
 ): Promise<Cart> {
   const options = await getCartOptions();
   const cartId = await requireCartId();
-  const result = await getClient().carts.couponCodes.apply(cartId, code, options);
+  const result = await getClient().carts.discountCodes.apply(cartId, code, options);
   revalidateTag('checkout');
   revalidateTag('cart');
   return result;
 }
 
 /**
- * Remove a coupon code from the cart.
+ * Remove a discount code from the cart.
  */
-export async function removeCoupon(
+export async function removeDiscountCode(
   code: string
 ): Promise<Cart> {
   const options = await getCartOptions();
   const cartId = await requireCartId();
-  const result = await getClient().carts.couponCodes.remove(cartId, code, options);
+  const result = await getClient().carts.discountCodes.remove(cartId, code, options);
+  revalidateTag('checkout');
+  revalidateTag('cart');
+  return result;
+}
+
+/**
+ * Apply a gift card to the cart.
+ * Gift cards are treated as a payment method — the cart total stays the same
+ * while `amount_due` is reduced.
+ */
+export async function applyGiftCard(
+  code: string
+): Promise<Cart> {
+  const options = await getCartOptions();
+  const cartId = await requireCartId();
+  const result = await getClient().carts.giftCards.apply(cartId, code, options);
+  revalidateTag('checkout');
+  revalidateTag('cart');
+  return result;
+}
+
+/**
+ * Remove the applied gift card from the cart.
+ * @param giftCardId - Gift card prefixed ID (e.g., 'gc_abc123') from cart.gift_card.id
+ */
+export async function removeGiftCard(giftCardId: string): Promise<Cart> {
+  const options = await getCartOptions();
+  const cartId = await requireCartId();
+  const result = await getClient().carts.giftCards.remove(cartId, giftCardId, options);
   revalidateTag('checkout');
   revalidateTag('cart');
   return result;

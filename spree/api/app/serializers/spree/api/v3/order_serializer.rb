@@ -17,7 +17,9 @@ module Spree
                  store_credit_total: :string, display_store_credit_total: :string,
                  gift_card_total: :string, display_gift_card_total: :string,
                  covered_by_store_credit: :boolean,
-                 total: :string, display_total: :string, completed_at: [:string, nullable: true],
+                 total: :string, display_total: :string,
+                 amount_due: :string, display_amount_due: :string,
+                 completed_at: [:string, nullable: true],
                  billing_address: { nullable: true }, shipping_address: { nullable: true },
                  gift_card: { nullable: true }
 
@@ -28,6 +30,8 @@ module Spree
                    :discount_total, :display_discount_total,
                    :tax_total, :display_tax_total, :included_tax_total, :display_included_tax_total,
                    :additional_tax_total, :display_additional_tax_total, :total, :display_total,
+                   :gift_card_total, :display_gift_card_total,
+                   :amount_due, :display_amount_due,
                    :delivery_total, :display_delivery_total, :fulfillment_status, :payment_status,
                    completed_at: :iso8601, created_at: :iso8601, updated_at: :iso8601
 
@@ -38,8 +42,6 @@ module Spree
         attribute :display_store_credit_total do |order|
           order.display_total_applied_store_credit.to_s
         end
-
-        attributes :gift_card_total, :display_gift_card_total
 
         attribute :covered_by_store_credit do |order|
           order.covered_by_store_credit?

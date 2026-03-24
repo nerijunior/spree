@@ -38,7 +38,8 @@ Spree::Core::Engine.add_routes do
             post :complete
           end
           resources :items, only: [:create, :update, :destroy], controller: 'carts/items'
-          resources :coupon_codes, only: [:create, :destroy], controller: 'carts/coupon_codes'
+          resources :discount_codes, only: [:create, :destroy], controller: 'carts/discount_codes'
+          resources :gift_cards, only: [:create, :destroy], controller: 'carts/gift_cards'
           resources :fulfillments, only: [:update], controller: 'carts/fulfillments'
           resources :payments, only: [:create], controller: 'carts/payments'
           resources :payment_sessions, only: [:create, :show, :update], controller: 'carts/payment_sessions' do

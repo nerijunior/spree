@@ -407,27 +407,28 @@ export class StoreClient {
     },
 
     /**
-     * Nested resource: Coupon codes
+     * Nested resource: Discount codes
      */
-    couponCodes: {
+    discountCodes: {
       /**
-       * Apply a coupon code to the cart
+       * Apply a discount code to the cart
        * @param cartId - Cart prefixed ID
+       * @param code - Promotion discount code to apply (e.g., 'SAVE10')
        */
       apply: (
         cartId: string,
         code: string,
         options?: RequestOptions
       ): Promise<Cart> =>
-        this.request<Cart>('POST', `/carts/${cartId}/coupon_codes`, {
+        this.request<Cart>('POST', `/carts/${cartId}/discount_codes`, {
           ...options,
           body: { code },
         }),
 
       /**
-       * Remove a coupon code from the cart
+       * Remove a discount code from the cart
        * @param cartId - Cart prefixed ID
-       * @param code - The coupon code string to remove (e.g., 'SAVE10')
+       * @param code - The discount code string to remove (e.g., 'SAVE10')
        */
       remove: (
         cartId: string,
@@ -436,7 +437,45 @@ export class StoreClient {
       ): Promise<Cart> =>
         this.request<Cart>(
           'DELETE',
-          `/carts/${cartId}/coupon_codes/${code}`,
+          `/carts/${cartId}/discount_codes/${code}`,
+          options
+        ),
+    },
+
+    /**
+     * Nested resource: Gift cards
+     */
+    giftCards: {
+      /**
+       * Apply a gift card to the cart.
+       * Gift cards are treated as a payment method — the cart total remains unchanged
+       * while `amount_due` is reduced.
+       * @param cartId - Cart prefixed ID
+       * @param code - Gift card code to apply
+       */
+      apply: (
+        cartId: string,
+        code: string,
+        options?: RequestOptions
+      ): Promise<Cart> =>
+        this.request<Cart>('POST', `/carts/${cartId}/gift_cards`, {
+          ...options,
+          body: { code },
+        }),
+
+      /**
+       * Remove the applied gift card from the cart
+       * @param cartId - Cart prefixed ID
+       * @param giftCardId - Gift card prefixed ID (e.g., 'gc_abc123')
+       */
+      remove: (
+        cartId: string,
+        giftCardId: string,
+        options?: RequestOptions
+      ): Promise<Cart> =>
+        this.request<Cart>(
+          'DELETE',
+          `/carts/${cartId}/gift_cards/${giftCardId}`,
           options
         ),
     },

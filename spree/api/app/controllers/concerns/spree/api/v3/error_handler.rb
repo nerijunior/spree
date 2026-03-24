@@ -48,6 +48,11 @@ module Spree
           payment_processing_error: 'payment_processing_error',
           gateway_error: 'gateway_error',
 
+          # Gift card errors
+          gift_card_not_found: 'gift_card_not_found',
+          gift_card_expired: 'gift_card_expired',
+          gift_card_already_redeemed: 'gift_card_already_redeemed',
+
           # Digital download errors
           attachment_missing: 'attachment_missing',
           download_unauthorized: 'download_unauthorized',

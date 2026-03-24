@@ -49,10 +49,11 @@ module Spree
                   :included_tax_total,  :additional_tax_total, :tax_total,
                   :shipment_total,      :promo_total,          :total,
                   :cart_promo_total,    :pre_tax_item_amount,  :pre_tax_total,
-                  :payment_total
+                  :payment_total,       :amount_due
 
     alias display_ship_total display_shipment_total
     alias_attribute :ship_total, :shipment_total
+    alias amount_due total_minus_store_credits
 
     # 5.5 API naming bridges (DB columns rename in 6.0)
     alias_attribute :discount_total, :promo_total

@@ -242,12 +242,21 @@ export const handlers = [
     HttpResponse.json(fixtures.cart)
   ),
 
-  // Carts > Coupon Codes
-  http.post(`${API_PREFIX}/carts/:cartId/coupon_codes`, () =>
+  // Carts > Discount Codes
+  http.post(`${API_PREFIX}/carts/:cartId/discount_codes`, () =>
     HttpResponse.json(fixtures.cart)
   ),
 
-  http.delete(`${API_PREFIX}/carts/:cartId/coupon_codes/:code`, () =>
+  http.delete(`${API_PREFIX}/carts/:cartId/discount_codes/:code`, () =>
+    HttpResponse.json(fixtures.cart)
+  ),
+
+  // Carts > Gift Cards
+  http.post(`${API_PREFIX}/carts/:cartId/gift_cards`, () =>
+    HttpResponse.json(fixtures.cart)
+  ),
+
+  http.delete(`${API_PREFIX}/carts/:cartId/gift_cards/:id`, () =>
     HttpResponse.json(fixtures.cart)
   ),
 

@@ -100,14 +100,26 @@ describe('carts', () => {
     });
   });
 
-  describe('couponCodes', () => {
-    it('applies a coupon code', async () => {
-      const result = await client.carts.couponCodes.apply('cart_1', 'SAVE10', opts);
+  describe('discountCodes', () => {
+    it('applies a discount code', async () => {
+      const result = await client.carts.discountCodes.apply('cart_1', 'SAVE10', opts);
       expect(result.id).toBe('cart_1');
     });
 
-    it('removes a coupon code by code string', async () => {
-      const result = await client.carts.couponCodes.remove('cart_1', 'SAVE10', opts);
+    it('removes a discount code by code string', async () => {
+      const result = await client.carts.discountCodes.remove('cart_1', 'SAVE10', opts);
+      expect(result.id).toBe('cart_1');
+    });
+  });
+
+  describe('giftCards', () => {
+    it('applies a gift card', async () => {
+      const result = await client.carts.giftCards.apply('cart_1', 'GC-ABCD-1234', opts);
+      expect(result.id).toBe('cart_1');
+    });
+
+    it('removes a gift card by prefixed ID', async () => {
+      const result = await client.carts.giftCards.remove('cart_1', 'gc_abc123', opts);
       expect(result.id).toBe('cart_1');
     });
   });
