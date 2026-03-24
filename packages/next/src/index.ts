@@ -70,6 +70,7 @@ export {
 // Re-export commonly used SDK types for convenience
 export type {
   Cart,
+  CartWarning,
   Product,
   Order,
   LineItem,

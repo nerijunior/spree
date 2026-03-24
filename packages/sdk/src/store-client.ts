@@ -28,7 +28,6 @@ import type {
   RequestPasswordResetParams,
   ResetPasswordParams,
   Cart,
-  CartResponse,
   CreditCard,
   GiftCard,
   Product,
@@ -303,15 +302,15 @@ export class StoreClient {
      * Get a cart by prefixed ID
      * @param cartId - Cart prefixed ID (e.g., "cart_abc123")
      */
-    get: (cartId: string, options?: RequestOptions): Promise<CartResponse> =>
-      this.request<CartResponse>('GET', `/carts/${cartId}`, options),
+    get: (cartId: string, options?: RequestOptions): Promise<Cart> =>
+      this.request<Cart>('GET', `/carts/${cartId}`, options),
 
     /**
      * Create a new cart
      * @param params - Optional cart parameters (e.g., metadata, items)
      */
-    create: (params?: CreateCartParams, options?: RequestOptions): Promise<CartResponse> =>
-      this.request<CartResponse>('POST', '/carts', {
+    create: (params?: CreateCartParams, options?: RequestOptions): Promise<Cart> =>
+      this.request<Cart>('POST', '/carts', {
         ...options,
         body: params,
       }),
@@ -325,8 +324,8 @@ export class StoreClient {
       cartId: string,
       params: UpdateCartParams,
       options?: RequestOptions
-    ): Promise<CartResponse> =>
-      this.request<CartResponse>('PATCH', `/carts/${cartId}`, {
+    ): Promise<Cart> =>
+      this.request<Cart>('PATCH', `/carts/${cartId}`, {
         ...options,
         body: params,
       }),
@@ -343,8 +342,8 @@ export class StoreClient {
      * @param cartId - Cart prefixed ID
      * @param options - Must include `token` (JWT) for authentication
      */
-    associate: (cartId: string, options: RequestOptions): Promise<CartResponse> =>
-      this.request<CartResponse>('PATCH', `/carts/${cartId}/associate`, options),
+    associate: (cartId: string, options: RequestOptions): Promise<Cart> =>
+      this.request<Cart>('PATCH', `/carts/${cartId}/associate`, options),
 
     /**
      * Complete the cart and finalize the purchase.
@@ -367,8 +366,8 @@ export class StoreClient {
         cartId: string,
         params: AddLineItemParams,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>('POST', `/carts/${cartId}/items`, {
+      ): Promise<Cart> =>
+        this.request<Cart>('POST', `/carts/${cartId}/items`, {
           ...options,
           body: params,
         }),
@@ -383,8 +382,8 @@ export class StoreClient {
         lineItemId: string,
         params: UpdateLineItemParams,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>(
+      ): Promise<Cart> =>
+        this.request<Cart>(
           'PATCH',
           `/carts/${cartId}/items/${lineItemId}`,
           { ...options, body: params }
@@ -399,8 +398,8 @@ export class StoreClient {
         cartId: string,
         lineItemId: string,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>(
+      ): Promise<Cart> =>
+        this.request<Cart>(
           'DELETE',
           `/carts/${cartId}/items/${lineItemId}`,
           options
@@ -420,8 +419,8 @@ export class StoreClient {
         cartId: string,
         code: string,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>('POST', `/carts/${cartId}/discount_codes`, {
+      ): Promise<Cart> =>
+        this.request<Cart>('POST', `/carts/${cartId}/discount_codes`, {
           ...options,
           body: { code },
         }),
@@ -435,8 +434,8 @@ export class StoreClient {
         cartId: string,
         code: string,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>(
+      ): Promise<Cart> =>
+        this.request<Cart>(
           'DELETE',
           `/carts/${cartId}/discount_codes/${code}`,
           options
@@ -458,8 +457,8 @@ export class StoreClient {
         cartId: string,
         code: string,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>('POST', `/carts/${cartId}/gift_cards`, {
+      ): Promise<Cart> =>
+        this.request<Cart>('POST', `/carts/${cartId}/gift_cards`, {
           ...options,
           body: { code },
         }),
@@ -473,8 +472,8 @@ export class StoreClient {
         cartId: string,
         giftCardId: string,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>(
+      ): Promise<Cart> =>
+        this.request<Cart>(
           'DELETE',
           `/carts/${cartId}/gift_cards/${giftCardId}`,
           options
@@ -495,8 +494,8 @@ export class StoreClient {
         fulfillmentId: string,
         params: { selected_delivery_rate_id: string },
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>(
+      ): Promise<Cart> =>
+        this.request<Cart>(
           'PATCH',
           `/carts/${cartId}/fulfillments/${fulfillmentId}`,
           { ...options, body: params }
@@ -606,8 +605,8 @@ export class StoreClient {
         cartId: string,
         amount?: number,
         options?: RequestOptions
-      ): Promise<CartResponse> =>
-        this.request<CartResponse>('POST', `/carts/${cartId}/store_credits`, {
+      ): Promise<Cart> =>
+        this.request<Cart>('POST', `/carts/${cartId}/store_credits`, {
           ...options,
           body: amount ? { amount } : undefined,
         }),
@@ -616,8 +615,8 @@ export class StoreClient {
        * Remove store credit from the cart
        * @param cartId - Cart prefixed ID
        */
-      remove: (cartId: string, options?: RequestOptions): Promise<CartResponse> =>
-        this.request<CartResponse>(
+      remove: (cartId: string, options?: RequestOptions): Promise<Cart> =>
+        this.request<Cart>(
           'DELETE',
           `/carts/${cartId}/store_credits`,
           options

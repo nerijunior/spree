@@ -99,6 +99,9 @@ export interface CheckoutRequirement {
   message: string;
 }
 
+// Cart warning type — convenience alias for the inline type from the generated Cart
+export type CartWarning = Cart['warnings'][number];
+
 // Hand-written domain types
 export type {
   LocaleDefaults,

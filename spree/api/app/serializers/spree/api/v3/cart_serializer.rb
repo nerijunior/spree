@@ -20,6 +20,7 @@ module Spree
                  total: :string, display_total: :string,
                  amount_due: :string, display_amount_due: :string,
                  shipping_eq_billing_address: :boolean,
+                 warnings: 'Array<{code: string, message: string, line_item_id?: string, variant_id?: string}>',
                  billing_address: { nullable: true }, shipping_address: { nullable: true },
                  gift_card: { nullable: true }
 
@@ -37,7 +38,7 @@ module Spree
                    :additional_tax_total, :display_additional_tax_total, :total, :display_total,
                    :gift_card_total, :display_gift_card_total,
                    :amount_due, :display_amount_due,
-                   :delivery_total, :display_delivery_total,
+                   :delivery_total, :display_delivery_total, :warnings,
                    created_at: :iso8601, updated_at: :iso8601
 
         attribute :store_credit_total do |order|

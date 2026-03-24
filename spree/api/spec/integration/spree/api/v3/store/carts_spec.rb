@@ -22,6 +22,18 @@ RSpec.describe 'Carts API', type: :request, swagger_doc: 'api-reference/store.ya
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: 'Authorization', in: :header, type: :string, required: true
+      parameter name: :page, in: :query, type: :integer, required: false, description: 'Page number (default: 1)'
+      parameter name: :limit, in: :query, type: :integer, required: false, description: 'Number of results per page (default: 25, max: 100)'
+      parameter name: :sort, in: :query, type: :string, required: false,
+                description: 'Sort order. Prefix with - for descending. Values: created_at, -created_at, updated_at, -updated_at'
+      parameter name: 'q[created_at_gt]', in: :query, type: :string, required: false,
+                description: 'Filter by created after date (ISO 8601)'
+      parameter name: 'q[updated_at_gt]', in: :query, type: :string, required: false,
+                description: 'Filter by updated after date (ISO 8601)'
+      parameter name: :expand, in: :query, type: :string, required: false,
+                description: 'Comma-separated associations to expand (items, fulfillments, payments, discounts, billing_address, shipping_address, gift_card, payment_methods). Use "none" to skip associations.'
+      parameter name: :fields, in: :query, type: :string, required: false,
+                description: 'Comma-separated list of fields to include (e.g., total,amount_due,item_count). id is always included.'
 
       response '200', 'carts listed' do
         let!(:cart1) { create(:order_with_line_items, store: store, user: user) }
@@ -133,6 +145,10 @@ RSpec.describe 'Carts API', type: :request, swagger_doc: 'api-reference/store.ya
       parameter name: 'Authorization', in: :header, type: :string, required: false
       parameter name: 'x-spree-token', in: :header, type: :string, required: false
       parameter name: :id, in: :path, type: :string, required: true, description: 'Cart prefixed ID (e.g., cart_abc123)'
+      parameter name: :expand, in: :query, type: :string, required: false,
+                description: 'Comma-separated associations to expand (items, fulfillments, payments, discounts, billing_address, shipping_address, gift_card, payment_methods). Use "none" to skip associations.'
+      parameter name: :fields, in: :query, type: :string, required: false,
+                description: 'Comma-separated list of fields to include (e.g., total,amount_due,item_count). id is always included.'
 
       response '200', 'cart found' do
         let(:cart) { create(:order_with_line_items, store: store) }
@@ -146,6 +162,27 @@ RSpec.describe 'Carts API', type: :request, swagger_doc: 'api-reference/store.ya
           data = JSON.parse(response.body)
           expect(data['id']).to start_with('cart_')
           expect(data['number']).to eq(cart.number)
+          expect(data['warnings']).to eq([])
+        end
+      end
+
+      response '200', 'cart with out-of-stock item removed (warnings returned)' do
+        let(:cart) { create(:order_with_line_items, store: store) }
+        let(:'x-spree-api-key') { api_key.token }
+        let(:'x-spree-token') { cart.token }
+        let(:id) { cart.prefixed_id }
+
+        before do
+          cart.products.first.stock_items.update_all(count_on_hand: 0, backorderable: false)
+        end
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['warnings']).to be_an(Array)
+          expect(data['warnings'].length).to eq(1)
+          expect(data['warnings'].first['code']).to eq('line_item_removed')
+          expect(data['warnings'].first['message']).to be_present
+          expect(data['warnings'].first['variant_id']).to be_present
         end
       end
 

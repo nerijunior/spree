@@ -26,7 +26,8 @@ module Spree
 
         # Render the cart as JSON using the cart serializer.
         def render_cart(status: :ok)
-          render json: Spree.api.cart_serializer.new(@cart.reload, params: serializer_params).to_h, status: status
+          @cart = @cart.remove_out_of_stock_items!
+          render json: Spree.api.cart_serializer.new(@cart, params: serializer_params).to_h, status: status
         end
 
         # Render the order as JSON using the order serializer (for complete action).
