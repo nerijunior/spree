@@ -1,4 +1,5 @@
 import type { ListParams, AddressParams } from '@spree/sdk-core';
+import type { Cart as CartType } from './generated';
 
 // Re-export all generated types (unprefixed: Product, Order, etc.)
 export type {
@@ -100,7 +101,7 @@ export interface CheckoutRequirement {
 }
 
 // Cart warning type — convenience alias for the inline type from the generated Cart
-export type CartWarning = Cart['warnings'][number];
+export type CartWarning = CartType['warnings'][number];
 
 // Hand-written domain types
 export type {

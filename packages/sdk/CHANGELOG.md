@@ -11,13 +11,13 @@
 
 - **Gift cards** — dedicated cart endpoints: `client.carts.giftCards.apply(cartId, code)` and `client.carts.giftCards.remove(cartId, giftCardId)`
 - **`amount_due` / `display_amount_due`** — new fields on Cart and Order types showing the amount owed after store credits/gift cards
-- **Cart warnings** — every cart response now includes a `warnings` array flagging issues like removed out-of-stock items. New types: `CartWarning`, `CartResponse`
+- **Cart warnings** — every cart response now includes a `warnings` array flagging issues like removed out-of-stock items
 - **Gift card error codes** — dedicated error codes: `gift_card_not_found`, `gift_card_expired`, `gift_card_already_redeemed`
 
 ### Types
 
-- All cart endpoints now return `CartResponse` (= `Cart & { warnings: CartWarning[] }`)
-- New exported types: `CartWarning`, `CartResponse`
+- `Cart` type now includes `warnings` array and `amount_due` / `display_amount_due` fields
+- New exported type: `CartWarning` (derived from `Cart['warnings'][number]`)
 
 ## 0.15.0
 

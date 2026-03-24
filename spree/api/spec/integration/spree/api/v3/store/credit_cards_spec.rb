@@ -63,7 +63,7 @@ RSpec.describe 'Credit Cards API', type: :request, swagger_doc: 'api-reference/s
       description 'Returns a saved credit card by its ID'
 
       sdk_example <<~JS
-        const card = await client.customer.creditCards.get('cc_abc123', {
+        const card = await client.customer.creditCards.get('card_abc123', {
           bearerToken: '<token>',
         })
       JS
@@ -102,7 +102,7 @@ RSpec.describe 'Credit Cards API', type: :request, swagger_doc: 'api-reference/s
       description 'Removes a saved credit card from the customer account'
 
       sdk_example <<~JS
-        await client.customer.creditCards.delete('cc_abc123', {
+        await client.customer.creditCards.delete('card_abc123', {
           bearerToken: '<token>',
         })
       JS

@@ -249,14 +249,14 @@ await client.carts.discountCodes.remove(cartId, 'SAVE20')
 ```bash cURL
 # Apply a discount code
 curl -X POST 'https://api.mystore.com/api/v3/store/carts/cart_xxx/discount_codes' \
-  -H 'X-Spree-Api-Key: pk_xxx' \
+  -H 'Authorization: Bearer spree_pk_xxx' \
   -H 'X-Spree-Token: abc123' \
   -H 'Content-Type: application/json' \
   -d '{ "code": "SAVE20" }'
 
 # Remove a discount code
 curl -X DELETE 'https://api.mystore.com/api/v3/store/carts/cart_xxx/discount_codes/SAVE20' \
-  -H 'X-Spree-Api-Key: pk_xxx' \
+  -H 'Authorization: Bearer spree_pk_xxx' \
   -H 'X-Spree-Token: abc123'
 ```
 

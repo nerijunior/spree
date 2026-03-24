@@ -53,6 +53,13 @@ RSpec.describe 'Customer Orders API', type: :request, swagger_doc: 'api-referenc
         let(:'x-spree-api-key') { api_key.token }
         let(:'Authorization') { "Bearer #{jwt_token}" }
 
+        schema type: :object,
+               properties: {
+                 data: { type: :array, items: { '$ref' => '#/components/schemas/Order' } },
+                 meta: { '$ref' => '#/components/schemas/PaginationMeta' }
+               },
+               required: %w[data meta]
+
         run_test! do |response|
           data = JSON.parse(response.body)
           ids = data['data'].map { |o| o['id'] }

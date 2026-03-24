@@ -95,6 +95,17 @@ module Spree
               },
               required: %w[step field message]
             },
+            CartWarning: {
+              type: :object,
+              description: 'A warning about a cart issue (e.g., item removed due to stock change)',
+              properties: {
+                code: { type: :string, description: 'Machine-readable warning code', example: 'line_item_removed' },
+                message: { type: :string, description: 'Human-readable warning message', example: 'Blue T-Shirt was removed because it was sold out' },
+                line_item_id: { type: :string, nullable: true, description: 'Prefixed line item ID (when applicable)', example: 'li_abc123' },
+                variant_id: { type: :string, nullable: true, description: 'Prefixed variant ID (when applicable)', example: 'variant_abc123' }
+              },
+              required: %w[code message]
+            },
             FulfillmentManifestItem: {
               type: :object,
               description: 'An item within a fulfillment — which line item and how many units are in this fulfillment',
@@ -150,6 +161,14 @@ module Spree
             props[req_key] = {
               type: :array,
               items: { '$ref' => '#/components/schemas/CheckoutRequirement' }
+            }
+          end
+
+          warn_key = props.key?('warnings') ? 'warnings' : :warnings
+          if props[warn_key]
+            props[warn_key] = {
+              type: :array,
+              items: { '$ref' => '#/components/schemas/CartWarning' }
             }
           end
         end
