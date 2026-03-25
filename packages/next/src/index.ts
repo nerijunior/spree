@@ -9,6 +9,7 @@ export { listCountries, getCountry } from './data/countries';
 export { listCurrencies } from './data/currencies';
 export { listLocales } from './data/locales';
 export { listMarkets, getMarket, resolveMarket, listMarketCountries, getMarketCountry } from './data/markets';
+export { listPolicies, getPolicy } from './data/policies';
 
 // Server actions (mutations + auth-dependent reads)
 export {
@@ -80,6 +81,7 @@ export type {
   Currency,
   Locale,
   Market,
+  Policy,
   Address,
   Customer,
   CreditCard,

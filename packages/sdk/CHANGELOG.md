@@ -13,11 +13,13 @@
 - **`amount_due` / `display_amount_due`** — new fields on Cart and Order types showing the amount owed after store credits/gift cards
 - **Cart warnings** — every cart response now includes a `warnings` array flagging issues like removed out-of-stock items
 - **Gift card error codes** — dedicated error codes: `gift_card_not_found`, `gift_card_expired`, `gift_card_already_redeemed`
+- **Store policies** — `client.policies.list()` and `client.policies.get(slug)` for return policy, privacy policy, terms of service, etc.
 
 ### Types
 
 - `Cart` type now includes `warnings` array and `amount_due` / `display_amount_due` fields
 - New exported type: `CartWarning` (derived from `Cart['warnings'][number]`)
+- New exported type: `Policy`
 
 ## 0.15.0
 

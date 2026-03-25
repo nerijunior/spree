@@ -526,6 +526,23 @@ export const handlers = [
     HttpResponse.json({ token: 'new-jwt-token', user: fixtures.user })
   ),
 
+  // Policies
+  http.get(`${API_PREFIX}/policies`, () =>
+    HttpResponse.json({
+      data: [
+        { id: 'pol_1', name: 'Return Policy', slug: 'return-policy', body: 'Return within 30 days.', body_html: '<p>Return within 30 days.</p>', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
+        { id: 'pol_2', name: 'Privacy Policy', slug: 'privacy-policy', body: 'We respect your privacy.', body_html: '<p>We respect your privacy.</p>', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
+      ]
+    })
+  ),
+
+  http.get(`${API_PREFIX}/policies/:id`, () =>
+    HttpResponse.json({
+      id: 'pol_1', name: 'Return Policy', slug: 'return-policy', body: 'Return within 30 days.', body_html: '<p>Return within 30 days.</p>',
+      created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z'
+    })
+  ),
+
   // Wishlists
   http.get(`${API_PREFIX}/wishlists`, () =>
     HttpResponse.json({ data: [fixtures.wishlist], meta: paginationMeta })

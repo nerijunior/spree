@@ -36,6 +36,7 @@ import type {
   Currency,
   Locale,
   Market,
+  Policy,
   Category,
   Payment,
   PaymentSession,
@@ -220,6 +221,25 @@ export class StoreClient {
      */
     list: (options?: RequestOptions): Promise<ListResponse<Locale>> =>
       this.request<ListResponse<Locale>>('GET', '/locales', options),
+  };
+
+  // ============================================
+  // Policies
+  // ============================================
+
+  readonly policies = {
+    /**
+     * List store policies (return policy, privacy policy, terms of service, etc.)
+     */
+    list: (options?: RequestOptions): Promise<ListResponse<Policy>> =>
+      this.request<ListResponse<Policy>>('GET', '/policies', options),
+
+    /**
+     * Get a policy by slug or prefixed ID
+     * @param id - Policy slug (e.g., 'return-policy') or prefixed ID (e.g., 'pol_abc123')
+     */
+    get: (id: string, options?: RequestOptions): Promise<Policy> =>
+      this.request<Policy>('GET', `/policies/${id}`, options),
   };
 
   // ============================================

@@ -53,6 +53,9 @@ Spree::Core::Engine.add_routes do
         # Orders (single order lookup, guest-accessible via order token)
         resources :orders, only: [:show]
 
+        # Policies (return policy, privacy policy, terms of service, etc.)
+        resources :policies, only: [:index, :show]
+
         # Password Resets (top-level, no auth required)
         resources :password_resets, only: [:create, :update], controller: 'customer/password_resets'
 
