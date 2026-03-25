@@ -38,7 +38,8 @@ Spree::Core::Engine.add_routes do
             post :complete
           end
           resources :items, only: [:create, :update, :destroy], controller: 'carts/items'
-          resources :coupon_codes, only: [:create, :destroy], controller: 'carts/coupon_codes'
+          resources :discount_codes, only: [:create, :destroy], controller: 'carts/discount_codes'
+          resources :gift_cards, only: [:create, :destroy], controller: 'carts/gift_cards'
           resources :fulfillments, only: [:update], controller: 'carts/fulfillments'
           resources :payments, only: [:create], controller: 'carts/payments'
           resources :payment_sessions, only: [:create, :show, :update], controller: 'carts/payment_sessions' do
@@ -52,6 +53,12 @@ Spree::Core::Engine.add_routes do
         # Orders (single order lookup, guest-accessible via order token)
         resources :orders, only: [:show]
 
+        # Policies (return policy, privacy policy, terms of service, etc.)
+        resources :policies, only: [:index, :show]
+
+        # Password Resets (top-level, no auth required)
+        resources :password_resets, only: [:create, :update], controller: 'customer/password_resets'
+
         # Customers
         resources :customers, only: [:create]
 
@@ -59,8 +66,6 @@ Spree::Core::Engine.add_routes do
         namespace :customer, path: 'customers/me' do
           get '/', action: :show, controller: '/spree/api/v3/store/customers'
           patch '/', action: :update, controller: '/spree/api/v3/store/customers'
-
-          resources :password_resets, only: [:create, :update]
 
           resources :orders, only: [:index, :show]
           resources :addresses, only: [:index, :show, :create, :update, :destroy]

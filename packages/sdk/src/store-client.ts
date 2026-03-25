@@ -36,6 +36,7 @@ import type {
   Currency,
   Locale,
   Market,
+  Policy,
   Category,
   Payment,
   PaymentSession,
@@ -223,6 +224,25 @@ export class StoreClient {
   };
 
   // ============================================
+  // Policies
+  // ============================================
+
+  readonly policies = {
+    /**
+     * List store policies (return policy, privacy policy, terms of service, etc.)
+     */
+    list: (options?: RequestOptions): Promise<ListResponse<Policy>> =>
+      this.request<ListResponse<Policy>>('GET', '/policies', options),
+
+    /**
+     * Get a policy by slug or prefixed ID
+     * @param id - Policy slug (e.g., 'return-policy') or prefixed ID (e.g., 'pol_abc123')
+     */
+    get: (id: string, options?: RequestOptions): Promise<Policy> =>
+      this.request<Policy>('GET', `/policies/${id}`, options),
+  };
+
+  // ============================================
   // Markets
   // ============================================
 
@@ -407,27 +427,28 @@ export class StoreClient {
     },
 
     /**
-     * Nested resource: Coupon codes
+     * Nested resource: Discount codes
      */
-    couponCodes: {
+    discountCodes: {
       /**
-       * Apply a coupon code to the cart
+       * Apply a discount code to the cart
        * @param cartId - Cart prefixed ID
+       * @param code - Promotion discount code to apply (e.g., 'SAVE10')
        */
       apply: (
         cartId: string,
         code: string,
         options?: RequestOptions
       ): Promise<Cart> =>
-        this.request<Cart>('POST', `/carts/${cartId}/coupon_codes`, {
+        this.request<Cart>('POST', `/carts/${cartId}/discount_codes`, {
           ...options,
           body: { code },
         }),
 
       /**
-       * Remove a coupon code from the cart
+       * Remove a discount code from the cart
        * @param cartId - Cart prefixed ID
-       * @param code - The coupon code string to remove (e.g., 'SAVE10')
+       * @param code - The discount code string to remove (e.g., 'SAVE10')
        */
       remove: (
         cartId: string,
@@ -436,7 +457,45 @@ export class StoreClient {
       ): Promise<Cart> =>
         this.request<Cart>(
           'DELETE',
-          `/carts/${cartId}/coupon_codes/${code}`,
+          `/carts/${cartId}/discount_codes/${code}`,
+          options
+        ),
+    },
+
+    /**
+     * Nested resource: Gift cards
+     */
+    giftCards: {
+      /**
+       * Apply a gift card to the cart.
+       * Gift cards are treated as a payment method — the cart total remains unchanged
+       * while `amount_due` is reduced.
+       * @param cartId - Cart prefixed ID
+       * @param code - Gift card code to apply
+       */
+      apply: (
+        cartId: string,
+        code: string,
+        options?: RequestOptions
+      ): Promise<Cart> =>
+        this.request<Cart>('POST', `/carts/${cartId}/gift_cards`, {
+          ...options,
+          body: { code },
+        }),
+
+      /**
+       * Remove the applied gift card from the cart
+       * @param cartId - Cart prefixed ID
+       * @param giftCardId - Gift card prefixed ID (e.g., 'gc_abc123')
+       */
+      remove: (
+        cartId: string,
+        giftCardId: string,
+        options?: RequestOptions
+      ): Promise<Cart> =>
+        this.request<Cart>(
+          'DELETE',
+          `/carts/${cartId}/gift_cards/${giftCardId}`,
           options
         ),
     },
@@ -854,34 +913,36 @@ export class StoreClient {
         ),
     },
 
-    /**
-     * Password reset
-     */
-    passwordResets: {
-      /**
-       * Request a password reset email.
-       * Always succeeds (202) to prevent email enumeration.
-       */
-      create: (params: RequestPasswordResetParams): Promise<{ message: string }> =>
-        this.request<{ message: string }>('POST', '/customers/me/password_resets', {
-          body: params,
-        }),
+  };
 
-      /**
-       * Reset password using the token from the email.
-       * Returns a JWT token on success (auto-login).
-       * @param token - Password reset token from the email
-       */
-      update: (
-        token: string,
-        params: ResetPasswordParams
-      ): Promise<AuthTokens> =>
-        this.request<AuthTokens>(
-          'PATCH',
-          `/customers/me/password_resets/${token}`,
-          { body: params }
-        ),
-    },
+  // ============================================
+  // Password Resets
+  // ============================================
+
+  readonly passwordResets = {
+    /**
+     * Request a password reset email.
+     * Always succeeds (202) to prevent email enumeration.
+     */
+    create: (params: RequestPasswordResetParams): Promise<{ message: string }> =>
+      this.request<{ message: string }>('POST', '/password_resets', {
+        body: params,
+      }),
+
+    /**
+     * Reset password using the token from the email.
+     * Returns a JWT token on success (auto-login).
+     * @param token - Password reset token from the email
+     */
+    update: (
+      token: string,
+      params: ResetPasswordParams
+    ): Promise<AuthTokens> =>
+      this.request<AuthTokens>(
+        'PATCH',
+        `/password_resets/${token}`,
+        { body: params }
+      ),
   };
 
   // ============================================

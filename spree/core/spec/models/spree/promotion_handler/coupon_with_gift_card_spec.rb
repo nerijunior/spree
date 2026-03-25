@@ -93,4 +93,81 @@ describe Spree::PromotionHandler::Coupon, type: :model do
       end
     end
   end
+
+  describe 'enable_gift_cards option' do
+    let(:store) { Spree::Store.default }
+    let(:order) { create(:order_with_line_items, store: store) }
+    let(:gift_card) { create(:gift_card, store: store, amount: 10) }
+
+    before do
+      order.update_column(:total, 30)
+    end
+
+    describe '#apply' do
+      context 'when enable_gift_cards: false' do
+        it 'does not apply gift card and falls through to coupon code lookup' do
+          order.coupon_code = gift_card.code
+          handler = described_class.new(order, enable_gift_cards: false)
+          handler.apply
+
+          expect(order.reload.gift_card).to be_nil
+          expect(handler.status_code).to eq(:coupon_code_not_found)
+        end
+      end
+
+      context 'when enable_gift_cards: true (explicit)' do
+        it 'applies gift card' do
+          order.coupon_code = gift_card.code
+          handler = described_class.new(order, enable_gift_cards: true)
+          handler.apply
+
+          expect(order.reload.gift_card).to eq(gift_card)
+        end
+      end
+
+      context 'when enable_gift_cards is not specified (default)' do
+        it 'applies gift card for backwards compatibility' do
+          order.coupon_code = gift_card.code
+          handler = described_class.new(order)
+          handler.apply
+
+          expect(order.reload.gift_card).to eq(gift_card)
+        end
+      end
+    end
+
+    describe '#remove' do
+      before do
+        order.apply_gift_card(gift_card)
+      end
+
+      context 'when enable_gift_cards: false' do
+        it 'does not remove gift card and falls through to coupon code lookup' do
+          handler = described_class.new(order, enable_gift_cards: false)
+          handler.remove(gift_card.code)
+
+          expect(order.reload.gift_card).to eq(gift_card)
+          expect(handler.status_code).to eq(:coupon_code_not_found)
+        end
+      end
+
+      context 'when enable_gift_cards: true (explicit)' do
+        it 'removes gift card' do
+          handler = described_class.new(order, enable_gift_cards: true)
+          handler.remove(gift_card.code)
+
+          expect(order.reload.gift_card).to be_nil
+        end
+      end
+
+      context 'when enable_gift_cards is not specified (default)' do
+        it 'removes gift card for backwards compatibility' do
+          handler = described_class.new(order)
+          handler.remove(gift_card.code)
+
+          expect(order.reload.gift_card).to be_nil
+        end
+      end
+    end
+  end
 end

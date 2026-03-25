@@ -3,14 +3,14 @@ module Spree
     module V3
       module Store
         module Carts
-          class CouponCodesController < Store::BaseController
+          class DiscountCodesController < Store::BaseController
             include Spree::Api::V3::CartResolvable
             include Spree::Api::V3::OrderLock
 
             before_action :find_cart!
 
-            # POST  /api/v3/store/carts/:cart_id/coupon_codes
-            # Apply a coupon code to the cart
+            # POST  /api/v3/store/carts/:cart_id/discount_codes
+            # Apply a discount code to the cart
             def create
               with_order_lock do
                 @cart.coupon_code = permitted_params[:code]
@@ -25,9 +25,9 @@ module Spree
               end
             end
 
-            # DELETE  /api/v3/store/carts/:cart_id/coupon_codes/:id
-            # Remove a coupon code from the cart
-            # :id is the coupon code string (e.g., SAVE10)
+            # DELETE  /api/v3/store/carts/:cart_id/discount_codes/:id
+            # Remove a discount code from the cart
+            # :id is the discount code string (e.g., SAVE10)
             def destroy
               with_order_lock do
                 coupon_handler.remove(params[:id])
@@ -43,7 +43,7 @@ module Spree
             private
 
             def coupon_handler
-              @coupon_handler ||= Spree.coupon_handler.new(@cart)
+              @coupon_handler ||= Spree.coupon_handler.new(@cart, enable_gift_cards: false)
             end
 
             def permitted_params

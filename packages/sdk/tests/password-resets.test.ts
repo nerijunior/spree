@@ -5,11 +5,11 @@ import { createTestClient, TEST_BASE_URL } from './helpers';
 
 const API_PREFIX = `${TEST_BASE_URL}/api/v3/store`;
 
-describe('customer.passwordResets', () => {
+describe('passwordResets', () => {
   describe('create (request password reset)', () => {
     it('returns a message on success', async () => {
       const client = createTestClient();
-      const result = await client.customer.passwordResets.create({
+      const result = await client.passwordResets.create({
         email: 'test@example.com',
       });
 
@@ -19,7 +19,7 @@ describe('customer.passwordResets', () => {
     it('sends email in request body', async () => {
       let capturedBody: Record<string, unknown> = {};
       server.use(
-        http.post(`${API_PREFIX}/customers/me/password_resets`, async ({ request }) => {
+        http.post(`${API_PREFIX}/password_resets`, async ({ request }) => {
           capturedBody = await request.json() as Record<string, unknown>;
           return HttpResponse.json(
             { message: 'If an account exists for that email, password reset instructions have been sent.' },
@@ -29,7 +29,7 @@ describe('customer.passwordResets', () => {
       );
 
       const client = createTestClient();
-      await client.customer.passwordResets.create({ email: 'test@example.com' });
+      await client.passwordResets.create({ email: 'test@example.com' });
 
       expect(capturedBody.email).toBe('test@example.com');
     });
@@ -38,7 +38,7 @@ describe('customer.passwordResets', () => {
   describe('update (reset password with token)', () => {
     it('returns auth tokens on successful reset', async () => {
       const client = createTestClient();
-      const result = await client.customer.passwordResets.update(
+      const result = await client.passwordResets.update(
         'valid-reset-token',
         {
           password: 'newsecurepassword',
@@ -53,24 +53,24 @@ describe('customer.passwordResets', () => {
     it('sends token in URL path', async () => {
       let capturedUrl = '';
       server.use(
-        http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, ({ request }) => {
+        http.patch(`${API_PREFIX}/password_resets/:token`, ({ request }) => {
           capturedUrl = request.url;
           return HttpResponse.json({ token: 'new-jwt-token', user: { id: 'user_1', email: 'test@example.com', first_name: null, last_name: null } });
         })
       );
 
       const client = createTestClient();
-      await client.customer.passwordResets.update('my-reset-token', {
+      await client.passwordResets.update('my-reset-token', {
         password: 'newsecurepassword',
         password_confirmation: 'newsecurepassword',
       });
 
-      expect(capturedUrl).toContain('/customers/me/password_resets/my-reset-token');
+      expect(capturedUrl).toContain('/password_resets/my-reset-token');
     });
 
     it('throws SpreeError on invalid token', async () => {
       server.use(
-        http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, () =>
+        http.patch(`${API_PREFIX}/password_resets/:token`, () =>
           HttpResponse.json(
             { error: { code: 'password_reset_token_invalid', message: 'Password reset token is invalid or has expired.' } },
             { status: 422 }
@@ -80,7 +80,7 @@ describe('customer.passwordResets', () => {
 
       const client = createTestClient();
       try {
-        await client.customer.passwordResets.update('expired-token', {
+        await client.passwordResets.update('expired-token', {
           password: 'newsecurepassword',
           password_confirmation: 'newsecurepassword',
         });

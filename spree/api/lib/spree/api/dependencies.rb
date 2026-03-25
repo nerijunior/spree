@@ -130,6 +130,7 @@ module Spree
         gift_card_serializer: 'Spree::Api::V3::GiftCardSerializer',
         currency_serializer: 'Spree::Api::V3::CurrencySerializer',
         locale_serializer: 'Spree::Api::V3::LocaleSerializer',
+        policy_serializer: 'Spree::Api::V3::PolicySerializer',
         metafield_serializer: 'Spree::Api::V3::MetafieldSerializer',
         shipping_category_serializer: 'Spree::Api::V3::ShippingCategorySerializer',
         tax_category_serializer: 'Spree::Api::V3::TaxCategorySerializer',

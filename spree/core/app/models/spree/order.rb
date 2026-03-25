@@ -49,10 +49,25 @@ module Spree
                   :included_tax_total,  :additional_tax_total, :tax_total,
                   :shipment_total,      :promo_total,          :total,
                   :cart_promo_total,    :pre_tax_item_amount,  :pre_tax_total,
-                  :payment_total
+                  :payment_total,       :amount_due
 
     alias display_ship_total display_shipment_total
     alias_attribute :ship_total, :shipment_total
+    alias amount_due total_minus_store_credits
+
+    # Transient warnings populated by remove_out_of_stock_items!
+    attribute :warnings, default: -> { [] }
+
+    # Removes out-of-stock/discontinued items and populates warnings.
+    # Returns self (reloaded if items were removed) with warnings set.
+    def remove_out_of_stock_items!
+      result = Spree::Cart::RemoveOutOfStockItems.call(order: self)
+      return self unless result.success?
+
+      order, _messages, warnings = result.value
+      order.warnings = warnings || []
+      order
+    end
 
     # 5.5 API naming bridges (DB columns rename in 6.0)
     alias_attribute :discount_total, :promo_total

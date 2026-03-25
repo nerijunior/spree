@@ -2684,4 +2684,71 @@ describe Spree::Order, type: :model do
       end
     end
   end
+
+  describe '#warnings' do
+    it 'defaults to empty array' do
+      expect(order.warnings).to eq([])
+    end
+
+    it 'is a transient attribute (not persisted)' do
+      order.warnings = [{ code: 'test', message: 'test' }]
+      order.save!
+      expect(order.reload.warnings).to eq([])
+    end
+  end
+
+  describe '#remove_out_of_stock_items!' do
+    let(:order) { create(:order_with_totals, store: store, user: user) }
+
+    context 'when all items are in stock' do
+      it 'does not remove any items' do
+        expect { order.remove_out_of_stock_items! }.not_to change { order.line_items.count }
+      end
+
+      it 'sets warnings to empty array' do
+        order.remove_out_of_stock_items!
+        expect(order.warnings).to eq([])
+      end
+    end
+
+    context 'when an item is out of stock' do
+      before do
+        order.line_items.first.variant.stock_items.update_all(count_on_hand: 0, backorderable: false)
+      end
+
+      it 'removes the out of stock item' do
+        expect { order.remove_out_of_stock_items! }.to change { order.reload.line_items.count }.by(-1)
+      end
+
+      it 'populates warnings with structured data' do
+        order.remove_out_of_stock_items!
+        expect(order.warnings.length).to eq(1)
+        expect(order.warnings.first[:code]).to eq('line_item_removed')
+        expect(order.warnings.first[:message]).to be_present
+        expect(order.warnings.first[:variant_id]).to start_with('variant_')
+        expect(order.warnings.first[:line_item_id]).to start_with('li_')
+      end
+    end
+
+    context 'when a product is discontinued' do
+      before do
+        order.line_items.first.product.update_columns(status: 'discontinued')
+      end
+
+      it 'removes the item and populates warnings' do
+        order.remove_out_of_stock_items!
+        expect(order.warnings.length).to eq(1)
+        expect(order.warnings.first[:code]).to eq('line_item_removed')
+      end
+    end
+
+    context 'when cart is empty' do
+      let(:order) { create(:order, store: store, user: user) }
+
+      it 'does nothing' do
+        order.remove_out_of_stock_items!
+        expect(order.warnings).to eq([])
+      end
+    end
+  end
 end

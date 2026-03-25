@@ -259,16 +259,33 @@ await client.carts.items.update('cart_xxx', lineItemId, {
 await client.carts.items.delete('cart_xxx', lineItemId, options);
 ```
 
-### Coupon Codes
+### Discount Codes
 
 ```typescript
 const options = { spreeToken: cart.token };
 
-// Apply a coupon code
-await client.carts.couponCodes.apply('cart_xxx', 'SAVE20', options);
+// Apply a discount code
+await client.carts.discountCodes.apply('cart_xxx', 'SAVE20', options);
 
-// Remove a coupon code
-await client.carts.couponCodes.remove('cart_xxx', 'SAVE20', options);
+// Remove a discount code
+await client.carts.discountCodes.remove('cart_xxx', 'SAVE20', options);
+```
+
+### Gift Cards
+
+```typescript
+const options = { spreeToken: cart.token };
+
+// Apply a gift card
+const cart = await client.carts.giftCards.apply('cart_xxx', 'GC-ABCD-1234', options);
+
+// Remove a gift card (ID from cart.gift_card.id)
+await client.carts.giftCards.remove('cart_xxx', 'gc_abc123', options);
+
+// Check cart warnings (e.g. items removed due to stock changes)
+if (cart.warnings.length > 0) {
+  cart.warnings.forEach(w => console.log(w.code, w.message));
+}
 ```
 
 ### Fulfillments
@@ -465,12 +482,12 @@ await client.customer.addresses.update('addr_xxx', { is_default_billing: true },
 await client.customer.addresses.update('addr_xxx', { is_default_shipping: true }, options);
 ```
 
-### Customer Password Resets
+### Password Resets
 
 ```typescript
 // Request a password reset email
 // Always returns { message: string } (202 status) — prevents email enumeration
-await client.customer.passwordResets.create({
+await client.passwordResets.create({
   email: 'customer@example.com',
   redirect_url: 'https://myshop.com/reset-password', // optional, validated against store's allowed origins
 });
@@ -478,7 +495,7 @@ await client.customer.passwordResets.create({
 // Reset password with token from email
 // Returns AuthTokens (JWT + user) — auto-login on success
 // Token expires in 15 minutes
-const { token, user } = await client.customer.passwordResets.update('reset_token_xxx', {
+const { token, user } = await client.passwordResets.update('reset_token_xxx', {
   password: 'newPassword123',
   password_confirmation: 'newPassword123',
 });
@@ -554,13 +571,15 @@ The SDK uses a resource builder pattern for nested resources:
 | Parent Resource | Nested Resource | Available Methods |
 |-----------------|-----------------|-------------------|
 | `carts` | `items` | `create`, `update`, `delete` |
-| `carts` | `couponCodes` | `apply`, `remove` |
+| `carts` | `discountCodes` | `apply`, `remove` |
+| `carts` | `giftCards` | `apply`, `remove` |
 | `carts` | `fulfillments` | `update` |
 | `carts` | `payments` | `create` |
 | `carts` | `paymentSessions` | `create`, `get`, `update`, `complete` |
 | `carts` | `storeCredits` | `apply`, `remove` |
+| `policies` | — | `list`, `get` |
+| `passwordResets` | — | `create`, `update` |
 | `customer` | `addresses` | `list`, `get`, `create`, `update`, `delete` |
-| `customer` | `passwordResets` | `create`, `update` |
 | `customer` | `creditCards` | `list`, `get`, `delete` |
 | `customer` | `giftCards` | `list`, `get` |
 | `customer` | `storeCredits` | `list`, `get` |
@@ -573,7 +592,7 @@ Example:
 ```typescript
 // Cart resources take cartId as first argument
 await client.carts.items.create(cartId, params, options);
-await client.carts.couponCodes.apply(cartId, code, options);
+await client.carts.discountCodes.apply(cartId, code, options);
 await client.carts.fulfillments.update(cartId, fulfillmentId, params, options);
 await client.carts.payments.create(cartId, params, options);
 await client.carts.paymentSessions.create(cartId, params, options);

@@ -5,8 +5,9 @@ module Spree
 
       def call(order:)
         @messages = []
+        @warnings = []
 
-        return success([order, @messages]) if order.item_count.zero? || order.line_items.none?
+        return success([order, @messages, @warnings]) if order.item_count.zero? || order.line_items.none?
 
         line_items = order.line_items.includes(variant: [:product, :stock_items, :stock_locations, { stock_items: :stock_location }])
 
@@ -17,9 +18,9 @@ module Spree
         end
 
         if @messages.any? # If any line item was removed, reload the order
-          success([order.reload, @messages])
+          success([order.reload, @messages, @warnings])
         else
-          success([order, @messages])
+          success([order, @messages, @warnings])
         end
       end
 
@@ -28,7 +29,14 @@ module Spree
       def valid_status?(line_item)
         product = line_item.product
         if !product.active? || product.deleted? || product.discontinued? || line_item.variant.discontinued?
-          @messages << Spree.t('cart_line_item.discontinued', li_name: line_item.name)
+          message = Spree.t('cart_line_item.discontinued', li_name: line_item.name)
+          @messages << message
+          @warnings << {
+            code: 'line_item_removed',
+            message: message,
+            line_item_id: line_item.prefixed_id,
+            variant_id: line_item.variant.prefixed_id
+          }
           return false
         end
         true
@@ -36,7 +44,14 @@ module Spree
 
       def stock_available?(line_item)
         if line_item.insufficient_stock?
-          @messages << Spree.t('cart_line_item.out_of_stock', li_name: line_item.name)
+          message = Spree.t('cart_line_item.out_of_stock', li_name: line_item.name)
+          @messages << message
+          @warnings << {
+            code: 'line_item_removed',
+            message: message,
+            line_item_id: line_item.prefixed_id,
+            variant_id: line_item.variant.prefixed_id
+          }
           return false
         end
         true

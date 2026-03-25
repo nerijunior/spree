@@ -380,6 +380,54 @@ RSpec.describe Spree::Api::V3::Store::CartsController, type: :controller do
       end
     end
 
+    context 'warnings' do
+      let(:cart) { create(:order_with_line_items, store: store) }
+
+      before { request.headers['x-spree-token'] = cart.token }
+
+      it 'returns empty warnings array when cart is valid' do
+        get :show, params: { id: cart.prefixed_id }
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['warnings']).to eq([])
+      end
+
+      it 'returns warnings when a line item is out of stock' do
+        cart.line_items.first.variant.stock_items.update_all(count_on_hand: 0, backorderable: false)
+
+        get :show, params: { id: cart.prefixed_id }
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['warnings']).to be_an(Array)
+        expect(json_response['warnings'].length).to eq(1)
+
+        warning = json_response['warnings'].first
+        expect(warning['code']).to eq('line_item_removed')
+        expect(warning['message']).to be_present
+        expect(warning['variant_id']).to start_with('variant_')
+        expect(warning['line_item_id']).to start_with('li_')
+      end
+
+      it 'returns warnings when a product is discontinued' do
+        cart.line_items.first.product.update_columns(status: 'discontinued')
+
+        get :show, params: { id: cart.prefixed_id }
+
+        expect(response).to have_http_status(:ok)
+        expect(json_response['warnings'].length).to eq(1)
+        expect(json_response['warnings'].first['code']).to eq('line_item_removed')
+      end
+
+      it 'removes the line item when returning a warning' do
+        cart.line_items.first.variant.stock_items.update_all(count_on_hand: 0, backorderable: false)
+        original_item_count = cart.line_items.count
+
+        get :show, params: { id: cart.prefixed_id }
+
+        expect(json_response['items'].length).to eq(original_item_count - 1)
+      end
+    end
+
     context 'auto-advance' do
       let(:user) { create(:user_with_addresses) }
       let(:cart) { create(:order_with_line_items, store: store, user: user) }

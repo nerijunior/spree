@@ -75,6 +75,7 @@ RSpec.configure do |config|
         { name: 'Customers', description: 'Customer account, addresses, saved payment methods, and order history' },
         { name: 'Markets', description: 'Markets, countries, currencies, and locales' },
         { name: 'Wishlists', description: 'Customer wishlists' },
+        { name: 'Policies', description: 'Store policies (return policy, privacy policy, terms of service)' },
         { name: 'Digitals', description: 'Digital product downloads' }
       ],
       'x-tagGroups': [
@@ -85,6 +86,7 @@ RSpec.configure do |config|
         { name: 'Customers', tags: ['Customers'] },
         { name: 'Markets', tags: ['Markets'] },
         { name: 'Wishlists', tags: ['Wishlists'] },
+        { name: 'Policies', tags: ['Policies'] },
         { name: 'Digitals', tags: ['Digitals'] }
       ],
       components: {

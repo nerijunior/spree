@@ -19,7 +19,11 @@ const mockClient = {
     fulfillments: {
       update: vi.fn(),
     },
-    couponCodes: {
+    discountCodes: {
+      apply: vi.fn(),
+      remove: vi.fn(),
+    },
+    giftCards: {
       apply: vi.fn(),
       remove: vi.fn(),
     },
@@ -32,7 +36,7 @@ vi.mock('@spree/sdk', () => ({
 
 import {
   getCart, getOrCreateCart, addItem, updateItem, removeItem, clearCart, associateCart,
-  updateCart, selectDeliveryRate, applyCoupon, removeCoupon, complete,
+  updateCart, selectDeliveryRate, applyDiscountCode, removeDiscountCode, applyGiftCard, removeGiftCard, complete,
 } from '../../src/actions/cart';
 import { revalidateTag } from 'next/cache';
 
@@ -274,19 +278,19 @@ describe('cart actions', () => {
     });
   });
 
-  describe('applyCoupon', () => {
-    it('applies coupon and revalidates checkout and cart', async () => {
+  describe('applyDiscountCode', () => {
+    it('applies discount code and revalidates checkout and cart', async () => {
       const updatedCart = { id: 'cart_1', discount_total: -10 };
       mockCookies({
         '_spree_cart_token': 'order_token',
         '_spree_cart_token_id': 'cart_1',
         '_spree_jwt': 'jwt_token',
       });
-      mockClient.carts.couponCodes.apply.mockResolvedValue(updatedCart);
+      mockClient.carts.discountCodes.apply.mockResolvedValue(updatedCart);
 
-      const result = await applyCoupon('SAVE10');
+      const result = await applyDiscountCode('SAVE10');
       expect(result).toEqual(updatedCart);
-      expect(mockClient.carts.couponCodes.apply).toHaveBeenCalledWith(
+      expect(mockClient.carts.discountCodes.apply).toHaveBeenCalledWith(
         'cart_1',
         'SAVE10',
         { spreeToken: 'order_token', token: 'jwt_token' }
@@ -296,21 +300,65 @@ describe('cart actions', () => {
     });
   });
 
-  describe('removeCoupon', () => {
-    it('removes coupon and revalidates checkout and cart', async () => {
+  describe('removeDiscountCode', () => {
+    it('removes discount code and revalidates checkout and cart', async () => {
       const updatedCart = { id: 'cart_1', discount_total: 0 };
       mockCookies({
         '_spree_cart_token': 'order_token',
         '_spree_cart_token_id': 'cart_1',
         '_spree_jwt': 'jwt_token',
       });
-      mockClient.carts.couponCodes.remove.mockResolvedValue(updatedCart);
+      mockClient.carts.discountCodes.remove.mockResolvedValue(updatedCart);
 
-      const result = await removeCoupon('SAVE10');
+      const result = await removeDiscountCode('SAVE10');
       expect(result).toEqual(updatedCart);
-      expect(mockClient.carts.couponCodes.remove).toHaveBeenCalledWith(
+      expect(mockClient.carts.discountCodes.remove).toHaveBeenCalledWith(
         'cart_1',
         'SAVE10',
+        { spreeToken: 'order_token', token: 'jwt_token' }
+      );
+      expect(revalidateTag).toHaveBeenCalledWith('checkout');
+      expect(revalidateTag).toHaveBeenCalledWith('cart');
+    });
+  });
+
+  describe('applyGiftCard', () => {
+    it('applies gift card and revalidates checkout and cart', async () => {
+      const updatedCart = { id: 'cart_1', gift_card_total: '50.0', amount_due: '59.08' };
+      mockCookies({
+        '_spree_cart_token': 'order_token',
+        '_spree_cart_token_id': 'cart_1',
+        '_spree_jwt': 'jwt_token',
+      });
+      mockClient.carts.giftCards.apply.mockResolvedValue(updatedCart);
+
+      const result = await applyGiftCard('GC-ABCD-1234');
+      expect(result).toEqual(updatedCart);
+      expect(mockClient.carts.giftCards.apply).toHaveBeenCalledWith(
+        'cart_1',
+        'GC-ABCD-1234',
+        { spreeToken: 'order_token', token: 'jwt_token' }
+      );
+      expect(revalidateTag).toHaveBeenCalledWith('checkout');
+      expect(revalidateTag).toHaveBeenCalledWith('cart');
+    });
+  });
+
+  describe('removeGiftCard', () => {
+    it('removes gift card and revalidates checkout and cart', async () => {
+      const updatedCart = { id: 'cart_1', gift_card_total: '0.0', amount_due: '109.08' };
+      mockCookies({
+        '_spree_cart_token': 'order_token',
+        '_spree_cart_token_id': 'cart_1',
+        '_spree_jwt': 'jwt_token',
+      });
+      mockClient.carts.giftCards.remove.mockResolvedValue(updatedCart);
+
+      const result = await removeGiftCard('gc_abc123');
+      expect(result).toEqual(updatedCart);
+      expect(mockClient.carts.giftCards.remove).toHaveBeenCalledWith(
+        'cart_1',
+        'gc_abc123',
         { spreeToken: 'order_token', token: 'jwt_token' }
       );
       expect(revalidateTag).toHaveBeenCalledWith('checkout');

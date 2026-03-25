@@ -55,16 +55,26 @@ await client.carts.items.update(cartId, lineItemId, {
 await client.carts.items.delete(cartId, lineItemId, options);
 ```
 
-### Coupon Codes
+### Discount Codes
 
 ```typescript
 const options = { spreeToken: cart.token };
 
-// Apply a coupon code
-await client.carts.couponCodes.apply(cartId, 'SAVE20', options);
+// Apply a discount code
+await client.carts.discountCodes.apply(cartId, 'SAVE20', options);
 
-// Remove a coupon code
-await client.carts.couponCodes.remove(cartId, 'SUMMER20', options);
+// Remove a discount code
+await client.carts.discountCodes.remove(cartId, 'SAVE20', options);
+```
+
+### Gift Cards
+
+```typescript
+// Apply a gift card (reduces amount_due, not total)
+const cart = await client.carts.giftCards.apply(cartId, 'GC-ABCD-1234', options);
+
+// Remove a gift card (ID from cart.gift_card.id)
+await client.carts.giftCards.remove(cartId, 'gc_abc123', options);
 ```
 
 ## Checkout

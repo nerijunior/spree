@@ -30,6 +30,8 @@ RSpec.describe 'Digitals API', type: :request, swagger_doc: 'api-reference/store
       response '200', 'file downloaded' do
         let(:token) { digital_link.token }
 
+        produces 'application/octet-stream'
+
         run_test! do |response|
           expect(response.headers['Content-Disposition']).to include('thinking-cat.jpg')
           expect(digital_link.reload.access_counter).to eq(1)

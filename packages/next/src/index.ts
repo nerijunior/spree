@@ -9,6 +9,7 @@ export { listCountries, getCountry } from './data/countries';
 export { listCurrencies } from './data/currencies';
 export { listLocales } from './data/locales';
 export { listMarkets, getMarket, resolveMarket, listMarketCountries, getMarketCountry } from './data/markets';
+export { listPolicies, getPolicy } from './data/policies';
 
 // Server actions (mutations + auth-dependent reads)
 export {
@@ -21,8 +22,10 @@ export {
   associateCart,
   updateCart,
   selectDeliveryRate,
-  applyCoupon,
-  removeCoupon,
+  applyDiscountCode,
+  removeDiscountCode,
+  applyGiftCard,
+  removeGiftCard,
   complete,
 } from './actions/cart';
 
@@ -68,6 +71,7 @@ export {
 // Re-export commonly used SDK types for convenience
 export type {
   Cart,
+  CartWarning,
   Product,
   Order,
   LineItem,
@@ -77,6 +81,7 @@ export type {
   Currency,
   Locale,
   Market,
+  Policy,
   Address,
   Customer,
   CreditCard,

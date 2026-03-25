@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :controller do
+RSpec.describe Spree::Api::V3::Store::Carts::DiscountCodesController, type: :controller do
   render_views
 
   include_context 'API v3 Store'
@@ -16,7 +16,7 @@ RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :contr
     context 'with a standard promotion (single code)' do
       let!(:promotion) { create(:promotion_with_item_adjustment, code: 'SAVE10', stores: [store]) }
 
-      it 'applies the coupon code successfully' do
+      it 'applies the discount code successfully' do
         post :create, params: { cart_id: order.prefixed_id, code: 'SAVE10' }
 
         expect(response).to have_http_status(:created)
@@ -29,14 +29,14 @@ RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :contr
         expect(response).to have_http_status(:created)
       end
 
-      it 'returns error for invalid coupon code' do
+      it 'returns error for invalid discount code' do
         post :create, params: { cart_id: order.prefixed_id, code: 'INVALID' }
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(json_response['error']).to be_present
       end
 
-      it 'returns error when coupon is already applied' do
+      it 'returns error when discount is already applied' do
         order.coupon_code = 'SAVE10'
         Spree::PromotionHandler::Coupon.new(order).apply
 
@@ -52,7 +52,7 @@ RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :contr
       end
       let!(:coupon_code) { create(:coupon_code, promotion: promotion, code: 'multi1') }
 
-      it 'applies the multi-code coupon successfully' do
+      it 'applies the multi-code discount successfully' do
         post :create, params: { cart_id: order.prefixed_id, code: 'multi1' }
 
         expect(response).to have_http_status(:created)
@@ -66,27 +66,10 @@ RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :contr
       end
     end
 
-    context 'with a gift card' do
+    context 'with a gift card code' do
       let!(:gift_card) { create(:gift_card, store: store, amount: 50, code: 'giftcard123') }
 
-      it 'applies the gift card successfully' do
-        post :create, params: { cart_id: order.prefixed_id, code: 'giftcard123' }
-
-        expect(response).to have_http_status(:created)
-        expect(json_response['id']).to start_with('cart_')
-      end
-
-      it 'returns error for expired gift card' do
-        gift_card.update!(expires_at: 1.day.ago)
-
-        post :create, params: { cart_id: order.prefixed_id, code: 'giftcard123' }
-
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-
-      it 'returns error for redeemed gift card' do
-        gift_card.update!(state: :redeemed, redeemed_at: Time.current, amount_used: gift_card.amount)
-
+      it 'does not apply gift cards (gift cards use dedicated endpoint)' do
         post :create, params: { cart_id: order.prefixed_id, code: 'giftcard123' }
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -132,7 +115,7 @@ RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :contr
         Spree::PromotionHandler::Coupon.new(order).apply
       end
 
-      it 'removes the coupon code successfully' do
+      it 'removes the discount code successfully' do
         delete :destroy, params: { cart_id: order.prefixed_id, id: 'REMOVE10' }
 
         expect(response).to have_http_status(:ok)
@@ -140,7 +123,7 @@ RSpec.describe Spree::Api::V3::Store::Carts::CouponCodesController, type: :contr
       end
     end
 
-    context 'with non-existent coupon code' do
+    context 'with non-existent discount code' do
       it 'returns error' do
         delete :destroy, params: { cart_id: order.prefixed_id, id: 'NONEXISTENT' }
 

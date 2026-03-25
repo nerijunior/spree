@@ -1,5 +1,24 @@
 # @spree/next
 
+## 0.16.0
+
+### Breaking Changes
+
+- **Renamed `applyCoupon` / `removeCoupon`** to `applyDiscountCode` / `removeDiscountCode`
+### New Features
+
+- **`applyGiftCard(code)`** — apply gift card to cart
+- **`removeGiftCard(giftCardId)`** — remove gift card by prefixed ID
+- **Cart warnings** — `cart.warnings` array flags items removed due to stock changes
+- **Store policies** — `listPolicies()` and `getPolicy(slug)` data functions for return policy, privacy policy, terms of service, etc.
+
+### Types
+
+- `Cart` type now includes `warnings` array
+- New re-exported types: `CartWarning`, `Policy`
+
+Requires `@spree/sdk >= 0.16.0`.
+
 ## 0.15.0
 
 ### Minor Changes

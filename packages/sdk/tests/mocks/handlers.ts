@@ -242,12 +242,21 @@ export const handlers = [
     HttpResponse.json(fixtures.cart)
   ),
 
-  // Carts > Coupon Codes
-  http.post(`${API_PREFIX}/carts/:cartId/coupon_codes`, () =>
+  // Carts > Discount Codes
+  http.post(`${API_PREFIX}/carts/:cartId/discount_codes`, () =>
     HttpResponse.json(fixtures.cart)
   ),
 
-  http.delete(`${API_PREFIX}/carts/:cartId/coupon_codes/:code`, () =>
+  http.delete(`${API_PREFIX}/carts/:cartId/discount_codes/:code`, () =>
+    HttpResponse.json(fixtures.cart)
+  ),
+
+  // Carts > Gift Cards
+  http.post(`${API_PREFIX}/carts/:cartId/gift_cards`, () =>
+    HttpResponse.json(fixtures.cart)
+  ),
+
+  http.delete(`${API_PREFIX}/carts/:cartId/gift_cards/:id`, () =>
     HttpResponse.json(fixtures.cart)
   ),
 
@@ -505,16 +514,33 @@ export const handlers = [
     })
   ),
 
-  // Customer > Password Resets
-  http.post(`${API_PREFIX}/customers/me/password_resets`, () =>
+  // Password Resets
+  http.post(`${API_PREFIX}/password_resets`, () =>
     HttpResponse.json(
       { message: 'If an account exists for that email, password reset instructions have been sent.' },
       { status: 202 }
     )
   ),
 
-  http.patch(`${API_PREFIX}/customers/me/password_resets/:token`, () =>
+  http.patch(`${API_PREFIX}/password_resets/:token`, () =>
     HttpResponse.json({ token: 'new-jwt-token', user: fixtures.user })
+  ),
+
+  // Policies
+  http.get(`${API_PREFIX}/policies`, () =>
+    HttpResponse.json({
+      data: [
+        { id: 'pol_1', name: 'Return Policy', slug: 'return-policy', body: 'Return within 30 days.', body_html: '<p>Return within 30 days.</p>', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
+        { id: 'pol_2', name: 'Privacy Policy', slug: 'privacy-policy', body: 'We respect your privacy.', body_html: '<p>We respect your privacy.</p>', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z' },
+      ]
+    })
+  ),
+
+  http.get(`${API_PREFIX}/policies/:id`, () =>
+    HttpResponse.json({
+      id: 'pol_1', name: 'Return Policy', slug: 'return-policy', body: 'Return within 30 days.', body_html: '<p>Return within 30 days.</p>',
+      created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z'
+    })
   ),
 
   // Wishlists

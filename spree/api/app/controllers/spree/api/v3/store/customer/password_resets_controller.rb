@@ -13,7 +13,7 @@ module Spree
 
             skip_before_action :authenticate_user
 
-            # POST /api/v3/store/customer/password_resets
+            # POST /api/v3/store/password_resets
             def create
               redirect_url = params[:redirect_url]
 
@@ -41,7 +41,7 @@ module Spree
               render json: { message: Spree.t(:password_reset_requested, scope: :api) }, status: :accepted
             end
 
-            # PATCH /api/v3/store/customer/password_resets/:id
+            # PATCH /api/v3/store/password_resets/:id
             def update
               user = Spree.user_class.find_by_password_reset_token(params[:id])
 
