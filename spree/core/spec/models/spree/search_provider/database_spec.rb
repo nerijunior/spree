@@ -118,6 +118,52 @@ module Spree
           expect(result.products).not_to include(product_2, product_3)
         end
       end
+
+      context 'with in_category filter' do
+        let(:taxonomy) { create(:taxonomy, store: store) }
+        let(:parent_taxon) { create(:taxon, taxonomy: taxonomy, name: 'Clothing') }
+        let(:child_taxon) { create(:taxon, taxonomy: taxonomy, parent: parent_taxon, name: 'Shirts') }
+
+        before do
+          product_1.taxons << child_taxon
+          product_2.taxons << parent_taxon
+        end
+
+        it 'returns products directly in the category' do
+          result = provider.search_and_filter(scope: scope, filters: { 'in_category' => child_taxon.prefixed_id })
+          expect(result.products).to include(product_1)
+          expect(result.products).not_to include(product_2, product_3)
+        end
+
+        it 'returns products in descendant categories when filtering by parent' do
+          result = provider.search_and_filter(scope: scope, filters: { 'in_category' => parent_taxon.prefixed_id })
+          expect(result.products).to include(product_1, product_2)
+          expect(result.products).not_to include(product_3)
+        end
+
+        it 'returns no products for an invalid category ID' do
+          result = provider.search_and_filter(scope: scope, filters: { 'in_category' => 'ctg_nonexistent' })
+          expect(result.products).to be_empty
+          expect(result.total_count).to eq(0)
+        end
+      end
+
+      context 'with in_categories filter (multiple, OR logic)' do
+        let(:taxonomy) { create(:taxonomy, store: store) }
+        let(:shirts_taxon) { create(:taxon, taxonomy: taxonomy, name: 'Shirts') }
+        let(:pants_taxon) { create(:taxon, taxonomy: taxonomy, name: 'Pants') }
+
+        before do
+          product_1.taxons << shirts_taxon
+          product_2.taxons << pants_taxon
+        end
+
+        it 'returns products in any of the given categories' do
+          result = provider.search_and_filter(scope: scope, filters: { 'in_categories' => [shirts_taxon.prefixed_id, pants_taxon.prefixed_id] })
+          expect(result.products).to include(product_1, product_2)
+          expect(result.products).not_to include(product_3)
+        end
+      end
     end
 
     describe '#index' do

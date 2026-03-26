@@ -133,7 +133,7 @@ RSpec.describe 'Meilisearch Integration', type: :controller, if: ENV['MEILISEARC
 
   describe 'filtering by category' do
     it 'filters by category ID' do
-      get :index, params: { q: { categories_id_eq: clothing_category.prefixed_id } }
+      get :index, params: { q: { in_category: clothing_category.prefixed_id } }
 
       expect(response).to have_http_status(:ok)
       names = json_response['data'].map { |p| p['name'] }
@@ -173,7 +173,7 @@ RSpec.describe 'Meilisearch Integration', type: :controller, if: ENV['MEILISEARC
     end
 
     it 'searches text and filters by category' do
-      get :index, params: { q: { search: 'blue', categories_id_eq: shoes_category.prefixed_id } }
+      get :index, params: { q: { search: 'blue', in_category: shoes_category.prefixed_id } }
 
       expect(response).to have_http_status(:ok)
       names = json_response['data'].map { |p| p['name'] }

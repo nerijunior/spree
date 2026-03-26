@@ -200,7 +200,7 @@ module Spree
     self.whitelisted_ransackable_attributes = %w[description name slug discontinue_on status available_on created_at updated_at]
     self.whitelisted_ransackable_associations = %w[taxons categories stores variants_including_master master variants tags labels
                                                    shipping_category classifications option_types]
-    self.whitelisted_ransackable_scopes = %w[not_discontinued search_by_name in_taxon price_between
+    self.whitelisted_ransackable_scopes = %w[not_discontinued search_by_name in_taxon in_category in_categories price_between
                                              price_lte price_gte
                                              search multi_search in_stock out_of_stock with_option_value_ids
 

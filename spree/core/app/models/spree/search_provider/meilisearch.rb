@@ -198,8 +198,10 @@ module Spree
           'in_stock = true' if value.to_s != '0'
         when 'out_of_stock'
           'in_stock = false' if value.to_s != '0'
-        when 'categories_id_eq'
+        when 'in_category'
           "category_ids = '#{sanitize_prefixed_id(value)}'" if valid_prefixed_id?(value)
+        when 'in_categories'
+          Array(value).filter_map { |id| "category_ids = '#{sanitize_prefixed_id(id)}'" if valid_prefixed_id?(id) }
         when 'with_option_value_ids'
           Array(value).filter_map { |ov| "option_value_ids = '#{sanitize_prefixed_id(ov)}'" if valid_prefixed_id?(ov) }
         end

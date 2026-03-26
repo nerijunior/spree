@@ -7943,12 +7943,20 @@ paths:
         description: Filter by name containing string
         schema:
           type: string
-      - name: q[categories_id_eq]
+      - name: q[in_category]
         in: query
         required: false
-        description: Filter by category ID
+        description: Filter by category prefixed ID (includes descendants)
         schema:
           type: string
+      - name: q[in_categories][]
+        in: query
+        required: false
+        description: Filter by multiple category prefixed IDs (OR logic, includes descendants)
+        schema:
+          type: array
+          items:
+            type: string
       - name: q[price_gte]
         in: query
         required: false
