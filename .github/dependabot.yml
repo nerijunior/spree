@@ -1,32 +1,34 @@
 version: 2
 updates:
-- package-ecosystem: bundler
-  directory: "/core"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: bundler
-  directory: "/cli"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: bundler
-  directory: "/api"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: bundler
-  directory: "/storefront"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: bundler
-  directory: "/admin"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-- package-ecosystem: bundler
-  directory: "/emails"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+  # Ruby gems (under spree/ engine directories)
+  - package-ecosystem: bundler
+    directory: "/spree/core"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: bundler
+    directory: "/spree/api"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: bundler
+    directory: "/spree/admin"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: bundler
+    directory: "/spree/emails"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+
+  # JavaScript/TypeScript (pnpm workspace — single root lockfile)
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      typescript-packages:
+        patterns:
+          - "*"
