@@ -4,11 +4,73 @@ sidebarTitle: Emails
 description: Learn how to send transactional emails from your Spree application.
 ---
 
-Spree sends transactional emails such as order confirmation, password reset, shipping notifications, etc. You can use any SMTP provider — Resend, Postmark, Mailgun, SendGrid, Amazon SES, or your own SMTP server.
+Spree handles two categories of emails:
 
-## Configuration
+| Category | Sent by | Examples |
+|----------|---------|----------|
+| **Customer-facing** | Storefront (via webhooks) | Order confirmation, shipping notification, password reset |
+| **System/admin** | Spree backend (Rails) | Staff invitation, report ready, export complete |
 
-Set the following environment variables to enable email delivery:
+## Customer-Facing Emails (Headless)
+
+In headless builds, customer-facing emails are rendered and sent by the **storefront**, not the backend. The Spree backend publishes webhook events, and the storefront receives them, renders React email templates, and sends via [Resend](https://resend.com) (or any provider).
+
+```
+Spree Backend → Webhook POST → Storefront → render email → send via Resend
+                (HMAC signed)   (verified)    (react-email)
+```
+
+### Setup
+
+1. **Create a webhook endpoint** in Spree Admin → Settings → Developers → Webhooks:
+   - **URL:** `https://your-storefront.com/api/webhooks/spree`
+   - **Events:** `order.completed`, `order.canceled`, `order.shipped`, `customer.password_reset_requested`
+
+2. **Configure the storefront** with the webhook secret and email provider:
+
+```env
+# .env.local (storefront)
+SPREE_WEBHOOK_SECRET=your_webhook_endpoint_secret_key
+RESEND_API_KEY=re_your_resend_api_key
+EMAIL_FROM=Your Store <orders@your-domain.com>
+```
+
+3. **The storefront handles everything else** — signature verification, event routing, email rendering, and delivery are built into `@spree/next/webhooks`. See the [Next.js storefront email docs](/developer/storefront/nextjs/customization#transactional-emails) for template customization.
+
+### Supported Events
+
+| Event | Email |
+|-------|-------|
+| `order.completed` | Order confirmation with items, totals, addresses |
+| `order.canceled` | Cancellation notice |
+| `order.shipped` | Shipping notification with tracking link |
+| `customer.password_reset_requested` | Password reset link |
+
+### Custom Frameworks
+
+If you're not using the Next.js storefront, you can build your own webhook handler with any framework. Use `@spree/sdk/webhooks` for signature verification:
+
+```typescript
+import { verifyWebhookSignature } from '@spree/sdk/webhooks'
+```
+
+See [Webhooks documentation](/developer/core-concepts/webhooks) for the full payload format and verification details.
+
+## System Emails (Rails)
+
+System emails are internal notifications sent to **store staff**, not customers. They are sent by the Spree backend via Rails ActionMailer.
+
+| Email | When |
+|-------|------|
+| Staff invitation | Admin invites a new team member |
+| Invitation accepted | Invited user accepts |
+| Report ready | Background report generation completes |
+| Export complete | Data export finishes |
+| Webhook endpoint disabled | Endpoint auto-disabled after repeated failures |
+
+### Configuration
+
+Set the following environment variables on the **Spree backend** to enable system email delivery:
 
 | Variable | Default | Description |
 | --- | --- | --- |
@@ -16,7 +78,7 @@ Set the following environment variables to enable email delivery:
 | `SMTP_PORT` | `587` | SMTP server port |
 | `SMTP_USERNAME` | — | SMTP auth username |
 | `SMTP_PASSWORD` | — | SMTP auth password |
-| `SMTP_FROM_ADDRESS` | — | Default "from" email address (e.g., `orders@mystore.com`) |
+| `SMTP_FROM_ADDRESS` | — | Default "from" email address (e.g., `admin@mystore.com`) |
 | `RAILS_HOST` | `example.com` | Host used in email URLs |
 
 When `SMTP_HOST` is not set, emails are printed to the Rails log instead of being sent.
@@ -29,7 +91,7 @@ When `SMTP_HOST` is not set, emails are printed to the Rails log instead of bein
     SMTP_HOST=smtp.sendgrid.net
     SMTP_USERNAME=apikey
     SMTP_PASSWORD=SG.your-sendgrid-api-key
-    SMTP_FROM_ADDRESS=orders@mystore.com
+    SMTP_FROM_ADDRESS=admin@mystore.com
     ```
 
     <Warning>
@@ -42,7 +104,7 @@ When `SMTP_HOST` is not set, emails are printed to the Rails log instead of bein
     SMTP_HOST=smtp.resend.com
     SMTP_USERNAME=resend
     SMTP_PASSWORD=re_your-resend-api-key
-    SMTP_FROM_ADDRESS=orders@mystore.com
+    SMTP_FROM_ADDRESS=admin@mystore.com
     ```
   </Tab>
   <Tab title="Postmark">
@@ -50,7 +112,7 @@ When `SMTP_HOST` is not set, emails are printed to the Rails log instead of bein
     SMTP_HOST=smtp.postmarkapp.com
     SMTP_USERNAME=your-postmark-server-token
     SMTP_PASSWORD=your-postmark-server-token
-    SMTP_FROM_ADDRESS=orders@mystore.com
+    SMTP_FROM_ADDRESS=admin@mystore.com
     ```
   </Tab>
   <Tab title="Amazon SES">
@@ -58,22 +120,30 @@ When `SMTP_HOST` is not set, emails are printed to the Rails log instead of bein
     SMTP_HOST=email-smtp.us-east-1.amazonaws.com
     SMTP_USERNAME=your-ses-access-key-id
     SMTP_PASSWORD=your-ses-secret-access-key
-    SMTP_FROM_ADDRESS=orders@mystore.com
+    SMTP_FROM_ADDRESS=admin@mystore.com
     ```
   </Tab>
 </Tabs>
 
 ## Local Development
 
-In local development, emails are printed to the Rails log by default. To preview emails with a web UI, run [Mailpit](https://mailpit.axllent.org):
+### Customer-facing emails (storefront)
+
+In development, no email provider is needed. Emails are rendered to HTML files in `.next/emails/` with a clickable `file://` link in the console. To preview and design templates:
 
 ```bash
-docker run -d --name mailpit -p 8025:8025 -p 1025:1025 axllent/mailpit
-SMTP_HOST=localhost bin/dev
+npm run email:dev
 ```
 
-Open [http://localhost:8025](http://localhost:8025) to see all outgoing emails.
+To test the full webhook flow locally, use [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/):
 
-<Tip>
-If you're using `docker compose up` for development, Mailpit is included automatically and all emails are caught at [http://localhost:8025](http://localhost:8025).
-</Tip>
+```bash
+brew install cloudflared
+cloudflared tunnel --url http://localhost:3001
+```
+
+Use the tunnel URL as the webhook endpoint URL in Spree Admin.
+
+### System emails (Rails)
+
+System emails use [letter_opener](https://github.com/ryanb/letter_opener) in development — emails open automatically in your browser instead of being sent.
