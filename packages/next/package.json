@@ -1,6 +1,6 @@
 {
   "name": "@spree/next",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Next.js integration for Spree Commerce — server actions, caching, and cookie-based auth",
   "type": "module",
   "main": "./dist/index.js",
@@ -23,6 +23,13 @@
         "default": "./dist/middleware.js"
       },
       "default": "./dist/middleware.js"
+    },
+    "./webhooks": {
+      "import": {
+        "types": "./dist/webhooks.d.ts",
+        "default": "./dist/webhooks.js"
+      },
+      "default": "./dist/webhooks.js"
     }
   },
   "files": [

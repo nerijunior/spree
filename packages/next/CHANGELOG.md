@@ -1,5 +1,13 @@
 # @spree/next
 
+## 0.17.0
+
+### New Features
+
+- **Webhook Route Handler** — new `@spree/next/webhooks` subpath export with `createWebhookHandler()` factory. Creates a Next.js Route Handler that verifies HMAC-SHA256 signatures, parses events, and dispatches to user-defined handlers. Returns 200 immediately and processes handlers async.
+
+Requires `@spree/sdk >= 0.16.0`.
+
 ## 0.16.0
 
 ### Breaking Changes

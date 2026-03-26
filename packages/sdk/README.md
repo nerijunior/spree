@@ -760,6 +760,35 @@ const client = createClient({
 });
 ```
 
+## Webhooks
+
+The SDK includes webhook signature verification and types via the `@spree/sdk/webhooks` subpath:
+
+```typescript
+import { verifyWebhookSignature, type WebhookEvent } from '@spree/sdk/webhooks';
+import type { Order } from '@spree/sdk';
+
+// Verify a webhook signature (works with any framework)
+const isValid = verifyWebhookSignature(
+  rawBody,                                              // raw request body string
+  request.headers.get('x-spree-webhook-signature')!,    // HMAC signature
+  request.headers.get('x-spree-webhook-timestamp')!,    // unix timestamp
+  process.env.SPREE_WEBHOOK_SECRET!                     // endpoint secret key
+);
+
+// Type your webhook handlers using SDK types
+type OrderEvent = WebhookEvent<Order>;
+
+function handleOrderCompleted(event: OrderEvent) {
+  const order = event.data; // fully typed Order
+  console.log(order.number, order.email, order.display_total);
+}
+```
+
+Webhook payloads use the same V3 serializers as the REST API, so all SDK types (`Order`, `Cart`, `Payment`, `Fulfillment`, etc.) work directly as the `data` field type.
+
+For **Next.js** projects, use `@spree/next/webhooks` for a ready-made Route Handler — see [`@spree/next` README](../next/README.md#webhooks).
+
 ## Development
 
 ### Setup

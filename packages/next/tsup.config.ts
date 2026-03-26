@@ -52,4 +52,15 @@ export default defineConfig([
     sourcemap: true,
     external: ['next', 'next/server', '@spree/sdk'],
   },
+  // Webhooks — separate entry (uses next/server + @spree/sdk/webhooks)
+  {
+    entry: {
+      webhooks: 'src/webhooks.ts',
+    },
+    format: ['esm'],
+    dts: true,
+    splitting: false,
+    sourcemap: true,
+    external: ['next', 'next/server', '@spree/sdk', '@spree/sdk/webhooks'],
+  },
 ]);

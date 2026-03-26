@@ -1,5 +1,12 @@
 # @spree/sdk
 
+## 0.17.0
+
+### New Features
+
+- **Webhook signature verification** — new `@spree/sdk/webhooks` subpath export with `verifyWebhookSignature()` for HMAC-SHA256 signature verification with replay protection. Works with any framework (Express, Hono, Cloudflare Workers, Next.js, etc.)
+- **Webhook event types** — `WebhookEvent<T>` generic envelope type. Use existing SDK types (`Order`, `Payment`, `Fulfillment`, etc.) as the type parameter — webhook payloads use the same V3 serializers as the REST API
+
 ## 0.16.0
 
 ### Breaking Changes
