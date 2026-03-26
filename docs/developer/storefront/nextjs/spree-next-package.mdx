@@ -20,6 +20,9 @@ Set environment variables and the client initializes automatically:
 ```env
 SPREE_API_URL=https://api.mystore.com
 SPREE_PUBLISHABLE_KEY=spree_pk_xxx
+
+# Required for webhook-based emails (see Webhooks section below)
+SPREE_WEBHOOK_SECRET=your_webhook_endpoint_secret_key
 ```
 
 ### Explicit initialization
@@ -283,6 +286,48 @@ You can still pass locale options explicitly — they override the auto-detected
 const products = await listProducts({ limit: 10 }, { locale: 'fr', country: 'FR' });
 const category = await getCategory('clothing/shirts', {}, { locale: 'de', country: 'DE' });
 ```
+
+## Webhooks
+
+Handle Spree webhook events in your Next.js app with `@spree/next/webhooks`:
+
+```typescript
+// src/app/api/webhooks/spree/route.ts
+import { createWebhookHandler } from '@spree/next/webhooks'
+
+export const POST = createWebhookHandler({
+  secret: process.env.SPREE_WEBHOOK_SECRET!,
+  handlers: {
+    'order.completed': async (event) => {
+      await sendOrderConfirmationEmail(event.data)
+    },
+    'order.canceled': async (event) => {
+      await sendCancellationEmail(event.data)
+    },
+    'order.shipped': async (event) => {
+      await sendShippingNotification(event.data)
+    },
+    'customer.password_reset_requested': async (event) => {
+      await sendPasswordResetEmail(event.data)
+    },
+  },
+})
+```
+
+The handler verifies HMAC-SHA256 signatures, rejects replayed requests, routes events to your handlers, and returns 200 immediately (handlers run async).
+
+### Local development
+
+Webhooks require a publicly accessible URL. Use [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/) for local development:
+
+```bash
+brew install cloudflared
+cloudflared tunnel --url http://localhost:3001
+```
+
+Then create a webhook endpoint in **Spree Admin → Settings → Developers → Webhooks** pointing to your tunnel URL + `/api/webhooks/spree`.
+
+For more details, see [Webhooks](/developer/core-concepts/webhooks).
 
 ## TypeScript
 

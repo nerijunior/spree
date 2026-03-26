@@ -1,6 +1,6 @@
 {
   "name": "@spree/sdk",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Official TypeScript SDK for Spree Commerce Store API",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -35,6 +35,16 @@
       "require": {
         "types": "./dist/zod/index.d.cts",
         "default": "./dist/zod/index.cjs"
+      }
+    },
+    "./webhooks": {
+      "import": {
+        "types": "./dist/webhooks.d.ts",
+        "default": "./dist/webhooks.js"
+      },
+      "require": {
+        "types": "./dist/webhooks.d.cts",
+        "default": "./dist/webhooks.cjs"
       }
     }
   },

@@ -17,8 +17,8 @@ x-app: &app
     RAILS_FORCE_SSL: "false"
     RAILS_ASSUME_SSL: "false"
     MEILISEARCH_URL: http://meilisearch:7700
-    SMTP_HOST: mailpit
-    SMTP_PORT: "1025"
+    # Admin/system emails use letter_opener in development (opens in browser).
+    # Customer transactional emails are handled by the storefront via webhooks.
 
 services:
   postgres:
@@ -58,12 +58,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  mailpit:
-    image: axllent/mailpit
-    ports:
-      - "8025:8025"
-      - "1025:1025"
 
   web:
     <<: *app

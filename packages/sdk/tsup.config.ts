@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'types/index': 'src/types/index.ts',
     'zod/index': 'src/zod/index.ts',
+    webhooks: 'src/webhooks.ts',
   },
   format: ['cjs', 'esm'],
   dts: { resolve: ['@spree/sdk-core'] },

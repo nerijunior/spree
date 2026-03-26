@@ -323,6 +323,47 @@ You can still pass locale options explicitly — they override auto-detected val
 const products = await listProducts({ limit: 10 }, { locale: 'fr', country: 'FR' });
 ```
 
+## Webhooks
+
+Handle Spree webhook events in your Next.js app with a single function:
+
+```typescript
+// src/app/api/webhooks/spree/route.ts
+import { createWebhookHandler } from '@spree/next/webhooks';
+
+export const POST = createWebhookHandler({
+  secret: process.env.SPREE_WEBHOOK_SECRET!,
+  handlers: {
+    'order.completed': async (event) => {
+      const order = event.data; // typed as the data you pass
+      await sendOrderConfirmationEmail(order);
+    },
+    'order.canceled': async (event) => {
+      await sendCancellationEmail(event.data);
+    },
+    'shipment.shipped': async (event) => {
+      await sendShippingNotification(event.data);
+    },
+  },
+});
+```
+
+`createWebhookHandler` handles:
+- HMAC-SHA256 signature verification (via `@spree/sdk/webhooks`)
+- Replay protection (rejects timestamps older than 5 minutes)
+- Event routing to your handlers by event name
+- Returns 200 immediately, processes handlers async (Spree won't time out)
+- Unhandled events return 200 with `{ handled: false }` (no retries)
+
+### Setup
+
+1. Install [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/) for local development: `brew install cloudflared`
+2. Expose your storefront: `cloudflared tunnel --url http://localhost:3001`
+3. Create a webhook endpoint in **Spree Admin → Settings → Developers → Webhooks** pointing to your tunnel URL + `/api/webhooks/spree`
+4. Add `SPREE_WEBHOOK_SECRET` to your `.env.local`
+
+For framework-agnostic webhook verification (Express, Hono, etc.), use `@spree/sdk/webhooks` directly — see the [`@spree/sdk` README](../sdk/README.md#webhooks).
+
 ## TypeScript
 
 All types are re-exported from `@spree/sdk` for convenience:

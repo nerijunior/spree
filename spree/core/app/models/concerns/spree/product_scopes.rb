@@ -147,8 +147,32 @@ module Spree
           where("#{Classification.table_name}.taxon_id" => taxon.cached_self_and_descendants_ids).distinct
       }
 
-      # Alias for in_taxon — public API name
-      scope :in_category, ->(category) { in_taxon(category) }
+      # Products in a category AND all its descendants.
+      # Accepts a Category record or a prefixed ID string (e.g. 'ctg_xxx').
+      def self.in_category(category_or_id)
+        category = category_or_id.is_a?(String) ? Spree::Taxon.find_by_prefix_id(category_or_id) : category_or_id
+        return none unless category
+
+        in_taxon(category)
+      end
+
+      # Products in ANY of the given categories (OR logic), each including descendants.
+      # Accepts an array of Category records, prefixed ID strings, or a mix.
+      def self.in_categories(*categories_or_ids)
+        categories_or_ids = categories_or_ids.flatten.compact
+        return none if categories_or_ids.empty?
+
+        ids, records = categories_or_ids.partition { |c| c.is_a?(String) }
+        if ids.any?
+          decoded = ids.filter_map { |id| Spree::Taxon.decode_prefixed_id(id) }
+          records += Spree::Taxon.where(id: decoded).to_a if decoded.any?
+        end
+        return none if records.empty?
+
+        taxon_ids = records.flat_map(&:cached_self_and_descendants_ids).uniq
+
+        joins(:classifications).where(Classification.table_name => { taxon_id: taxon_ids }).distinct
+      end
 
       # Deprecated — remove in 6.0. Use in_taxon instead.
       def self.in_taxons(*taxons)

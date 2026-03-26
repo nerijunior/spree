@@ -54,8 +54,10 @@ RSpec.describe 'Products API', type: :request, swagger_doc: 'api-reference/store
                 description: 'Sort order. Prefix with - for descending. Values: price, -price, best_selling, name, -name, -available_on, available_on'
       parameter name: 'q[name_cont]', in: :query, type: :string, required: false,
                 description: 'Filter by name containing string'
-      parameter name: 'q[categories_id_eq]', in: :query, type: :string, required: false,
-                description: 'Filter by category ID'
+      parameter name: 'q[in_category]', in: :query, type: :string, required: false,
+                description: 'Filter by category prefixed ID (includes descendants)'
+      parameter name: 'q[in_categories][]', in: :query, type: :string, required: false,
+                description: 'Filter by multiple category prefixed IDs (OR logic, includes descendants)'
       parameter name: 'q[price_gte]', in: :query, type: :number, required: false,
                 description: 'Filter by minimum price'
       parameter name: 'q[price_lte]', in: :query, type: :number, required: false,

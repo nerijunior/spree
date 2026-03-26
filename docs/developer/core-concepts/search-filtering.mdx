@@ -80,9 +80,14 @@ const { data: products } = await client.categories.products.list('clothing/shirt
   limit: 12,
 })
 
-// Or filter by category ID
+// Or filter by category ID (includes descendants)
 const { data: products } = await client.products.list({
-  categories_id_eq: 'ctg_xxx',
+  in_category: 'ctg_xxx',
+})
+
+// Multiple categories (OR logic, checkbox filters)
+const { data: products } = await client.products.list({
+  in_categories: ['ctg_shirts', 'ctg_pants'],
 })
 ```
 
@@ -91,8 +96,12 @@ const { data: products } = await client.products.list({
 curl 'https://api.mystore.com/api/v3/store/categories/clothing/shirts/products?limit=12' \
   -H 'Authorization: Bearer spree_pk_xxx'
 
-# Filter by category ID
-curl 'https://api.mystore.com/api/v3/store/products?q[categories_id_eq]=ctg_xxx' \
+# Filter by category ID (includes descendants)
+curl 'https://api.mystore.com/api/v3/store/products?q[in_category]=ctg_xxx' \
+  -H 'Authorization: Bearer spree_pk_xxx'
+
+# Multiple categories (OR logic)
+curl 'https://api.mystore.com/api/v3/store/products?q[in_categories][]=ctg_shirts&q[in_categories][]=ctg_pants' \
   -H 'Authorization: Bearer spree_pk_xxx'
 ```
 

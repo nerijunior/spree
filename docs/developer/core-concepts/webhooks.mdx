@@ -163,22 +163,56 @@ Each webhook request includes these headers:
 
 ### Verifying Webhook Signatures
 
-To ensure webhooks are genuinely from your Spree store, verify the signature:
+To ensure webhooks are genuinely from your Spree store, verify the signature.
 
-```ruby
-# In your webhook receiver
-def verify_webhook(request)
-  payload = request.body.read
-  signature = request.headers['X-Spree-Webhook-Signature']
-  secret_key = ENV['SPREE_WEBHOOK_SECRET'] # Your endpoint's secret_key
+#### Next.js (recommended)
 
-  expected = OpenSSL::HMAC.hexdigest('SHA256', secret_key, payload)
+Use `@spree/next/webhooks` for a ready-made Route Handler:
 
-  ActiveSupport::SecurityUtils.secure_compare(signature, expected)
-end
+```typescript
+// src/app/api/webhooks/spree/route.ts
+import { createWebhookHandler } from '@spree/next/webhooks'
+
+export const POST = createWebhookHandler({
+  secret: process.env.SPREE_WEBHOOK_SECRET!,
+  handlers: {
+    'order.completed': async (event) => {
+      // event.data is the order payload (same shape as Store API)
+      await sendOrderConfirmationEmail(event.data)
+    },
+    'order.canceled': async (event) => {
+      await sendCancellationEmail(event.data)
+    },
+  },
+})
 ```
 
-Example in a Rails controller:
+#### Any JavaScript/TypeScript framework
+
+Use `@spree/sdk/webhooks` for framework-agnostic verification:
+
+```typescript
+import { verifyWebhookSignature } from '@spree/sdk/webhooks'
+import type { WebhookEvent } from '@spree/sdk/webhooks'
+import type { Order } from '@spree/sdk'
+
+// Hono, Cloudflare Workers, or any Web Fetch API-based framework
+app.post('/webhooks/spree', async (req, res) => {
+  const body = await req.text()
+  const signature = req.headers['x-spree-webhook-signature']
+  const timestamp = req.headers['x-spree-webhook-timestamp']
+
+  if (!verifyWebhookSignature(body, signature, timestamp, process.env.SPREE_WEBHOOK_SECRET!)) {
+    return res.status(401).json({ error: 'Invalid signature' })
+  }
+
+  const event: WebhookEvent<Order> = JSON.parse(body)
+  // handle event...
+  res.json({ received: true })
+})
+```
+
+#### Ruby
 
 ```ruby
 class WebhooksController < ApplicationController
@@ -209,7 +243,8 @@ class WebhooksController < ApplicationController
     request.body.rewind
 
     signature = request.headers['X-Spree-Webhook-Signature']
-    expected = OpenSSL::HMAC.hexdigest('SHA256', ENV['SPREE_WEBHOOK_SECRET'], payload)
+    timestamp = request.headers['X-Spree-Webhook-Timestamp']
+    expected = OpenSSL::HMAC.hexdigest('SHA256', ENV['SPREE_WEBHOOK_SECRET'], "#{timestamp}.#{payload}")
 
     ActiveSupport::SecurityUtils.secure_compare(signature.to_s, expected)
   end

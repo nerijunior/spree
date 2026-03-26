@@ -87,9 +87,14 @@ You can filter by associated model attributes using underscore notation:
 <CodeGroup>
 
 ```typescript SDK
-// Products in a specific category
+// Products in a specific category (includes descendants)
 const products = await client.products.list({
-  categories_id_eq: 'ctg_abc123',
+  in_category: 'ctg_abc123',
+})
+
+// Multiple categories (OR logic, checkbox filters)
+const products = await client.products.list({
+  in_categories: ['ctg_abc123', 'ctg_def456'],
 })
 
 // Categories at a specific depth
@@ -99,10 +104,10 @@ const categories = await client.categories.list({
 ```
 
 ```bash cURL
-# Products in a specific category
+# Products in a specific category (includes descendants)
 curl -G 'http://localhost:3000/api/v3/store/products' \
   -H 'X-Spree-Api-Key: spree_pk_xxx' \
-  --data-urlencode 'q[categories_id_eq]=ctg_abc123'
+  --data-urlencode 'q[in_category]=ctg_abc123'
 
 # Top-level categories only
 curl -G 'http://localhost:3000/api/v3/store/categories' \
