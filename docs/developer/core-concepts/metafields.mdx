@@ -175,18 +175,22 @@ When editing a resource (e.g., a product), metafields appear in a dedicated sect
 
 ## Metafields vs Metadata
 
-| Feature | Metafields | Metadata |
+Spree has two permanent, complementary systems for custom data — **metadata for machines, metafields for humans**. They serve different purposes and are not interchangeable. Neither is going away.
+
+| Feature | Metafields | [Metadata](/developer/customization/metadata) |
 |---------|-----------|----------|
-| Structure | Strongly typed, schema-defined | Flat key-value JSON |
-| Validation | Type-specific validation | None |
-| Visibility | Configurable (front/back/both) | Write-only in Store API |
-| Admin UI | Dedicated management forms | JSON preview |
-| Data Types | 6 specific types | Any JSON-serializable data |
-| Organization | Namespaced (`namespace.key`) | Flat structure |
+| **Purpose** | Merchant-defined structured attributes | Developer escape hatch — integration IDs, sync state |
+| **Schema** | Defined via MetafieldDefinitions | Schemaless JSON — no definition required |
+| **Validation** | Type-specific (text, number, boolean, etc.) | None — accepts any JSON-serializable data |
+| **Visibility** | Configurable (front-end, back-end, both) | Write-only in Store API, readable in Admin API |
+| **Admin UI** | Dedicated management forms | JSON preview |
+| **Data Types** | 6 specific types | Any JSON value |
+| **Organization** | Namespaced (`namespace.key`) | Flat key-value structure |
+| **Queryable** | Via SQL joins, Ransack scopes, search providers | Via JSONB operators (PostgreSQL) |
 
 **Use Metafields** when you need type validation, visibility control, admin UI forms, or organized namespacing.
 
-**Use Metadata** for external system IDs, tracking attribution, or simple write-and-forget data.
+**Use [Metadata](/developer/customization/metadata)** for external system IDs, tracking attribution, syncing with integrations, or simple write-and-forget data that only backend systems need to read.
 
 <Warning>
 Product Properties are deprecated and will be removed in Spree 6.0. For new projects, always use Metafields. For existing projects, plan to migrate using the [migration guide](/developer/upgrades/5.1-to-5.2#3-migrate-to-metafields-or-keep-using-properties).

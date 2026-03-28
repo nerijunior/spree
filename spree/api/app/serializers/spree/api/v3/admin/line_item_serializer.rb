@@ -10,6 +10,8 @@ module Spree
                    tax_category_id: [:string, nullable: true],
                    order_id: [:string, nullable: true]
 
+          attributes created_at: :iso8601, updated_at: :iso8601
+
           attribute :metadata do |line_item|
             line_item.metadata.presence
           end

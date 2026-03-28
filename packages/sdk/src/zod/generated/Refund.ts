@@ -4,8 +4,6 @@ import { z } from 'zod';
 export const RefundSchema = z.object({
   id: z.string(),
   transaction_id: z.string().nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
   amount: z.string().nullable(),
   payment_id: z.string().nullable(),
   refund_reason_id: z.string().nullable(),

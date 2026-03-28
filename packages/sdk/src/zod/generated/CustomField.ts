@@ -1,7 +1,7 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
 
-export const MetafieldSchema = z.object({
+export const CustomFieldSchema = z.object({
   id: z.string(),
   name: z.string(),
   type: z.string(),
@@ -9,4 +9,4 @@ export const MetafieldSchema = z.object({
   value: z.any(),
 });
 
-export type Metafield = z.infer<typeof MetafieldSchema>;
+export type CustomField = z.infer<typeof CustomFieldSchema>;

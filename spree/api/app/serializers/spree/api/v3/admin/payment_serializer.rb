@@ -10,7 +10,8 @@ module Spree
                    cvv_response_code: [:string, nullable: true],
                    cvv_response_message: [:string, nullable: true]
 
-          attributes :avs_response, :cvv_response_code, :cvv_response_message
+          attributes :avs_response, :cvv_response_code, :cvv_response_message,
+                     created_at: :iso8601, updated_at: :iso8601
 
           attribute :metadata do |payment|
             payment.metadata.presence

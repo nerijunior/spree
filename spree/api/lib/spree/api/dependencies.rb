@@ -131,7 +131,7 @@ module Spree
         currency_serializer: 'Spree::Api::V3::CurrencySerializer',
         locale_serializer: 'Spree::Api::V3::LocaleSerializer',
         policy_serializer: 'Spree::Api::V3::PolicySerializer',
-        metafield_serializer: 'Spree::Api::V3::MetafieldSerializer',
+        custom_field_serializer: 'Spree::Api::V3::CustomFieldSerializer',
         shipping_category_serializer: 'Spree::Api::V3::ShippingCategorySerializer',
         tax_category_serializer: 'Spree::Api::V3::TaxCategorySerializer',
 
@@ -163,7 +163,7 @@ module Spree
         admin_variant_serializer: 'Spree::Api::V3::Admin::VariantSerializer',
         admin_price_serializer: 'Spree::Api::V3::Admin::PriceSerializer',
         admin_price_history_serializer: 'Spree::Api::V3::Admin::PriceHistorySerializer',
-        admin_metafield_serializer: 'Spree::Api::V3::Admin::MetafieldSerializer',
+        admin_custom_field_serializer: 'Spree::Api::V3::Admin::CustomFieldSerializer',
         admin_category_serializer: 'Spree::Api::V3::Admin::CategorySerializer',
         admin_line_item_serializer: 'Spree::Api::V3::Admin::LineItemSerializer',
         admin_option_type_serializer: 'Spree::Api::V3::Admin::OptionTypeSerializer',

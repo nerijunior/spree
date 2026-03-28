@@ -11,8 +11,6 @@ export const FulfillmentSchema = z.object({
   tracking_url: z.string().nullable(),
   cost: z.string(),
   display_cost: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
   status: z.string(),
   fulfillment_type: z.string(),
   fulfilled_at: z.string().nullable(),

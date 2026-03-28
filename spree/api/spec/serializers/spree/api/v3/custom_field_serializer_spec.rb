@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Spree::Api::V3::MetafieldSerializer do
+RSpec.describe Spree::Api::V3::CustomFieldSerializer do
   let(:store) { @default_store }
   let(:product) { create(:product, stores: [store]) }
   let(:metafield_definition) { create(:metafield_definition, resource_type: 'Spree::Product', display_on: 'both') }
@@ -33,7 +33,7 @@ RSpec.describe Spree::Api::V3::MetafieldSerializer do
   end
 end
 
-RSpec.describe Spree::Api::V3::Admin::MetafieldSerializer do
+RSpec.describe Spree::Api::V3::Admin::CustomFieldSerializer do
   let(:store) { @default_store }
   let(:product) { create(:product, stores: [store]) }
   let(:metafield_definition) { create(:metafield_definition, resource_type: 'Spree::Product', display_on: 'back_end') }
@@ -52,8 +52,19 @@ RSpec.describe Spree::Api::V3::Admin::MetafieldSerializer do
       )
     end
 
-    it 'includes display_on' do
-      expect(subject['display_on']).to eq('back_end')
+    it 'includes storefront_visible as false for back_end display_on' do
+      expect(subject['storefront_visible']).to be false
+    end
+
+    it 'includes storefront_visible as true for both display_on' do
+      public_definition = create(:metafield_definition, resource_type: 'Spree::Product', display_on: 'both')
+      public_metafield = create(:metafield, resource: product, metafield_definition: public_definition, value: 'public value')
+      result = described_class.new(public_metafield, params: base_params).to_h
+      expect(result['storefront_visible']).to be true
+    end
+
+    it 'does not include display_on' do
+      expect(subject).not_to have_key('display_on')
     end
   end
 end

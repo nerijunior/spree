@@ -12,8 +12,7 @@ module Spree
           payment.payment_method&.prefixed_id
         end
 
-        attributes :response_code, :number, :amount, :display_amount,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :response_code, :number, :amount, :display_amount
 
         attribute :status do |payment|
           payment.state

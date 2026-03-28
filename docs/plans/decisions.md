@@ -99,23 +99,39 @@ Models already correct (no change): Product, PriceList, PaymentSession,
 PaymentSetupSession, Import, ImportRow, Invitation, ReturnItem
 (`reception_status`/`acceptance_status`), Reimbursement (`reimbursement_status`).
 
+## 2026-03-28: Simplify metafield visibility — display_on → storefront_visible boolean (6.0)
+Replace three-way `display_on` (both/front_end/back_end) with `storefront_visible`
+boolean (default: true) on CustomFieldDefinition. `front_end`-only was already
+excluded from `MetafieldDefinition::DISPLAY` and never made sense.
+
+This makes the two-system boundary razor-sharp:
+- Custom Fields (storefront_visible: true) = public structured data
+- Custom Fields (storefront_visible: false) = admin-only structured data
+- Metadata = private developer-owned data (never exposed)
+
+Matches Vendure (`public: boolean`) and Saleor (`visibleInStorefront: boolean`).
+Ships with the 6.0 model rename wave. See `5.4-6.0-custom-fields-rename.md`.
+
 ## 2026-03-16: Consolidate metadata — drop public_metadata, keep metadata JSON column
 Drop `public_metadata` column (never exposed in Store API, unused). Rename
 `private_metadata` → `metadata` in the database. Simplify the `Spree::Metadata`
 concern to a single `metadata` JSON column with no alias indirection.
 
-**Metadata** (JSON column) stays as a schemaless developer escape hatch —
-integration IDs, sync state, ad-hoc flags. No definition required, one-step API:
+**Metadata** (JSON column) is a permanent, first-class system — the schemaless
+developer escape hatch for integration IDs, sync state, ad-hoc flags. No
+definition required, one-step API:
 `PATCH /product { metadata: { erp_id: "123" } }`. Never exposed in Store API
-(Stripe convention: write-only).
+(Stripe convention: write-only). Metadata is here to stay.
 
-**Metafields** stay as merchant-defined structured data — typed values
-(short_text, number, boolean, json, rich_text, long_text), require a
-`MetafieldDefinition`, have visibility control (front_end/back_end),
-searchable, CSV importable. With the ProductType plan (6.0-product-types.md),
-metafields become schema-enforced custom attributes driven by ProductType.
+**Metafields** (→ Custom Fields in 6.0, see `5.4-6.0-custom-fields-rename.md`)
+stay as merchant-defined structured data — typed values (short_text, number,
+boolean, json, rich_text, long_text), require a `MetafieldDefinition`, have
+`storefront_visible` boolean, searchable, CSV importable. With the
+ProductType plan (6.0-product-types.md), metafields become schema-enforced
+custom attributes driven by ProductType.
 
 Two systems, two purposes, no overlap. No consolidation into one.
+Metadata for machines, metafields/custom fields for humans.
 
 ## 2026-03-10: Product descriptions stay as plain column
 Considered Action Text. Rejected for API-first performance —

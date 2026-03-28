@@ -6,8 +6,6 @@ export const DigitalLinkSchema = z.object({
   access_counter: z.number(),
   filename: z.string(),
   content_type: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
   download_url: z.string(),
   authorizable: z.boolean(),
   expired: z.boolean(),

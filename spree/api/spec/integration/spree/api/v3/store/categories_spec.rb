@@ -82,7 +82,7 @@ RSpec.describe 'Categories API', type: :request, swagger_doc: 'api-reference/sto
       parameter name: :id, in: :path, type: :string, required: true,
                 description: 'Category permalink (e.g., clothing/shirts) or prefix ID (e.g., ctg_abc123)'
       parameter name: :expand, in: :query, type: :string, required: false,
-                description: 'Expand associations (children, parent, ancestors, metafields)'
+                description: 'Expand associations (children, parent, ancestors, custom_fields)'
       parameter name: :fields, in: :query, type: :string, required: false,
                 description: 'Comma-separated list of fields to include (e.g., name,slug,price). id is always included.'
 

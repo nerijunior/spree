@@ -16,8 +16,7 @@ module Spree
           variant.product&.prefixed_id
         end
 
-        attributes :sku, :options_text, :track_inventory, :media_count,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :sku, :options_text, :track_inventory, :media_count
 
         # Main variant image URL for listings (cached primary_media)
         attribute :thumbnail_url do |variant|
@@ -82,9 +81,9 @@ module Spree
         many :option_values, resource: Spree.api.option_value_serializer
 
         many :public_metafields,
-             key: :metafields,
-             resource: Spree.api.metafield_serializer,
-             if: proc { expand?('metafields') }
+             key: :custom_fields,
+             resource: Spree.api.custom_field_serializer,
+             if: proc { expand?('custom_fields') }
 
         typelize prior_price: ['PriceHistory', nullable: true]
 

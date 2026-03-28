@@ -9,8 +9,7 @@ module Spree
                  items: 'Array<{ item_id: string; variant_id: string; quantity: number }>'
 
         attributes :number, :tracking, :tracking_url,
-                   :cost, :display_cost,
-                   created_at: :iso8601, updated_at: :iso8601
+                   :cost, :display_cost
 
         attribute :status do |shipment|
           shipment.state

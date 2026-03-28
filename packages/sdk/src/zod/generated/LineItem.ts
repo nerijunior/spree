@@ -28,8 +28,6 @@ export const LineItemSchema = z.object({
   discounted_amount: z.string(),
   display_discounted_amount: z.string(),
   display_compare_at_amount: z.string().nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
   compare_at_amount: z.string().nullable(),
   thumbnail_url: z.string().nullable(),
   option_values: z.array(OptionValueSchema),

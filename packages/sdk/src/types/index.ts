@@ -21,7 +21,7 @@ export type {
   LineItem,
   Locale,
   Market,
-  Metafield,
+  CustomField,
   NewsletterSubscriber,
   OptionType,
   OptionValue,
@@ -48,48 +48,6 @@ export type {
   WishlistItem,
   Wishlist,
 } from './generated';
-
-// Backward compatibility aliases (Store* prefix)
-export type { Address as StoreAddress } from './generated';
-export type { Cart as StoreCart } from './generated';
-export type { Category as StoreCategory } from './generated';
-export type { Country as StoreCountry } from './generated';
-export type { CreditCard as StoreCreditCard } from './generated';
-export type { Currency as StoreCurrency } from './generated';
-export type { Customer as StoreCustomer } from './generated';
-export type { Discount as StoreDiscount } from './generated';
-export type { DigitalLink as StoreDigitalLink } from './generated';
-export type { Digital as StoreDigital } from './generated';
-export type { GiftCardBatch as StoreGiftCardBatch } from './generated';
-export type { GiftCard as StoreGiftCard } from './generated';
-export type { Media as StoreMedia } from './generated';
-export type { LineItem as StoreLineItem } from './generated';
-export type { Locale as StoreLocale } from './generated';
-export type { Market as StoreMarket } from './generated';
-export type { Metafield as StoreMetafield } from './generated';
-export type { OptionType as StoreOptionType } from './generated';
-export type { OptionValue as StoreOptionValue } from './generated';
-export type { Order as StoreOrder } from './generated';
-export type { PaymentMethod as StorePaymentMethod } from './generated';
-export type { Payment as StorePayment } from './generated';
-export type { PaymentSession as StorePaymentSession } from './generated';
-export type { PaymentSetupSession as StorePaymentSetupSession } from './generated';
-export type { PaymentSource as StorePaymentSource } from './generated';
-export type { Price as StorePrice } from './generated';
-export type { Product as StoreProduct } from './generated';
-export type { Promotion as StorePromotion } from './generated';
-export type { Refund as StoreRefund } from './generated';
-export type { ReturnAuthorization as StoreReturnAuthorization } from './generated';
-export type { ReturnItem as StoreReturnItem } from './generated';
-export type { DeliveryMethod as StoreDeliveryMethod } from './generated';
-export type { DeliveryRate as StoreDeliveryRate } from './generated';
-export type { Fulfillment as StoreFulfillment } from './generated';
-export type { State as StoreState } from './generated';
-export type { StockLocation as StoreStockLocation } from './generated';
-export type { StoreCredit as StoreStoreCredit } from './generated';
-export type { Variant as StoreVariant } from './generated';
-export type { WishlistItem as StoreWishlistItem } from './generated';
-export type { Wishlist as StoreWishlist } from './generated';
 
 // Checkout requirement — a single unsatisfied checkout prerequisite
 export interface CheckoutRequirement {

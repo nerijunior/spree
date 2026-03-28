@@ -160,13 +160,16 @@ Metadata is stored as a flat JSON object. You can use any keys and values:
 
 ## Metadata vs Metafields
 
+Spree has two permanent, complementary systems for custom data — **metadata for machines, metafields for humans**.
+
 | | Metadata | Metafields |
 |-|----------|------------|
-| **Structure** | Untyped JSON | Schema-defined, strongly typed |
+| **Purpose** | Developer escape hatch — integration IDs, sync state | Merchant-defined structured attributes |
+| **Schema** | Schemaless JSON — no definition required | Defined via MetafieldDefinitions (typed, validated) |
 | **Validation** | None | Type-specific validation |
-| **Visibility** | Write-only in Store API | Configurable (public/private) |
+| **Visibility** | Write-only in Store API, readable in Admin API | Configurable (front-end, back-end, both) |
 | **Admin UI** | JSON preview | Dedicated form fields |
-| **Best for** | Integration data, tracking, attribution | Product specs, custom fields, customer-facing data |
+| **Best for** | Integration data, tracking, attribution, write-and-forget | Product specs, custom attributes, customer-facing data |
 | **API access** | Write via Store API, read via Admin API | Read/write via both APIs |
 
-For more details on metafields, see the [Metafields guide](/developer/core-concepts/metafields).
+Both systems are here to stay. For more details on metafields, see the [Metafields guide](/developer/core-concepts/metafields).

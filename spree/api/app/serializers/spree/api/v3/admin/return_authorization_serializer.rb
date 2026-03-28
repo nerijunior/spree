@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class ReturnAuthorizationSerializer < V3::ReturnAuthorizationSerializer
+          attributes created_at: :iso8601, updated_at: :iso8601
+
           one :order,
               resource: Spree.api.admin_order_serializer,
               if: proc { expand?('order') }

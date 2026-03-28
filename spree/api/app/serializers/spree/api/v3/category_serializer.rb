@@ -62,9 +62,9 @@ module Spree
              if: proc { expand?('ancestors') }
 
         many :public_metafields,
-             key: :metafields,
-             resource: Spree.api.metafield_serializer,
-             if: proc { expand?('metafields') }
+             key: :custom_fields,
+             resource: Spree.api.custom_field_serializer,
+             if: proc { expand?('custom_fields') }
       end
     end
   end
