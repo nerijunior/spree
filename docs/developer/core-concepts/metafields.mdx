@@ -182,7 +182,7 @@ Spree has two permanent, complementary systems for custom data — **metadata fo
 | **Purpose** | Merchant-defined structured attributes | Developer escape hatch — integration IDs, sync state |
 | **Schema** | Defined via MetafieldDefinitions | Schemaless JSON — no definition required |
 | **Validation** | Type-specific (text, number, boolean, etc.) | None — accepts any JSON-serializable data |
-| **Visibility** | Configurable (front-end, back-end, both) | Write-only in Store API, readable in Admin API |
+| **Visibility** | Configurable (admin-only or public) | Write-only in Store API, readable in Admin API |
 | **Admin UI** | Dedicated management forms | JSON preview |
 | **Data Types** | 6 specific types | Any JSON value |
 | **Organization** | Namespaced (`namespace.key`) | Flat key-value structure |

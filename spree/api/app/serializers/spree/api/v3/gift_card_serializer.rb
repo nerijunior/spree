@@ -55,7 +55,6 @@ module Spree
           gift_card.active?
         end
 
-        attributes created_at: :iso8601, updated_at: :iso8601
       end
     end
   end

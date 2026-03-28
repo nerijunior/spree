@@ -12,8 +12,7 @@ module Spree
           wished_item.wishlist&.prefixed_id
         end
 
-        attributes :quantity,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :quantity
 
         one :variant, resource: Spree.api.variant_serializer
       end

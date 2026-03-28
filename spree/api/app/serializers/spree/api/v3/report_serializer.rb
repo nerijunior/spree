@@ -9,8 +9,7 @@ module Spree
                  currency: [:string, nullable: true],
                  date_from: [:string, nullable: true], date_to: [:string, nullable: true]
 
-        attributes :type, :currency,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :type, :currency
 
         attribute :user_id do |report|
           report.user&.prefixed_id

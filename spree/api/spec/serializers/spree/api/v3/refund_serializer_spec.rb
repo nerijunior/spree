@@ -12,7 +12,7 @@ RSpec.describe Spree::Api::V3::RefundSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id amount transaction_id payment_id refund_reason_id reimbursement_id created_at updated_at
+      id amount transaction_id payment_id refund_reason_id reimbursement_id
     ])
   end
 

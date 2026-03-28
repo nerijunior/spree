@@ -148,7 +148,7 @@ When there is no metadata, the field is `null`.
 
 ### Reading and writing
 
-Every model that includes `Spree::Metadata` has a `metadata` accessor. Always use `metadata` — do not use `public_metadata` or `private_metadata` directly:
+Every model that includes `Spree::Metadata` has a `metadata` accessor. Always use `metadata` in Ruby code — do not call `public_metadata=` or `private_metadata=` directly. (SQL queries still reference the underlying `private_metadata` column name — see querying examples below.)
 
 ```ruby
 order = Spree::Order.find_by!(number: 'R123456')

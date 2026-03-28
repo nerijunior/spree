@@ -41,9 +41,9 @@ RSpec.describe Spree::Api::V3::PaymentSessionSerializer do
       expect(subject['order_id']).to eq(order.prefixed_id)
     end
 
-    it 'includes timestamp attributes' do
-      expect(subject).to have_key('created_at')
-      expect(subject).to have_key('updated_at')
+    it 'does not include timestamps in Store API' do
+      expect(subject).not_to have_key('created_at')
+      expect(subject).not_to have_key('updated_at')
     end
 
     it 'includes expires_at' do

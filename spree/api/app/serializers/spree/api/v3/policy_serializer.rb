@@ -15,7 +15,6 @@ module Spree
           policy.body&.body&.to_s.to_s
         end
 
-        attributes created_at: :iso8601, updated_at: :iso8601
       end
     end
   end

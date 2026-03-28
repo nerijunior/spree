@@ -9,7 +9,7 @@ module Spree
 
         attributes :status, :currency, :external_id, :external_data,
                    :customer_external_id,
-                   expires_at: :iso8601, created_at: :iso8601, updated_at: :iso8601
+                   expires_at: :iso8601
 
         attribute :amount do |session|
           session.amount&.to_s

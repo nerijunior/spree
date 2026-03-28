@@ -11,7 +11,7 @@ RSpec.describe Spree::Api::V3::StockItemSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id count_on_hand backorderable stock_location_id variant_id created_at updated_at
+      id count_on_hand backorderable stock_location_id variant_id
     ])
   end
 

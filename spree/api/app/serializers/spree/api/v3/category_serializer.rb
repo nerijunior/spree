@@ -11,8 +11,7 @@ module Spree
 
         attributes :name, :permalink, :position, :depth,
                    :meta_title, :meta_description, :meta_keywords,
-                   :children_count,
-                   created_at: :iso8601, updated_at: :iso8601
+                   :children_count
 
         attribute :parent_id do |category|
           category.parent&.prefixed_id
