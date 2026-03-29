@@ -52,19 +52,16 @@ en:
         products:
           body:
             add_tags: 'Select tags to add to the products:'
-            add_to_brand: 'Select which brand to add the products to:'
-            add_to_taxons: 'Select which taxons to add the products to:'
-            remove_from_taxons: 'Select which taxons to remove the products from:'
+            add_to_taxons: 'Select which categories to add the products to:'
+            remove_from_taxons: 'Select which categories to remove the products from:'
             remove_tags: 'Select tags to remove from the products:'
             set_active: Setting products to active will make those products available on the storefront.
             set_archived: Setting products to archived will hide them from storefront.
             set_draft: Setting products to draft will hide them from storefront.
           title:
             add_tags: Add tags
-            add_to_brand: Add to brand
-            add_to_taxons: Add to taxons
-            remove_from_brand: Remove from brand
-            remove_from_taxons: Remove from taxons
+            add_to_taxons: Add to categories
+            remove_from_taxons: Remove from categories
             remove_tags: Remove tags
             set_active: Set as Active
             set_archived: Set as Archived
@@ -149,7 +146,7 @@ en:
       manage_currencies: Manage Currencies
       manage_properties: Manage Properties
       manage_stock_locations: Manage Stock Locations
-      manage_taxons: Manage Taxons
+      manage_taxons: Manage Categories
       manage_zones: Manage Zones
       markets:
         edit: Edit Market
@@ -227,7 +224,7 @@ en:
         not_set: Not set
         separated: Separated
         show_more_button: Show explore category button
-        show_taxon_image: Show taxon image
+        show_taxon_image: Show category image
         text_color: Text color
         title: Title
         top_padding: Top padding
@@ -362,10 +359,10 @@ en:
         on_sale: On sale
         products_must_match: 'Products must match:'
         tag: Product tag
-      taxon_type: Taxon type
+      taxon_type: Category type
       taxon_types:
         automatic: Automatic
-        automatic_info: Automatically add products to this taxon if they match the rules you set.
+        automatic_info: Automatically add products to this category if they match the rules you set.
         manual: Manual
         manual_info: Curate products manually. You can add or remove them in bulk.
       translations:
