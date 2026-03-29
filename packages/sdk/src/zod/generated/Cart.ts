@@ -38,8 +38,6 @@ export const CartSchema = z.object({
   delivery_total: z.string(),
   display_delivery_total: z.string(),
   warnings: z.array(z.any()),
-  created_at: z.string(),
-  updated_at: z.string(),
   store_credit_total: z.string(),
   display_store_credit_total: z.string(),
   covered_by_store_credit: z.boolean(),

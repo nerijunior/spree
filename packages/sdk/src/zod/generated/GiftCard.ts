@@ -17,8 +17,6 @@ export const GiftCardSchema = z.object({
   redeemed_at: z.string().nullable(),
   expired: z.boolean(),
   active: z.boolean(),
-  created_at: z.string(),
-  updated_at: z.string(),
 });
 
 export type GiftCard = z.infer<typeof GiftCardSchema>;

@@ -8,8 +8,6 @@ export const PaymentSetupSessionSchema = z.object({
   external_id: z.string().nullable(),
   external_client_secret: z.string().nullable(),
   external_data: z.record(z.string(), z.unknown()),
-  created_at: z.string(),
-  updated_at: z.string(),
   payment_method_id: z.string().nullable(),
   payment_source_id: z.string().nullable(),
   payment_source_type: z.string().nullable(),

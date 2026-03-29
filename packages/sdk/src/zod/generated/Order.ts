@@ -38,8 +38,6 @@ export const OrderSchema = z.object({
   fulfillment_status: z.string().nullable(),
   payment_status: z.string().nullable(),
   completed_at: z.string().nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
   store_credit_total: z.string(),
   display_store_credit_total: z.string(),
   covered_by_store_credit: z.boolean(),

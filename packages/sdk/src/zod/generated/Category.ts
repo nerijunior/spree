@@ -12,8 +12,6 @@ export const CategorySchema: z.ZodObject<any> = z.object({
   meta_description: z.string().nullable(),
   meta_keywords: z.string().nullable(),
   children_count: z.number(),
-  created_at: z.string(),
-  updated_at: z.string(),
   parent_id: z.string().nullable(),
   description: z.string(),
   description_html: z.string(),

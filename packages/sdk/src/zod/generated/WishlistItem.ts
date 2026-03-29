@@ -7,8 +7,6 @@ export const WishlistItemSchema = z.object({
   variant_id: z.string(),
   wishlist_id: z.string(),
   quantity: z.number(),
-  created_at: z.string(),
-  updated_at: z.string(),
   variant: VariantSchema,
 });
 

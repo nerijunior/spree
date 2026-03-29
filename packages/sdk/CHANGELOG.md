@@ -1,5 +1,11 @@
 # @spree/sdk
 
+## 0.19.1
+
+### Patch Changes
+
+- Updated types reflecting removal of timestampts from Store API
+
 ## 0.19.0
 
 ### Minor Changes
