@@ -1,13 +1,13 @@
 # @spree/next
 
-Next.js integration for Spree Commerce — server actions, caching, and cookie-based auth.
+Next.js integration for Spree Commerce — cookie-based auth, middleware, and webhook helpers.
+
+Provides the server-side plumbing for building a Next.js storefront with `@spree/sdk`: JWT token lifecycle (proactive refresh, 401 retry), httpOnly cookie management, locale/country detection middleware, and webhook signature verification.
 
 ## Installation
 
 ```bash
 npm install @spree/next @spree/sdk
-# or
-yarn add @spree/next @spree/sdk
 # or
 pnpm add @spree/next @spree/sdk
 ```
@@ -18,273 +18,136 @@ pnpm add @spree/next @spree/sdk
 
 ```env
 SPREE_API_URL=https://api.mystore.com
-SPREE_API_KEY=your-publishable-api-key
+SPREE_PUBLISHABLE_KEY=your-publishable-api-key
 ```
 
 The client auto-initializes from these env vars. Alternatively, initialize explicitly:
 
 ```typescript
-// lib/storefront.ts
 import { initSpreeNext } from '@spree/next';
 
 initSpreeNext({
   baseUrl: process.env.SPREE_API_URL!,
-  apiKey: process.env.SPREE_API_KEY!,
+  publishableKey: process.env.SPREE_PUBLISHABLE_KEY!,
 });
 ```
 
-### 2. Fetch data in Server Components
+### 2. Call the SDK directly in your server actions
+
+`@spree/next` provides `getClient()` (the SDK singleton), auth helpers, and cookie management. You write server actions that call the SDK directly:
 
 ```typescript
-import { listProducts, getProduct, listCategories } from '@spree/next';
+'use server';
 
-export default async function ProductsPage() {
-  const products = await listProducts({ limit: 12 });
-  const categories = await listCategories({ depth_eq: 1 });
+import { getClient, getLocaleOptions } from '@spree/next';
 
-  return (
-    <div>
-      {products.data.map((product) => (
-        <div key={product.id}>{product.name}</div>
-      ))}
-    </div>
-  );
+export async function getProducts(params?: { limit?: number }) {
+  const options = await getLocaleOptions(); // reads country/locale from cookies
+  return getClient().products.list(params, options);
 }
 ```
 
-### 3. Use server actions for mutations
+### 3. Use auth helpers for authenticated endpoints
 
 ```typescript
-import { addItem, removeItem, getCart } from '@spree/next';
+'use server';
 
-export default async function CartPage() {
-  const cart = await getCart(); // Cart | null
+import { getClient, withAuthRefresh } from '@spree/next';
 
-  async function handleAddItem(formData: FormData) {
-    'use server';
-    await addItem(formData.get('variantId') as string, 1);
-  }
-
-  return <form action={handleAddItem}>...</form>;
+export async function getAddresses() {
+  return withAuthRefresh(async (options) => {
+    return getClient().customer.addresses.list(undefined, options);
+  });
 }
 ```
 
-## Configuration
+`withAuthRefresh` reads the JWT from cookies, proactively refreshes if near expiry, and retries once on 401.
+
+### 4. Use cookie helpers for cart operations
 
 ```typescript
-import { initSpreeNext } from '@spree/next';
+'use server';
 
+import { getClient, getCartOptions, requireCartId } from '@spree/next';
+
+export async function addToCart(variantId: string, quantity: number) {
+  const options = await getCartOptions(); // { spreeToken, token } from cookies
+  const cartId = await requireCartId();
+  return getClient().carts.items.create(cartId, { variant_id: variantId, quantity }, options);
+}
+```
+
+## API Reference
+
+### Configuration
+
+```typescript
+import { initSpreeNext, getClient, getConfig } from '@spree/next';
+
+// Initialize (or let it auto-init from env vars)
 initSpreeNext({
   baseUrl: 'https://api.mystore.com',
-  apiKey: 'your-publishable-api-key',
+  publishableKey: 'pk_xxx',
   cartCookieName: '_spree_cart_token',     // default
   accessTokenCookieName: '_spree_jwt',     // default
   defaultLocale: 'en',
   defaultCurrency: 'USD',
+  defaultCountry: 'US',
 });
+
+// Get the @spree/sdk Client instance
+const client = getClient();
 ```
 
-## Data Functions
-
-Plain async functions for reading data in Server Components. Wrap with `"use cache"` in your app for caching.
-
-### Products
+### Auth Helpers
 
 ```typescript
-import { listProducts, getProduct, getProductFilters } from '@spree/next';
+import { withAuthRefresh, getAuthOptions } from '@spree/next';
 
-const products = await listProducts({ limit: 25, expand: ['variants', 'media'] });
-const product = await getProduct('spree-tote');
-const filters = await getProductFilters({ category_id: 'ctg_123' });
+// Wrap any authenticated SDK call — handles proactive refresh + 401 retry
+const customer = await withAuthRefresh(async (options) => {
+  return getClient().customer.get(options);
+});
+
+// Or get auth options manually
+const options = await getAuthOptions(); // { token: 'jwt...' } or {}
 ```
 
-### Categories
-
-```typescript
-import { listCategories, getCategory, listCategoryProducts } from '@spree/next';
-
-const categories = await listCategories({ depth_eq: 1 });
-const category = await getCategory('clothing/shirts');
-const products = await listCategoryProducts('clothing/shirts', { limit: 12 });
-```
-
-### Store & Geography
-
-```typescript
-import { getStore, listCountries, getCountry } from '@spree/next';
-
-const store = await getStore();
-const countries = await listCountries();
-const usa = await getCountry('US');
-```
-
-## Server Actions
-
-Server actions handle mutations and auth-dependent reads. They automatically manage cookies for cart tokens and JWT authentication.
-
-### Cart
-
-```typescript
-import { getCart, getOrCreateCart, addItem, updateItem, removeItem, clearCart } from '@spree/next';
-
-const cart = await getCart();           // Cart | null
-const cart = await getOrCreateCart();   // Cart
-await addItem(variantId, quantity, { gift_message: 'Happy Birthday!' });   // Cart
-await updateItem(lineItemId, { quantity: 3 });                             // Cart
-await updateItem(lineItemId, { metadata: { engraving: 'J.D.' } });        // Cart
-await removeItem(lineItemId);                                              // Cart
-await clearCart();
-```
-
-### Checkout
-
-All checkout functions operate on the current cart implicitly (via the cart cookie).
+### Cookie Management
 
 ```typescript
 import {
-  getCheckout,
-  updateCheckout,
-  selectDeliveryRate,
-  applyDiscountCode,
-  removeDiscountCode,
-  applyGiftCard,
-  removeGiftCard,
-  complete,
+  // Cart cookies
+  getCartToken,       // guest cart order token
+  getCartId,          // cart prefixed ID
+  setCartCookies,     // set both cart ID + token
+  clearCartCookies,   // clear cart cookies
+  getCartOptions,     // { spreeToken, token } for SDK calls
+  requireCartId,      // throws if no cart found
+
+  // Auth cookies
+  getAccessToken,     // JWT access token
+  setAccessToken,
+  clearAccessToken,
+  getRefreshToken,    // refresh token
+  setRefreshToken,
+  clearRefreshToken,
 } from '@spree/next';
-
-const checkout = await getCheckout();
-// Fulfillments are included in the checkout/cart response:
-// checkout.fulfillments
-await updateCheckout({ shipping_address: { ... }, billing_address: { ... } });
-await selectDeliveryRate(fulfillmentId, rateId);
-await applyDiscountCode('SAVE20');
-await removeDiscountCode('SAVE20');
-await applyGiftCard('GC-ABCD-1234');
-await removeGiftCard('gc_abc123'); // ID from cart.gift_card.id
-await complete();
 ```
 
-### Authentication
+### Locale Resolution
 
 ```typescript
-import { login, register, logout, getCustomer, updateCustomer } from '@spree/next';
+import { getLocaleOptions } from '@spree/next';
 
-await login(email, password);
-await register({ email, password, password_confirmation, first_name, last_name, phone, accepts_email_marketing });
-await logout();
-const customer = await getCustomer();
-await updateCustomer({ first_name: 'John' });
+// Reads country/locale from cookies, falls back to config defaults
+const options = await getLocaleOptions();
+// { locale: 'en', country: 'us' }
 ```
 
-### Password Reset
+### Middleware
 
-```typescript
-import { requestPasswordReset, resetPassword } from '@spree/next';
-
-// Request a password reset email — returns { message: string }
-await requestPasswordReset(email);
-
-// With redirect URL (validated against store's allowed origins)
-await requestPasswordReset(email, 'https://myshop.com/reset-password');
-
-// Reset password and auto-login — returns { success: boolean; error?: string }
-await resetPassword(token, password, password_confirmation);
-```
-
-### Addresses
-
-```typescript
-import { listAddresses, getAddress, createAddress, updateAddress, deleteAddress } from '@spree/next';
-
-const addresses = await listAddresses();
-const address = await getAddress(addressId);
-await createAddress({ first_name: 'John', address1: '123 Main St', ... });
-await updateAddress(addressId, { city: 'Brooklyn' });
-await deleteAddress(addressId);
-```
-
-### Orders
-
-```typescript
-import { listOrders, getOrder } from '@spree/next';
-
-const orders = await listOrders();
-const order = await getOrder(orderId);
-```
-
-### Payments (Manual/Offline)
-
-All payment functions operate on the current cart implicitly (via the cart cookie).
-
-```typescript
-import { createPayment } from '@spree/next';
-
-// Create a payment for a non-session payment method
-// (e.g. Check, Cash on Delivery, Bank Transfer, Purchase Order)
-await createPayment({
-  payment_method_id: 'pm_123',
-  amount: '99.99',              // Optional, defaults to order total minus store credits
-  metadata: {                   // Optional, write-only metadata
-    purchase_order_number: 'PO-12345',
-  },
-});
-```
-
-### Payment Sessions (Stripe, Adyen, PayPal, etc.)
-
-All payment session functions operate on the current cart implicitly (via the cart cookie).
-
-```typescript
-import {
-  createPaymentSession,
-  getPaymentSession,
-  updatePaymentSession,
-  completePaymentSession,
-} from '@spree/next';
-
-// Create a payment session (initializes provider-specific session)
-const session = await createPaymentSession({ payment_method_id: 'pm_123' });
-
-// Access provider data (e.g., Stripe client secret)
-const clientSecret = session.external_data.client_secret;
-
-// Get a payment session
-const session = await getPaymentSession(sessionId);
-
-// Update a payment session
-await updatePaymentSession(sessionId, { amount: '50.00' });
-
-// Complete a payment session (confirms payment with provider)
-await completePaymentSession(sessionId, { session_result: 'success' });
-```
-
-### Store Credits
-
-```typescript
-import { listStoreCredits, getStoreCredit } from '@spree/next';
-
-const credits = await listStoreCredits();
-const credit = await getStoreCredit(creditId);
-```
-
-### Credit Cards & Gift Cards
-
-```typescript
-import { listCreditCards, deleteCreditCard } from '@spree/next';
-import { listGiftCards, getGiftCard } from '@spree/next';
-
-const cards = await listCreditCards();
-await deleteCreditCard(cardId);
-
-const giftCards = await listGiftCards();
-const giftCard = await getGiftCard(giftCardId);
-```
-
-## Localization
-
-### Automatic (recommended)
-
-Data functions automatically read locale and country from cookies. Use the included middleware to handle URL-based routing and cookie persistence:
+Handles URL-based country/locale routing with automatic detection:
 
 ```typescript
 // middleware.ts
@@ -300,32 +163,11 @@ export const config = {
 };
 ```
 
-Data functions work without any locale arguments:
+Detection order: cookie → geo headers (Vercel/Cloudflare) → default.
 
-```typescript
-const products = await listProducts({ limit: 10 });
-const category = await getCategory('clothing/shirts');
-```
+### Webhooks
 
-Use the `setLocale` server action in country/language switchers:
-
-```typescript
-import { setLocale } from '@spree/next';
-
-await setLocale({ country: 'de', locale: 'de' });
-```
-
-### Manual override
-
-You can still pass locale options explicitly — they override auto-detected values:
-
-```typescript
-const products = await listProducts({ limit: 10 }, { locale: 'fr', country: 'FR' });
-```
-
-## Webhooks
-
-Handle Spree webhook events in your Next.js app with a single function:
+Handle Spree webhook events with signature verification:
 
 ```typescript
 // src/app/api/webhooks/spree/route.ts
@@ -335,51 +177,28 @@ export const POST = createWebhookHandler({
   secret: process.env.SPREE_WEBHOOK_SECRET!,
   handlers: {
     'order.completed': async (event) => {
-      const order = event.data; // typed as the data you pass
-      await sendOrderConfirmationEmail(order);
+      await sendOrderConfirmationEmail(event.data);
     },
     'order.canceled': async (event) => {
       await sendCancellationEmail(event.data);
-    },
-    'shipment.shipped': async (event) => {
-      await sendShippingNotification(event.data);
     },
   },
 });
 ```
 
-`createWebhookHandler` handles:
+Features:
 - HMAC-SHA256 signature verification (via `@spree/sdk/webhooks`)
 - Replay protection (rejects timestamps older than 5 minutes)
 - Event routing to your handlers by event name
-- Returns 200 immediately, processes handlers async (Spree won't time out)
+- Supports `waitUntil` for Vercel/Cloudflare serverless execution
 - Unhandled events return 200 with `{ handled: false }` (no retries)
-
-### Setup
-
-1. Install [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/) for local development: `brew install cloudflared`
-2. Expose your storefront: `cloudflared tunnel --url http://localhost:3001`
-3. Create a webhook endpoint in **Spree Admin → Settings → Developers → Webhooks** pointing to your tunnel URL + `/api/webhooks/spree`
-4. Add `SPREE_WEBHOOK_SECRET` to your `.env.local`
-
-For framework-agnostic webhook verification (Express, Hono, etc.), use `@spree/sdk/webhooks` directly — see the [`@spree/sdk` README](../sdk/README.md#webhooks).
 
 ## TypeScript
 
-All types are re-exported from `@spree/sdk` for convenience:
+Import types directly from `@spree/sdk`:
 
 ```typescript
-import type {
-  Cart,
-  StoreProduct,
-  StoreOrder,
-  StoreLineItem,
-  StorePaymentSession,
-  StoreCategory,
-  UpdateCartParams,
-  PaginatedResponse,
-  SpreeError,
-} from '@spree/next';
+import type { Product, Cart, Order, Address, Customer, SpreeError } from '@spree/sdk';
 ```
 
 ## Development
@@ -391,16 +210,6 @@ pnpm dev         # Build in watch mode
 pnpm typecheck   # Type-check
 pnpm test        # Run tests
 pnpm build       # Production build
-```
-
-### Releasing
-
-This package uses [Changesets](https://github.com/changesets/changesets) for version management.
-
-```bash
-npx changeset           # Add a changeset after making changes
-npx changeset version   # Bump version and update CHANGELOG
-pnpm release            # Build and publish to npm
 ```
 
 ## License

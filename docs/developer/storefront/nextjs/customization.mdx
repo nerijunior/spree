@@ -111,7 +111,7 @@ To customize API behavior, modify the server actions in `src/lib/data/`. Each fi
 | `gift-cards.ts` | Gift card management |
 | `utils.ts` | Shared helpers (error handling, fallbacks) |
 
-These server actions wrap the `@spree/next` package functions. You can add custom logic, caching strategies, or additional transformations as needed.
+These server actions call `@spree/sdk` directly, using `@spree/next` helpers for auth cookies and locale resolution. You can add custom logic, caching strategies, or additional transformations as needed.
 
 ## Adding New Pages
 
@@ -122,10 +122,10 @@ src/app/[country]/[locale]/(storefront)/your-new-page/page.tsx
 ```
 
 ```typescript
-import { listProducts } from '@spree/next';
+import { getProducts } from '@/lib/data/products';
 
 export default async function YourNewPage() {
-  const products = await listProducts({ limit: 6 });
+  const products = await getProducts({ limit: 6 });
 
   return (
     <div>

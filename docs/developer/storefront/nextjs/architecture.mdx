@@ -8,14 +8,14 @@ description: Server-first architecture, project structure, and auth flow
 The storefront follows a **server-first architecture** where all API calls are made server-side. The Spree API key is never exposed to the browser.
 
 ```
-Browser → Server Action → @spree/next → Spree API
-         (with httpOnly cookies)
+Browser → Server Action → @spree/sdk → Spree API
+         (with httpOnly cookies via @spree/next helpers)
 ```
 
-- **Server Actions** (`src/lib/data/`) — thin wrappers around `@spree/next` data functions
+- **Server Actions** (`src/lib/data/`) — call `@spree/sdk` directly with auth/cookie helpers from `@spree/next`
 - **httpOnly Cookies** — auth tokens, cart tokens, and locale are stored securely
 - **No Client-Side API Calls** — the Spree API key stays on the server
-- **Auto-Localization** — locale and country are read from cookies automatically by `@spree/next`
+- **Auto-Localization** — locale and country are read from cookies via `getLocaleOptions()`
 
 ## Project Structure
 
@@ -59,7 +59,7 @@ src/
 └── lib/
     ├── analytics/                   # GTM integration
     ├── constants.ts                 # App constants
-    ├── data/                        # Server Actions
+    ├── data/                        # Server Actions (call @spree/sdk directly)
     │   ├── addresses.ts             # Address CRUD
     │   ├── cart.ts                  # Cart operations
     │   ├── checkout.ts              # Checkout flow
@@ -71,8 +71,7 @@ src/
     │   ├── orders.ts                # Order history
     │   ├── payment.ts               # Payment processing
     │   ├── products.ts              # Product queries
-    │   ├── store.ts                 # Store configuration
-    │   ├── categories.ts             # Categories
+    │   ├── categories.ts            # Categories
     │   └── utils.ts                 # Shared helpers (actionResult, withFallback)
     └── utils/                       # Client utilities
         ├── address.ts               # Address formatting
@@ -85,21 +84,26 @@ src/
 ## Authentication Flow
 
 1. User submits login form
-2. Server action calls `@spree/next` which authenticates with the Spree API
-3. JWT token is stored in an httpOnly cookie by `@spree/next`
-4. Subsequent requests include the token automatically
+2. Server action calls `@spree/sdk` to authenticate
+3. JWT token is stored in an httpOnly cookie via `@spree/next` cookie helpers
+4. Subsequent requests use `withAuthRefresh()` which reads the token from cookies automatically
 5. Token is never accessible to client-side JavaScript
 
 ```typescript
 // src/lib/data/customer.ts
-import { login as _login, getCustomer as _getCustomer } from '@spree/next'
+import { getClient, withAuthRefresh, setAccessToken, setRefreshToken } from '@spree/next'
 
 export async function login(email: string, password: string) {
-  return _login(email, password) // token stored in httpOnly cookie automatically
+  const result = await getClient().auth.login({ email, password })
+  await setAccessToken(result.token)
+  await setRefreshToken(result.refresh_token)
+  return { success: true, user: result.user }
 }
 
 export async function getCustomer() {
-  return _getCustomer() // reads token from cookie automatically
+  return withAuthRefresh(async (options) => {
+    return getClient().customer.get(options) // reads token from cookie
+  })
 }
 ```
 
@@ -117,17 +121,17 @@ A middleware (`src/proxy.ts`) uses `createSpreeMiddleware` from `@spree/next` to
 
 ## Server Actions
 
-All data fetching is done through server actions in `src/lib/data/`. These are thin wrappers around `@spree/next` functions — locale and currency are resolved automatically from cookies:
+All data fetching is done through server actions in `src/lib/data/`. These call `@spree/sdk` directly, using `@spree/next` helpers for auth and locale:
 
 ```typescript
-// Products
+// Products — use getLocaleOptions() for locale-aware reads
 import { getProducts, getProduct, getProductFilters } from '@/lib/data/products'
 
 const products = await getProducts({ limit: 12 })
 const product = await getProduct('product-slug')
 const filters = await getProductFilters()
 
-// Cart
+// Cart — use getCartOptions()/requireCartId() for cart operations
 import { getCart, addToCart, updateCartItem, removeCartItem } from '@/lib/data/cart'
 
 const cart = await getCart()
@@ -135,14 +139,14 @@ await addToCart('var_xxx', 1)
 await updateCartItem('li_xxx', 2)
 await removeCartItem('li_xxx')
 
-// Authentication
+// Authentication — use withAuthRefresh() for authenticated endpoints
 import { login, register, logout, getCustomer } from '@/lib/data/customer'
 
 await login('user@example.com', 'password')
 const customer = await getCustomer()
 await logout()
 
-// Addresses
+// Addresses — use withAuthRefresh() for customer data
 import { getAddresses, createAddress, updateAddress, deleteAddress } from '@/lib/data/addresses'
 
 const addresses = await getAddresses()
