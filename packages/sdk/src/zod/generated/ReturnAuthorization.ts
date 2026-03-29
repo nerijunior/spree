@@ -4,8 +4,6 @@ import { z } from 'zod';
 export const ReturnAuthorizationSchema = z.object({
   id: z.string(),
   number: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
   status: z.string(),
   order_id: z.string().nullable(),
   stock_location_id: z.string().nullable(),

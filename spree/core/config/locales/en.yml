@@ -532,11 +532,11 @@ en:
         one: Tax Rate
         other: Tax Rates
       spree/taxon:
-        one: Taxon
-        other: Taxons
+        one: Category
+        other: Categories
       spree/taxonomy:
-        one: Taxonomy
-        other: Taxonomies
+        one: Category
+        other: Categories
       spree/theme:
         one: Theme
         other: Themes
@@ -1451,7 +1451,7 @@ en:
     new_image: New Image
     new_line_item: Add line item
     new_metafield_definition: New Metafield Definition
-    new_nested_taxon: New nested taxon
+    new_nested_taxon: New nested subcategory
     new_option_type: New Option Type
     new_order: New Order
     new_order_completed: New Order Completed
@@ -1486,8 +1486,8 @@ en:
     new_store_credit_category: New Store Credit Category
     new_tax_category: New Tax Category
     new_tax_rate: New Tax Rate
-    new_taxon: New Taxon
-    new_taxonomy: New Taxonomy
+    new_taxon: New Subcategory
+    new_taxonomy: New Category
     new_tracker: New Tracker
     new_user: New User
     new_variant: New Variant
@@ -2332,15 +2332,15 @@ en:
       label: Order must contain x amount of these taxons
       match_all: all
       match_any: at least one
-    taxonomies: Taxonomies
-    taxonomy: Taxonomy
+    taxonomies: Categories
+    taxonomy: Category
     taxonomy_brands_name: Brands
     taxonomy_categories_name: Categories
     taxonomy_collections_name: Collections
     taxonomy_edit: Edit taxonomy
     taxonomy_tree_error: The requested change has not been accepted and the tree has been returned to its previous state, please try again.
     taxonomy_tree_instruction: "* Right click (or double tap on iOS device) a child in the tree to access the menu for adding, deleting or sorting a child."
-    taxons: Taxons
+    taxons: Categories
     terms_of_service: Terms of Service
     test: Test
     test_mode: Test Mode

@@ -49,20 +49,20 @@ RSpec.describe Spree::Api::V3::ProductSerializer do
       end
     end
 
-    describe 'metafields' do
+    describe 'custom_fields' do
       let(:public_definition) { create(:metafield_definition, resource_type: 'Spree::Product', display_on: 'both') }
       let(:private_definition) { create(:metafield_definition, :back_end_only, resource_type: 'Spree::Product') }
       let!(:public_metafield) { create(:metafield, resource: product, metafield_definition: public_definition, value: 'public') }
       let!(:private_metafield) { create(:metafield, resource: product, metafield_definition: private_definition, value: 'private') }
 
-      it 'does not include metafields without include param' do
-        expect(subject).not_to have_key('metafields')
+      it 'does not include custom_fields without expand param' do
+        expect(subject).not_to have_key('custom_fields')
       end
 
-      it 'includes only public metafields with include param' do
-        result = described_class.new(product, params: base_params.merge(expand: ['metafields'])).to_h
-        expect(result['metafields'].length).to eq(1)
-        expect(result['metafields'].first['value']).to eq('public')
+      it 'includes only public custom fields with expand param' do
+        result = described_class.new(product, params: base_params.merge(expand: ['custom_fields'])).to_h
+        expect(result['custom_fields'].length).to eq(1)
+        expect(result['custom_fields'].first['value']).to eq('public')
       end
     end
   end
@@ -80,15 +80,15 @@ RSpec.describe Spree::Api::V3::Admin::ProductSerializer do
       expect(subject.keys).to include('cost_price', 'cost_currency', 'deleted_at', 'status')
     end
 
-    it 'includes all metafields with display_on when included' do
+    it 'includes all custom fields with storefront_visible when expanded' do
       public_def = create(:metafield_definition, resource_type: 'Spree::Product', display_on: 'both')
       private_def = create(:metafield_definition, :back_end_only, resource_type: 'Spree::Product')
       create(:metafield, resource: product, metafield_definition: public_def, value: 'public')
       create(:metafield, resource: product, metafield_definition: private_def, value: 'private')
 
-      result = described_class.new(product, params: base_params.merge(expand: ['metafields'])).to_h
-      expect(result['metafields'].length).to eq(2)
-      expect(result['metafields']).to all(have_key('display_on'))
+      result = described_class.new(product, params: base_params.merge(expand: ['custom_fields'])).to_h
+      expect(result['custom_fields'].length).to eq(2)
+      expect(result['custom_fields']).to all(have_key('storefront_visible'))
     end
   end
 end

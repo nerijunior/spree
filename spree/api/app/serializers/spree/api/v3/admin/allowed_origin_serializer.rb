@@ -7,13 +7,11 @@ module Spree
         class AllowedOriginSerializer < V3::BaseSerializer
           typelize store_id: :string
 
-          attributes :id, :origin
+          attributes :id, :origin, created_at: :iso8601, updated_at: :iso8601
 
           attribute :store_id do |allowed_origin|
             allowed_origin.store&.prefixed_id
           end
-
-          attributes created_at: :iso8601, updated_at: :iso8601
         end
       end
     end

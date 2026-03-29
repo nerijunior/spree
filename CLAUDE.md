@@ -34,6 +34,7 @@ Current plans:
 
 - `5.4-disjunctive-option-faceting.md` — Per-option-type filter params with disjunctive facet counts (OR within option type, AND across)
 - `5.5-option-type-enhancements.md` — Add `kind` (dropdown/color_swatch/buttons) to OptionType, `color_code` + `image` to OptionValue for swatch support
+- `5.4-6.0-custom-fields-rename.md` — Rename Metafields → Custom Fields (5.4 API bridge + 6.0 model rename)
 
 Completed plans:
 - `5.4-store-api-bridges.md` — Bridge 6.0 naming into 5.4 Store API (implemented, PR #13782)

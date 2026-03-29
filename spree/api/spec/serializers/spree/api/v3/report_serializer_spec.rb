@@ -11,7 +11,7 @@ RSpec.describe Spree::Api::V3::ReportSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id type user_id currency date_from date_to created_at updated_at
+      id type user_id currency date_from date_to
     ])
   end
 

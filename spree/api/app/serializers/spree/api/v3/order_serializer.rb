@@ -33,7 +33,7 @@ module Spree
                    :gift_card_total, :display_gift_card_total,
                    :amount_due, :display_amount_due,
                    :delivery_total, :display_delivery_total, :fulfillment_status, :payment_status,
-                   completed_at: :iso8601, created_at: :iso8601, updated_at: :iso8601
+                   completed_at: :iso8601
 
         attribute :store_credit_total do |order|
           order.total_applied_store_credit.to_s

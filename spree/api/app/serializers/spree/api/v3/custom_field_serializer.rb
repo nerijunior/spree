@@ -1,9 +1,9 @@
 module Spree
   module Api
     module V3
-      # Store API Metafield Serializer
-      # Customer-facing metafield data (public metafields only)
-      class MetafieldSerializer < BaseSerializer
+      # Store API Custom Field Serializer
+      # Customer-facing custom field data (public metafields only)
+      class CustomFieldSerializer < BaseSerializer
         typelize key: :string, name: :string, type: :string, value: :any
 
         attributes :name, :type

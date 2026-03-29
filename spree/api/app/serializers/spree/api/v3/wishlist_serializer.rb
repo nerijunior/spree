@@ -4,8 +4,7 @@ module Spree
       class WishlistSerializer < BaseSerializer
         typelize name: :string, token: :string, is_default: :boolean, is_private: :boolean
 
-        attributes :name, :token,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :name, :token
 
         attribute :is_default do |wishlist|
           wishlist.is_default?

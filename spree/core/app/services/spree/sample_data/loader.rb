@@ -26,6 +26,8 @@ module Spree
             puts 'Loading sample posts...'
             load_ruby_file('posts')
 
+            clear_jobs_queue
+
             puts 'Sample data loaded successfully!'
           end
         end
@@ -72,6 +74,11 @@ module Spree
         yield
       ensure
         Spree::Config[:geocode_addresses] = previous
+      end
+
+      def clear_jobs_queue
+        adapter = ActiveJob::Base.queue_adapter
+        adapter.enqueued_jobs.clear if adapter.respond_to?(:enqueued_jobs)
       end
     end
   end

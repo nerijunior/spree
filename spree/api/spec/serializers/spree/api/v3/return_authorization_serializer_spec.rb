@@ -11,7 +11,7 @@ RSpec.describe Spree::Api::V3::ReturnAuthorizationSerializer do
 
   it 'includes all expected attributes' do
     expect(subject.keys).to match_array(%w[
-      id number status order_id stock_location_id return_authorization_reason_id created_at updated_at
+      id number status order_id stock_location_id return_authorization_reason_id
     ])
   end
 

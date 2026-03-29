@@ -13,7 +13,6 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
       amount amount_used amount_authorized amount_remaining
       display_amount display_amount_used display_amount_remaining
       expires_at redeemed_at expired active
-      created_at updated_at
     ])
   end
 
@@ -56,9 +55,9 @@ RSpec.describe Spree::Api::V3::GiftCardSerializer do
     expect(subject['redeemed_at']).to be_nil
   end
 
-  it 'returns ISO 8601 timestamps' do
-    expect(subject['created_at']).to be_present
-    expect(subject['updated_at']).to be_present
+  it 'does not include timestamps in Store API' do
+    expect(subject).not_to have_key('created_at')
+    expect(subject).not_to have_key('updated_at')
   end
 
   context 'with expired gift card' do

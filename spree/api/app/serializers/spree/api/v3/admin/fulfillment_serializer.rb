@@ -11,7 +11,8 @@ module Spree
                    pre_tax_amount: :string
 
           attributes :adjustment_total, :additional_tax_total,
-                     :included_tax_total, :promo_total, :pre_tax_amount
+                     :included_tax_total, :promo_total, :pre_tax_amount,
+                     created_at: :iso8601, updated_at: :iso8601
 
           attribute :metadata do |shipment|
             shipment.metadata.presence

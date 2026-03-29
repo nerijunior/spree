@@ -7,8 +7,7 @@ module Spree
                  payment_method_id: [:string, nullable: true], payment_source_id: [:string, nullable: true],
                  payment_source_type: [:string, nullable: true], customer_id: [:string, nullable: true]
 
-        attributes :status, :external_id, :external_client_secret, :external_data,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :status, :external_id, :external_client_secret, :external_data
 
         attribute :payment_method_id do |session|
           session.payment_method&.prefixed_id

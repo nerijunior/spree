@@ -29,8 +29,7 @@ module Spree
         end
 
         attributes :position, :alt, :media_type,
-                   :focal_point_x, :focal_point_y, :external_video_url,
-                   created_at: :iso8601, updated_at: :iso8601
+                   :focal_point_x, :focal_point_y, :external_video_url
 
         attribute :original_url do |asset|
           image_url_for(asset)

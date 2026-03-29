@@ -12,7 +12,8 @@ module Spree
 
           # Admin-only attributes
           attributes :login,
-                     last_sign_in_at: :iso8601, current_sign_in_at: :iso8601
+                     last_sign_in_at: :iso8601, current_sign_in_at: :iso8601,
+                     created_at: :iso8601, updated_at: :iso8601
 
           attribute :sign_in_count do |user|
             user.sign_in_count

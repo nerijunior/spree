@@ -9,8 +9,6 @@ export const PaymentSchema = z.object({
   number: z.string(),
   amount: z.string(),
   display_amount: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
   status: z.string(),
   source_type: z.string().nullable(),
   source_id: z.string().nullable(),

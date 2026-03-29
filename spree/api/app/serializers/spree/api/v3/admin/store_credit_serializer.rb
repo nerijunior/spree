@@ -7,6 +7,8 @@ module Spree
                    created_by_id: [:string, nullable: true],
                    metadata: 'Record<string, unknown> | null'
 
+          attributes created_at: :iso8601, updated_at: :iso8601
+
           attribute :customer_id do |store_credit|
             store_credit.user&.prefixed_id
           end

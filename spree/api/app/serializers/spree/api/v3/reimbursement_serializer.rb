@@ -8,8 +8,7 @@ module Spree
                  total: [:string, nullable: true],
                  order_id: [:string, nullable: true], customer_return_id: [:string, nullable: true]
 
-        attributes :number, :reimbursement_status,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :number, :reimbursement_status
 
         attribute :total do |reimbursement|
           reimbursement.total&.to_s

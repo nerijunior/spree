@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
-import { MetafieldSchema } from './Metafield';
+import { CustomFieldSchema } from './CustomField';
 
 export const CategorySchema: z.ZodObject<any> = z.object({
   id: z.string(),
@@ -25,7 +25,7 @@ export const CategorySchema: z.ZodObject<any> = z.object({
   parent: z.lazy(() => CategorySchema).optional(),
   children: z.array(z.lazy(() => CategorySchema)).optional(),
   ancestors: z.array(z.lazy(() => CategorySchema)).optional(),
-  metafields: z.array(MetafieldSchema).optional(),
+  custom_fields: z.array(CustomFieldSchema).optional(),
 });
 
 export type Category = z.infer<typeof CategorySchema>;

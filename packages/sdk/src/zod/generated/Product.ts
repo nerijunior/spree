@@ -1,8 +1,8 @@
 // This file is auto-generated. Do not edit directly.
 import { z } from 'zod';
 import { CategorySchema } from './Category';
+import { CustomFieldSchema } from './CustomField';
 import { MediaSchema } from './Media';
-import { MetafieldSchema } from './Metafield';
 import { OptionTypeSchema } from './OptionType';
 import { PriceSchema } from './Price';
 import { PriceHistorySchema } from './PriceHistory';
@@ -16,8 +16,6 @@ export const ProductSchema = z.object({
   meta_keywords: z.string().nullable(),
   variant_count: z.number(),
   available_on: z.string().nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
   purchasable: z.boolean(),
   in_stock: z.boolean(),
   backorderable: z.boolean(),
@@ -35,7 +33,7 @@ export const ProductSchema = z.object({
   default_variant: VariantSchema.optional(),
   option_types: z.array(OptionTypeSchema).optional(),
   categories: z.array(z.lazy(() => CategorySchema)).optional(),
-  metafields: z.array(MetafieldSchema).optional(),
+  custom_fields: z.array(CustomFieldSchema).optional(),
   prior_price: PriceHistorySchema.nullable().optional(),
 });
 

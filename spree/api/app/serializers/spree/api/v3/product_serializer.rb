@@ -18,7 +18,7 @@ module Spree
         attributes :name, :slug,
                    :meta_description, :meta_keywords,
                    :variant_count,
-                   available_on: :iso8601, created_at: :iso8601, updated_at: :iso8601
+                   available_on: :iso8601
 
         attribute :purchasable do |product|
           product.purchasable?
@@ -108,9 +108,9 @@ module Spree
              if: proc { expand?('categories') }
 
         many :public_metafields,
-             key: :metafields,
-             resource: Spree.api.metafield_serializer,
-             if: proc { expand?('metafields') }
+             key: :custom_fields,
+             resource: Spree.api.custom_field_serializer,
+             if: proc { expand?('custom_fields') }
 
         typelize prior_price: ['PriceHistory', nullable: true]
 

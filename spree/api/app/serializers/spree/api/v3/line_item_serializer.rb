@@ -26,8 +26,7 @@ module Spree
                    :discount_total, :display_discount_total,
                    :pre_tax_amount, :display_pre_tax_amount,
                    :discounted_amount, :display_discounted_amount,
-                   :display_compare_at_amount,
-                   created_at: :iso8601, updated_at: :iso8601
+                   :display_compare_at_amount
 
         # Return compare_at_amount as string, nil if zero
         attribute :compare_at_amount do |line_item|

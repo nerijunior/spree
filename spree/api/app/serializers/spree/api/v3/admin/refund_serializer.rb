@@ -7,6 +7,8 @@ module Spree
                    refund_reason_id: [:string, nullable: true],
                    reimbursement_id: [:string, nullable: true]
 
+          attributes created_at: :iso8601, updated_at: :iso8601
+
           one :payment,
               resource: Spree.api.admin_payment_serializer,
               if: proc { expand?('payment') }

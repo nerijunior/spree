@@ -1,6 +1,6 @@
 module Spree
   class Metafield < Spree.base_class
-    has_prefix_id :mf
+    has_prefix_id :cf
 
     #
     # Associations

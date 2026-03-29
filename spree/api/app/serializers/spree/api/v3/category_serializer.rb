@@ -11,8 +11,7 @@ module Spree
 
         attributes :name, :permalink, :position, :depth,
                    :meta_title, :meta_description, :meta_keywords,
-                   :children_count,
-                   created_at: :iso8601, updated_at: :iso8601
+                   :children_count
 
         attribute :parent_id do |category|
           category.parent&.prefixed_id
@@ -62,9 +61,9 @@ module Spree
              if: proc { expand?('ancestors') }
 
         many :public_metafields,
-             key: :metafields,
-             resource: Spree.api.metafield_serializer,
-             if: proc { expand?('metafields') }
+             key: :custom_fields,
+             resource: Spree.api.custom_field_serializer,
+             if: proc { expand?('custom_fields') }
       end
     end
   end

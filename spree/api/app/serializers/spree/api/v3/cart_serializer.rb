@@ -38,8 +38,7 @@ module Spree
                    :additional_tax_total, :display_additional_tax_total, :total, :display_total,
                    :gift_card_total, :display_gift_card_total,
                    :amount_due, :display_amount_due,
-                   :delivery_total, :display_delivery_total, :warnings,
-                   created_at: :iso8601, updated_at: :iso8601
+                   :delivery_total, :display_delivery_total, :warnings
 
         attribute :store_credit_total do |order|
           order.total_applied_store_credit.to_s

@@ -1,6 +1,6 @@
 module Spree
   class MetafieldDefinition < Spree.base_class
-    has_prefix_id :mfdef
+    has_prefix_id :cfdef
 
     include Spree::DisplayOn
 

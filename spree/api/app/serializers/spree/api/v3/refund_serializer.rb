@@ -8,7 +8,7 @@ module Spree
                  payment_id: [:string, nullable: true], refund_reason_id: [:string, nullable: true],
                  reimbursement_id: [:string, nullable: true]
 
-        attributes :transaction_id, created_at: :iso8601, updated_at: :iso8601
+        attributes :transaction_id
 
         attribute :amount do |refund|
           refund.amount&.to_s

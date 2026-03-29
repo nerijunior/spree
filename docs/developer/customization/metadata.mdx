@@ -6,6 +6,8 @@ title: Metadata
 
 Metadata provides simple, unstructured key-value storage on Spree resources — similar to [Stripe's metadata](https://docs.stripe.com/api/metadata). It's ideal for storing integration IDs, tracking data, or any arbitrary information that doesn't need validation or admin UI.
 
+Metadata is a **permanent, first-class system** in Spree. It is designed to coexist alongside [Metafields](/developer/core-concepts/metafields) (structured, typed, admin-managed). The two systems serve different purposes and are not interchangeable — think of it as **metadata for machines, metafields for humans**.
+
 Metadata is **write-only** in the Store API — you can set it when creating or updating resources, but it is never returned in Store API responses. It is visible in Admin API responses for administrative use.
 
 <Info>
@@ -146,7 +148,7 @@ When there is no metadata, the field is `null`.
 
 ### Reading and writing
 
-Every model that includes `Spree::Metadata` has a `metadata` accessor (alias for `private_metadata`):
+Every model that includes `Spree::Metadata` has a `metadata` accessor. Always use `metadata` in Ruby code — do not call `public_metadata=` or `private_metadata=` directly. (SQL queries still reference the underlying `private_metadata` column name — see querying examples below.)
 
 ```ruby
 order = Spree::Order.find_by!(number: 'R123456')
@@ -190,14 +192,17 @@ Metadata updates use **merge semantics** — existing keys are preserved, new ke
 
 ## Metadata vs Metafields
 
+Spree has two permanent, complementary systems for custom data. They are not interchangeable and neither is going away.
+
 | | Metadata | [Metafields](/developer/core-concepts/metafields) |
 |---|---|---|
-| **Use case** | Integration data, tracking, simple key-value | Structured custom attributes with admin UI |
-| **Validation** | None | Type-specific (text, number, boolean, JSON) |
+| **Purpose** | Developer escape hatch — integration data, sync state, ad-hoc flags | Merchant-defined structured attributes with admin UI |
+| **Schema** | Schemaless JSON — no definition required | Defined via MetafieldDefinitions (typed, validated) |
+| **Validation** | None — accepts any JSON-serializable data | Type-specific (text, number, boolean, rich text, JSON) |
 | **Visibility** | Write-only in Store API, readable in Admin API | Configurable (front-end, back-end, both) |
-| **Admin UI** | Viewable in JSON preview | Full admin management |
-| **Schema** | Schemaless JSON | Defined via MetafieldDefinitions |
-| **API pattern** | Stripe-style flat key-value | Shopify-style typed resources |
+| **Admin UI** | JSON preview only | Dedicated management forms |
+| **API pattern** | Stripe-style: `metadata: { key: value }` | Expand-based: `?expand=metafields` |
+| **Queryable** | Via JSONB operators (PostgreSQL) | Via SQL joins, Ransack scopes, search providers |
 
 ### When to use metadata
 
@@ -205,13 +210,15 @@ Metadata updates use **merge semantics** — existing keys are preserved, new ke
 - Tracking attribution data (UTM parameters, referral source)
 - Passing context from the storefront that doesn't need validation
 - Any write-and-forget data that only needs to be read by backend systems
+- Syncing state with external integrations (webhooks, ETL pipelines)
 
 ### When to use metafields
 
-- Custom product specifications shown to customers
-- Admin-managed fields with validation
-- Data that needs to appear in the admin UI
-- Querying/filtering by custom attributes
+- Custom product specifications shown to customers (material, dimensions, certifications)
+- Admin-managed fields with validation and type safety
+- Data that needs to appear in the admin UI with dedicated form inputs
+- Querying/filtering by custom attributes (search facets, product filtering)
+- CSV import/export of structured product data
 
 ## Supported resources
 
@@ -222,17 +229,23 @@ The Store API currently supports writing metadata on:
 - **Carts** — on creation and update (`POST /api/v3/store/carts`, `PATCH /api/v3/store/carts/:id`)
 - **Items** — on create and update (`POST/PATCH /api/v3/store/carts/:id/items`)
 
-## Migration from public_metadata
+## Deprecation: public_metadata
 
-The `public_metadata` column is deprecated. Metadata is no longer returned in Store API responses. If you were using `public_metadata` for data that needs to be visible to customers, migrate to [Metafields](/developer/core-concepts/metafields) with `display_on: 'both'`.
+<Warning>
+`public_metadata` is deprecated and will be removed in Spree 6.0. Use `metadata` instead.
+</Warning>
+
+The `public_metadata` column was never exposed in Store API responses and in practice served the same purpose as `private_metadata`. It will be removed in Spree 6.0 and calling `public_metadata=` will emit a deprecation warning.
+
+Always use the single `metadata` accessor for all schemaless key-value storage. If you need data visible to customers on the storefront, use [Metafields](/developer/core-concepts/metafields) instead.
 
 ```ruby
-# Before (deprecated)
+# Deprecated — will be removed in 6.0
 order.public_metadata = { 'gift_message' => 'Happy Birthday!' }
 
-# After — use metadata for write-only storage
+# Use metadata for internal storage
 order.metadata = { 'gift_message' => 'Happy Birthday!' }
 
-# After — use metafields for customer-visible structured data
+# Use metafields for customer-visible structured data
 order.set_metafield('custom.gift_message', 'Happy Birthday!')
 ```

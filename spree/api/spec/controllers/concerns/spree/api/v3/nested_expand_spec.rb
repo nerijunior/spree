@@ -51,13 +51,13 @@ RSpec.describe Spree::Api::V3::Store::ProductsController, type: :controller do
       end
 
       it 'supports multiple nested expands' do
-        get :show, params: { id: product.prefixed_id, expand: 'variants.media,variants.metafields' }
+        get :show, params: { id: product.prefixed_id, expand: 'variants.media,variants.custom_fields' }
 
         data = JSON.parse(response.body)
         expect(data).to have_key('variants')
         data['variants'].each do |variant|
           expect(variant).to have_key('media')
-          expect(variant).to have_key('metafields')
+          expect(variant).to have_key('custom_fields')
         end
       end
 

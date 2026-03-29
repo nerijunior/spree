@@ -9,7 +9,7 @@ RSpec.describe Spree::Admin::JsonPreviewsController, type: :controller do
 
   describe 'GET #show' do
     it 'assigns @object and renders the show template' do
-      get :show, params: { resource_type: resource_type, id: product.id }
+      get :show, params: { resource_type: resource_type, id: product.to_param }
       expect(response).to render_template(:show)
       expect(assigns(:object)).to eq(product)
     end
@@ -25,7 +25,7 @@ RSpec.describe Spree::Admin::JsonPreviewsController, type: :controller do
     context 'when resource_type is invalid' do
       it 'raises ActiveRecord::RecordNotFound' do
         expect {
-          get :show, params: { resource_type: 'InvalidType', id: product.id }
+          get :show, params: { resource_type: 'InvalidType', id: product.to_param }
         }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end

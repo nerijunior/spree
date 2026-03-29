@@ -13,11 +13,8 @@ module Spree
                    deleted_at: [:string, nullable: true]
 
           # Admin-only attributes
-          attributes :position, :tax_category_id, :cost_price, :cost_currency, deleted_at: :iso8601
-
-          attribute :total_on_hand do |variant|
-            variant.total_on_hand
-          end
+          attributes :position, :total_on_hand, :tax_category_id, :cost_price, :cost_currency, deleted_at: :iso8601,
+                     created_at: :iso8601, updated_at: :iso8601
 
           # Override inherited associations to use admin serializers
           one :primary_media,
@@ -37,8 +34,9 @@ module Spree
                if: proc { expand?('prices') }
 
           many :metafields,
-               resource: Spree.api.admin_metafield_serializer,
-               if: proc { expand?('metafields') }
+               key: :custom_fields,
+               resource: Spree.api.admin_custom_field_serializer,
+               if: proc { expand?('custom_fields') }
         end
       end
     end

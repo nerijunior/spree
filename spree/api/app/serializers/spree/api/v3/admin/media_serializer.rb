@@ -5,6 +5,8 @@ module Spree
         class MediaSerializer < V3::MediaSerializer
           typelize viewable_type: :string, viewable_id: :string
 
+          attributes created_at: :iso8601, updated_at: :iso8601
+
           attribute :viewable_id do |asset|
             asset.viewable&.prefixed_id
           end

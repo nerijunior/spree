@@ -9,8 +9,7 @@ module Spree
                  available_store_credit_total: :string, display_available_store_credit_total: :string,
                  default_billing_address: { nullable: true }, default_shipping_address: { nullable: true }
 
-        attributes :email, :first_name, :last_name, :phone, :accepts_email_marketing,
-                   created_at: :iso8601, updated_at: :iso8601
+        attributes :email, :first_name, :last_name, :phone, :accepts_email_marketing
 
         attribute :available_store_credit_total do |user, params|
           store = params&.dig(:store) || Spree::Current.store

@@ -13,7 +13,8 @@ module Spree
                    deleted_at: [:string, nullable: true]
 
           # Admin-only attributes
-          attributes :status, :make_active_at, :discontinue_on, deleted_at: :iso8601
+          attributes :status, :make_active_at, :discontinue_on, deleted_at: :iso8601,
+                     created_at: :iso8601, updated_at: :iso8601
 
           attribute :cost_price do |product|
             product.master&.cost_price
@@ -54,8 +55,9 @@ module Spree
                if: proc { expand?('categories') }
 
           many :metafields,
-               resource: Spree.api.admin_metafield_serializer,
-               if: proc { expand?('metafields') }
+               key: :custom_fields,
+               resource: Spree.api.admin_custom_field_serializer,
+               if: proc { expand?('custom_fields') }
         end
       end
     end
