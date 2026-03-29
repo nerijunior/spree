@@ -1,5 +1,17 @@
 # @spree/sdk
 
+## 0.19.0
+
+### Minor Changes
+
+- Replace `categories_id_eq` filter and `categories.products.list()` with `in_category` / `in_categories` scopes on the `/products` endpoint. Category filters now include descendant categories.
+
+### Patch Changes
+
+- Rename metafields to custom*fields in Store API. The expand parameter changes from `metafields` to `custom_fields`, and the response key changes accordingly. Prefix IDs change from `mf*`to`cf\_`. The `StoreMetafield`type is replaced by`StoreCustomField`.
+
+- Remove `created_at` and `updated_at` from Store API responses. These internal timestamps are now only available in Admin API responses. Business timestamps like `completed_at` and `expires_at` are unchanged.
+
 ## 0.18.0
 
 ### Breaking Changes

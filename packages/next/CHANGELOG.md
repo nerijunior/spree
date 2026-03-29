@@ -1,5 +1,24 @@
 # @spree/next
 
+## 0.19.0
+
+### Minor Changes
+
+- **Breaking:** Remove all server actions (`actions/*`) and data functions (`data/*`) from the package. The package now exports only the server-side plumbing: `getClient()`, `withAuthRefresh()`, cookie helpers, `getLocaleOptions()`, `createSpreeMiddleware()`, and `createWebhookHandler()`.
+
+  Storefronts should call `@spree/sdk` directly in their own server actions, using the auth and cookie helpers from `@spree/next`. This eliminates a double-wrapping abstraction layer and gives storefronts full control over caching, error handling, and cache invalidation.
+
+  New public exports:
+
+  - `withAuthRefresh`, `getAuthOptions` — JWT lifecycle with proactive refresh
+  - `getCartToken`, `getCartId`, `setCartCookies`, `clearCartCookies` — cart cookie management
+  - `getAccessToken`, `setAccessToken`, `clearAccessToken` — JWT cookie management
+  - `getRefreshToken`, `setRefreshToken`, `clearRefreshToken` — refresh token cookie management
+  - `getCartOptions`, `requireCartId` — combined cart + auth options for SDK calls
+  - `getLocaleOptions` — reads country/locale from cookies
+
+  Removed exports: `listProducts`, `getProduct`, `getProductFilters`, `listCategories`, `getCategory`, `listCategoryProducts`, `listCountries`, `getCountry`, `listCurrencies`, `listLocales`, `listMarkets`, `getMarket`, `resolveMarket`, `listMarketCountries`, `getMarketCountry`, `listPolicies`, `getPolicy`, `getCart`, `getOrCreateCart`, `addItem`, `updateItem`, `removeItem`, `clearCart`, `associateCart`, `updateCart`, `selectDeliveryRate`, `applyDiscountCode`, `removeDiscountCode`, `applyGiftCard`, `removeGiftCard`, `complete`, `login`, `register`, `logout`, `getCustomer`, `updateCustomer`, `requestPasswordReset`, `resetPassword`, `listAddresses`, `getAddress`, `createAddress`, `updateAddress`, `deleteAddress`, `listOrders`, `getOrder`, `setLocale`, `listCreditCards`, `deleteCreditCard`, `listGiftCards`, `getGiftCard`, `listStoreCredits`, `createPayment`, `createPaymentSession`, `getPaymentSession`, `updatePaymentSession`, `completePaymentSession`, `createPaymentSetupSession`, `getPaymentSetupSession`, `completePaymentSetupSession`, and all re-exported SDK types.
+
 ## 0.18.0
 
 ### Breaking Changes
@@ -21,6 +40,7 @@ Requires `@spree/sdk >= 0.16.0`.
 ### Breaking Changes
 
 - **Renamed `applyCoupon` / `removeCoupon`** to `applyDiscountCode` / `removeDiscountCode`
+
 ### New Features
 
 - **`applyGiftCard(code)`** — apply gift card to cart
@@ -90,13 +110,6 @@ Requires `@spree/sdk` >= 0.15.0.
 ### Patch Changes
 
 - Allow `getCart()` to accept an optional `explicitCartId` parameter. When provided, fetches that specific cart directly by ID instead of reading from cookies. Needed for the confirm-payment flow where the cart ID is known from the URL but cookies may have been cleared.
-
-## 1.0.0
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @spree/sdk@0.13.0
 
 ## 0.12.0
 
