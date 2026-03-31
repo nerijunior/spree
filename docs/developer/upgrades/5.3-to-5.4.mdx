@@ -29,17 +29,46 @@ Samples are now included in the `spree` gem. If you've added previously `spree_s
   bin/rake spree:install:migrations && bin/rails db:migrate
   ```
 
+### Fix your Admin user class
+
+Your admin user model needs to include the `Spree::AdminUserMethods` concern instead of `Spree::UserMethods`.
+Previously `UserMethods` bundled `AdminUserMethods` but that caused all kinds of issues.
+
+So if you have a model like this:
+
+```ruby
+class Spree::AdminUser < Spree::Base
+  include Spree::UserMethods
+  
+  # ... other model code ...
+end
+```
+
+You need to change it to this:
+
+```ruby
+class Spree::AdminUser < Spree::Base
+  include Spree::AdminUserMethods
+  
+  # ... other model code ...
+end
+```
+
+By default that file is located at `app/models/spree/admin_user.rb`.
+
 ### Backfill Image Thumbnail IDs
 
-Spree 5.4 adds a `thumbnail` association to both `Product` and `Variant` models. This greatly speeds up rendering Product lists everywhere (API, Admin Dashboard and `spree_storefront`), as previously we've had to load all images for each product.
+Spree 5.4 adds a `primary_media` association to both `Product` and `Variant` models. This greatly speeds up rendering Product lists everywhere (API, Admin Dashboard and `spree_storefront`), as previously we've had to load all media/images for each product and determine which one is the one to render a thumbnail.
 
-This can be done by running the following command:
+To generate the new association you will need to run a rake task (both in development and production environments):
 
   ```bash
-  bin/rails spree:images:backfill_thumbnails
+  bin/rails spree:media:backfill_primary_media
   ```
 
 As above, this process can take a while depending on the size of your product catalog.
+
+For new products this will be set automatically and you won't need to run this rake task more than once.
 
 ### Prefixed IDs
 
@@ -95,7 +124,7 @@ Prefix length isn't limited by default, but we recommend to keep it short.
 
 ### Migrate Checkout Zones to Markets
 
-Spree 5.4 introduces [Markets](/developer/core-concepts/markets) as the primary way to manage which countries are available for checkout, along with their currencies and locales. The legacy `checkout_zone` field on the Store model is now deprecated and will be removed in Spree 5.5.
+Spree 5.4 introduces [Markets](/developer/core-concepts/markets) as the primary way to manage which countries are available for checkout, along with their currencies and locales. The legacy `checkout_zone` field on the Store model is now deprecated and will be removed in Spree 6.0.
 
 New stores automatically get a default market created from their `default_country` — no manual setup needed. For existing stores that used `checkout_zone`, run the migration rake task:
 
@@ -196,7 +225,7 @@ These extensions will continue to work — Spree's `LogEntry#parsed_details` sti
 
 `Spree::Address#active_merchant_hash` has been renamed to `#gateway_hash`. A backwards-compatible alias is provided, so existing code continues to work without changes.
 
-### (Optional) Install API v2
+### (Optional) Install Legacy API v2 extension
 
 Spree 5.4 ships with API v3, which marks deprecation of API v2. API v2 is still available but you need to install it separately. If you currently use API v2, you can do this by running the following command:
 
@@ -229,15 +258,21 @@ And run `bundle install`
 
 ### (Optional) Install Spree Multi Store
 
-Multi-store features like multiple store management & custom domains were moved to a separate gem `spree_multi_store`.
+[Multi-store](/developer/multi-store/quickstart) features like multiple store management & custom domains were moved to a separate gem `spree_multi_store`.
 
 If you rely on these features please run:
 
   ```bash
   bundle add spree_multi_store
   ```
+  
+<Info>
+Spree Multi-Store is licensed under the [AGPL v3 License](https://opensource.org/licenses/AGPL-3.0). 
 
-### (Optional) Install Legacy Product Properties
+If you would like to use it in a commercial application, please [contact us](https://spreecommerce.org/get-started/) to obtain a commercial license.
+</Info>
+
+### (Optional) Install Legacy Product Properties extension
 
 Product Properties have been extracted from Spree core to a separate gem `spree_legacy_product_properties`. Product Properties were already deprecated in favor of [Metafields](/developer/core-concepts/metafields) and disabled by default since Spree 5.1.
 
@@ -252,3 +287,13 @@ No data migration is needed — the gem uses the same database tables. All exist
 <Warning>
   If you skip this step and had Product Properties enabled, any code referencing `product.product_properties`, `product.property()`, `product.set_property()`, or the admin Properties page will stop working.
 </Warning>
+
+### (Optional) Install Spree Posts extension
+
+Posts and Post Categories management were extracted from Spree core into a seperate gem `spree_posts`.
+
+If you use these features before run this command to restore them:
+
+```bash
+bundle add spree_posts
+```
