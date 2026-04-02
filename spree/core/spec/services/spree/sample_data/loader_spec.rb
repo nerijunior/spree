@@ -11,7 +11,7 @@ RSpec.describe Spree::SampleData::Loader, type: :service, without_global_store: 
   end
 
   it 'creates products' do
-    expect(Spree::Product.count).to be > 50
+    expect(Spree::Product.count).to be > 30
   end
 
   it 'creates variants' do

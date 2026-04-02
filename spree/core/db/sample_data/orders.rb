@@ -1,8 +1,8 @@
 store = Spree::Store.default
 
 # Find products created by the product import
-product_1 = Spree::Product.find_by(name: 'Denim Shirt')
-product_2 = Spree::Product.find_by(name: 'Checked Shirt')
+product_1 = Spree::Product.find_by(name: 'Automatic Espresso Machine')
+product_2 = Spree::Product.find_by(name: 'Drip Coffee Maker 1.5L')
 
 unless product_1 && product_2
   puts '  Skipping orders: required products not found'
