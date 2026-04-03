@@ -7,7 +7,7 @@
     <%= hidden_field_tag :redirect_url, request.fullpath %>
 
     <%= dropdown(portal: false) do %>
-      <%= dropdown_toggle(class: 'btn-light btn-sm h-[2.125rem]') do %>
+      <%= dropdown_toggle(class: 'btn-light btn-sm') do %>
         <%= icon 'columns-3' %>
         <span><%= Spree.t('admin.tables.columns') %></span>
         <%= icon 'chevron-down' %>

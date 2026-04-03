@@ -13,10 +13,6 @@
     @apply p-0 mb-3;
   }
 
-  .card .card {
-    @apply rounded-xl;
-  }
-
   /* Card with table */
   .card > .table,
   .card .table-responsive > .table {
@@ -74,7 +70,7 @@
   }
 
   .card-body {
-    @apply flex-auto p-5;
+    @apply flex-auto p-3;
   }
 
   .card-body .form-group:last-child {
@@ -87,7 +83,7 @@
   }
 
   .card-header {
-    @apply flex items-center mb-0 p-5 pr-3 h-14 border-b border-gray-100 rounded-t-[calc(var(--radius-xl)-1px)];
+    @apply flex items-center mb-0 px-3 h-12 border-b border-gray-100 rounded-t-[calc(var(--radius-xl)-1px)];
   }
 
   .card-header .card-title {
@@ -107,7 +103,7 @@
   }
 
   .card-footer {
-    @apply p-5;
+    @apply p-3;
   }
 
   .card-footer:last-child {

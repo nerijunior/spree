@@ -66,7 +66,7 @@
   }
 
   .bulk-panel-container .btn-close {
-    @apply w-10;
+    @apply w-10 rounded-xl;
   }
 
   #bulk-panel {

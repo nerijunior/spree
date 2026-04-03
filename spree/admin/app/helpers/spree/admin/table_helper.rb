@@ -359,7 +359,7 @@ module Spree
       private
 
       def sort_dropdown_toggle(current_direction, current_label)
-        dropdown_toggle(class: 'btn-light btn-sm h-[2.125rem]') do
+        dropdown_toggle(class: 'btn-light btn-sm') do
           safe_join([
             icon(current_direction == 'asc' ? 'sort-ascending' : 'sort-descending'),
             content_tag(:span, current_label),

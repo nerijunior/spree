@@ -1,5 +1,5 @@
 <% order ||= shipment.order %>
-<%= turbo_frame_tag dom_id(shipment), class: "card rounded-lg" do %>
+<%= turbo_frame_tag dom_id(shipment), class: "card" do %>
   <div class="card-header items-center justify-between">
     <div class="flex items-center gap-2">
       <span class="flex items-center"><%= shipment_state(shipment.state) %></span>

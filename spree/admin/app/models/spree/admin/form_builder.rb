@@ -389,7 +389,7 @@ module Spree
 
         @template.content_tag(:div, class: 'input-group') do
           prepend_html = if prepend.present?
-                           @template.content_tag(:div, prepend, class: 'pl-3 text-gray-400')
+                           @template.content_tag(:div, prepend, class: 'pl-2 text-gray-400')
                          else
                            ''.html_safe
                          end
