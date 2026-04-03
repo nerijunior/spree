@@ -11,7 +11,7 @@
   .btn {
     @apply inline-flex items-center justify-center text-center align-middle gap-2;
     @apply cursor-pointer select-none no-underline;
-    @apply px-3 py-1.5 text-base font-medium leading-normal border border-transparent rounded-xl;
+    @apply px-2.5 py-1.5 text-base font-medium leading-normal border border-transparent rounded-xl;
     @apply transition-colors duration-100 ease-linear;
   }
 
