@@ -6,32 +6,32 @@ module Spree
       def call
         Spree::Events.disable do
           without_geocoding do
-            ensure_seeds_loaded
+            ActiveRecord::Base.no_touching do
+              ensure_seeds_loaded
 
-            puts 'Loading sample configuration data...'
-            load_configuration_data
+              puts 'Loading sample configuration data...'
+              load_configuration_data
 
-            puts 'Loading sample metafield definitions...'
-            load_ruby_file('metafield_definitions')
+              puts 'Loading sample metafield definitions...'
+              load_ruby_file('metafield_definitions')
 
-            puts 'Loading sample options...'
-            load_ruby_file('options')
+              puts 'Loading sample options...'
+              load_ruby_file('options')
 
-            puts 'Loading sample products...'
-            load_products
+              puts 'Loading sample products...'
+              load_products
 
-            puts 'Loading sample customers...'
-            load_customers
+              puts 'Loading sample customers...'
+              load_customers
 
-            puts 'Loading sample orders...'
-            load_ruby_file('orders')
+              puts 'Loading sample orders...'
+              load_ruby_file('orders')
 
-            puts 'Loading sample posts...'
-            load_ruby_file('posts')
+              puts 'Loading sample posts...'
+              load_ruby_file('posts')
 
-            clear_jobs_queue
-
-            puts 'Sample data loaded successfully!'
+              puts 'Sample data loaded successfully!'
+            end
           end
         end
       end
@@ -77,11 +77,6 @@ module Spree
         yield
       ensure
         Spree::Config[:geocode_addresses] = previous
-      end
-
-      def clear_jobs_queue
-        adapter = ActiveJob::Base.queue_adapter
-        adapter.enqueued_jobs.clear if adapter.respond_to?(:enqueued_jobs)
       end
     end
   end
