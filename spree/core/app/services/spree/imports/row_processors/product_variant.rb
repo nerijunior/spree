@@ -32,7 +32,7 @@ module Spree
           variant.width = attributes['width'] if attributes['width'].present?
           variant.depth = attributes['depth'] if attributes['depth'].present?
           variant.track_inventory = attributes['track_inventory'] if attributes['track_inventory'].present?
-          variant.option_value_variants = prepare_option_value_variants
+          variant.option_value_variants = prepare_option_value_variants if options.any?
 
           if attributes['tax_category'].present?
             tax_category = prepare_tax_category
@@ -68,7 +68,7 @@ module Spree
 
             product = assign_attributes_to_product(product)
             product.save!
-            handle_metafields(product)
+            handle_metafields(product) if has_product_attributes?
             product
           else
             # For non-master variants, only look up the product
@@ -105,7 +105,11 @@ module Spree
               shipping_category = prepare_shipping_category
               product.shipping_category = shipping_category if shipping_category.present?
             end
-            product.taxons = prepare_taxons
+
+            taxons = prepare_taxons
+            # Full product rows (with name/status/description) clear taxons when categories are blank.
+            # Price-only rows (no product attributes) never touch taxons.
+            product.taxons = taxons if taxons.any? || has_product_attributes?
           end
 
           product
@@ -195,6 +199,10 @@ module Spree
 
             options
           end
+        end
+
+        def has_product_attributes?
+          %w[name status description category1 category2 category3].any? { |key| attributes[key].present? }
         end
 
         def handle_metafields(product)
