@@ -257,7 +257,7 @@ describe 'Products', type: :feature do
         end
 
         after do
-          I18n.locale = @original_locale
+          I18n.locale = @original_locale || :en
         end
 
         it 'correctly saves price without multiplying by 100' do
