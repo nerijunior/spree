@@ -47,8 +47,8 @@ export class AdminClient {
     login: (credentials: LoginCredentials, options?: RequestOptions): Promise<AuthTokens> =>
       this.request<AuthTokens>('POST', '/auth/login', { ...options, body: credentials }),
 
-    refresh: (options?: RequestOptions): Promise<AuthTokens> =>
-      this.request<AuthTokens>('POST', '/auth/refresh', options),
+    refresh: (params: { refresh_token: string }, options?: RequestOptions): Promise<AuthTokens> =>
+      this.request<AuthTokens>('POST', '/auth/refresh', { ...options, body: params }),
   };
 
   // ============================================
