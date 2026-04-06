@@ -34,7 +34,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   })
   const [isLoading, setIsLoading] = useState(false)
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const isRefreshingRef = useRef(false)
+  // Serialize all refresh calls — prevents double-rotation from StrictMode/HMR
+  const refreshPromiseRef = useRef<Promise<boolean> | null>(null)
+
+  const clearRefreshTimer = useCallback(() => {
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current)
+      refreshTimerRef.current = null
+    }
+  }, [])
 
   const clearTokens = useCallback(() => {
     setToken(null)
@@ -42,11 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(REFRESH_TOKEN_KEY)
     localStorage.removeItem(USER_KEY)
-    if (refreshTimerRef.current) {
-      clearTimeout(refreshTimerRef.current)
-      refreshTimerRef.current = null
-    }
-  }, [])
+    clearRefreshTimer()
+  }, [clearRefreshTimer])
 
   const storeTokens = useCallback((accessToken: string, refreshToken: string, authUser: AuthUser) => {
     adminClient.setToken(accessToken)
@@ -57,11 +62,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(USER_KEY, JSON.stringify(authUser))
   }, [])
 
-  const refreshAccessToken = useCallback(async (): Promise<boolean> => {
+  const doRefresh = useCallback(async (): Promise<boolean> => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
-    if (!refreshToken || isRefreshingRef.current) return false
+    if (!refreshToken) return false
 
-    isRefreshingRef.current = true
     try {
       const response = await adminClient.auth.refresh({ refresh_token: refreshToken })
       if (response.refresh_token) {
@@ -71,23 +75,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       clearTokens()
       return false
-    } finally {
-      isRefreshingRef.current = false
     }
   }, [storeTokens, clearTokens])
 
+  // Serialize: if a refresh is already in-flight, return the same promise
+  const refreshAccessToken = useCallback((): Promise<boolean> => {
+    if (refreshPromiseRef.current) return refreshPromiseRef.current
+
+    const promise = doRefresh().finally(() => {
+      refreshPromiseRef.current = null
+    })
+    refreshPromiseRef.current = promise
+    return promise
+  }, [doRefresh])
+
   const scheduleRefresh = useCallback(() => {
-    if (refreshTimerRef.current) {
-      clearTimeout(refreshTimerRef.current)
-    }
+    clearRefreshTimer()
     refreshTimerRef.current = setTimeout(async () => {
-      await refreshAccessToken()
-      // Reschedule on success (clearTokens stops the chain on failure)
-      if (localStorage.getItem(REFRESH_TOKEN_KEY)) {
-        scheduleRefresh()
-      }
+      const success = await refreshAccessToken()
+      if (success) scheduleRefresh()
     }, REFRESH_INTERVAL_MS)
-  }, [refreshAccessToken])
+  }, [refreshAccessToken, clearRefreshTimer])
 
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true)
@@ -104,26 +112,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearTokens()
   }, [clearTokens])
 
+  // Register 401 handler: refresh token and retry the failed request
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only run on mount
+  useEffect(() => {
+    adminClient.onUnauthorized(async () => {
+      const success = await refreshAccessToken()
+      if (success) scheduleRefresh()
+      return success
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // On mount: refresh the token if we have a refresh token stored
   // biome-ignore lint/correctness/useExhaustiveDependencies: only run on mount
   useEffect(() => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
     if (!refreshToken) {
-      // No refresh token — clear stale JWT-only sessions
       if (token) clearTokens()
       return
     }
 
-    // Refresh immediately on mount, then schedule periodic refresh
     refreshAccessToken().then((success) => {
       if (success) scheduleRefresh()
     })
 
-    return () => {
-      if (refreshTimerRef.current) {
-        clearTimeout(refreshTimerRef.current)
-      }
-    }
+    return clearRefreshTimer
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
