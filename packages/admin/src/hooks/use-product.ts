@@ -11,7 +11,6 @@ export function useProduct(id: string) {
           'images',
           'option_types',
           'categories',
-          'shipping_category',
           'tax_category',
         ],
       }),

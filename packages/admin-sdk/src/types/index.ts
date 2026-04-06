@@ -40,7 +40,6 @@ export type { default as Product } from './generated/Product';
 export type { default as Refund } from './generated/Refund';
 export type { default as Reimbursement } from './generated/Reimbursement';
 export type { default as ReturnAuthorization } from './generated/ReturnAuthorization';
-export type { default as ShippingCategory } from './generated/ShippingCategory';
 export type { default as State } from './generated/State';
 export type { default as StockItem } from './generated/StockItem';
 export type { default as StockLocation } from './generated/StockLocation';

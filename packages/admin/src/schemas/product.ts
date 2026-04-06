@@ -26,7 +26,6 @@ export const productFormSchema = z.object({
   track_inventory: z.boolean().optional(),
 
   // Shipping
-  shipping_category_id: z.string().nullable().optional(),
   weight: z.coerce.number().nullable().optional(),
   height: z.coerce.number().nullable().optional(),
   width: z.coerce.number().nullable().optional(),

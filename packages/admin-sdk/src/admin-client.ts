@@ -17,7 +17,7 @@ export interface LoginCredentials {
   email: string;
   password: string;
 }
-import type { Store, Product, Order, Asset, Category, TaxCategory, ShippingCategory } from './types';
+import type { Store, Product, Order, Asset, Category, TaxCategory } from './types';
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
@@ -188,18 +188,6 @@ export class AdminClient {
   readonly taxCategories = {
     list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<TaxCategory>> =>
       this.request<PaginatedResponse<TaxCategory>>('GET', '/tax_categories', {
-        ...options,
-        params: params ? transformListParams(params) : undefined,
-      }),
-  };
-
-  // ============================================
-  // Shipping Categories
-  // ============================================
-
-  readonly shippingCategories = {
-    list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<ShippingCategory>> =>
-      this.request<PaginatedResponse<ShippingCategory>>('GET', '/shipping_categories', {
         ...options,
         params: params ? transformListParams(params) : undefined,
       }),

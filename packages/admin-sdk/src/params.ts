@@ -149,7 +149,6 @@ export interface ProductCreateParams {
   slug?: string;
   status?: 'draft' | 'active' | 'archived';
   sku?: string;
-  shipping_category_id: string;
   tax_category_id?: string;
   category_ids?: Array<string>;
   tags?: Array<string>;
@@ -174,7 +173,6 @@ export interface ProductUpdateParams {
   slug?: string;
   status?: 'draft' | 'active' | 'archived';
   sku?: string;
-  shipping_category_id?: string;
   tax_category_id?: string;
   category_ids?: Array<string>;
   tags?: Array<string>;

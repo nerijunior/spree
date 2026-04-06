@@ -7,7 +7,6 @@ type Variant = BaseVariant & {
   dimensions_unit?: string | null
 }
 type Product = Omit<BaseProduct, 'master_variant' | 'variants'> & {
-  shipping_category_id?: string | null
   tax_category_id?: string | null
   meta_title?: string | null
   master_variant?: Variant
@@ -62,7 +61,6 @@ import {
   useCreateProductAsset,
   useDeleteProductAsset,
 } from '@/hooks/use-product-assets'
-import { useShippingCategories } from '@/hooks/use-shipping-categories'
 import { useTaxCategories } from '@/hooks/use-tax-categories'
 import { useCategories } from '@/hooks/use-categories'
 import { productFormSchema, type ProductFormValues } from '@/schemas/product'
@@ -95,7 +93,6 @@ function productToFormValues(product: Product): ProductFormValues {
     sku: master?.sku ?? '',
     barcode: master?.barcode ?? '',
     track_inventory: master?.track_inventory ?? true,
-    shipping_category_id: product.shipping_category_id ?? null,
     weight: master?.weight ?? null,
     height: master?.height ?? null,
     width: master?.width ?? null,
@@ -862,37 +859,12 @@ function TagCombobox({
 // ---------------------------------------------------------------------------
 
 function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: boolean }) {
-  const { data: shippingCategoriesResponse } = useShippingCategories()
-  const shippingCategories = shippingCategoriesResponse?.data ?? []
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Shipping</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="grid gap-2">
-          <Label>Shipping category</Label>
-          <Controller
-            name="shipping_category_id"
-            control={form.control}
-            render={({ field }) => (
-              <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v || null)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select shipping category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {shippingCategories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
         {!hasVariants && (
           <>
             <div className="grid grid-cols-2 gap-3">

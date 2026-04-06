@@ -118,9 +118,6 @@ Spree::Core::Engine.add_routes do
         # Option Types (with nested option_values in payload)
         resources :option_types
 
-        # Shipping Categories
-        resources :shipping_categories, only: [:index, :show]
-
         # Tax Categories
         resources :tax_categories, only: [:index, :show]
 
