@@ -84,7 +84,7 @@ function productToFormValues(product: Product): ProductFormValues {
     available_on: product.available_on ?? null,
     discontinue_on: product.discontinue_on ?? null,
     category_ids: product.categories?.map((t) => t.id) ?? [],
-    tags: product.tags ?? [],
+    tags: product.tags?.map((t: any) => t.name ?? t) ?? [],
     price: master?.price?.amount ? Number(master.price.amount) : undefined,
     compare_at_price: master?.original_price?.amount
       ? Number(master.original_price.amount)
