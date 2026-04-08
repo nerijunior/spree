@@ -19,7 +19,7 @@ type LoginForm = z.infer<typeof loginSchema>
 export const Route = createFileRoute('/login')({
   beforeLoad: ({ context }) => {
     if (context.auth.isAuthenticated) {
-      throw redirect({ to: '/' })
+      throw redirect({ to: '/' }) // Will redirect to /$storeId via _authenticated/index
     }
   },
   component: LoginPage,

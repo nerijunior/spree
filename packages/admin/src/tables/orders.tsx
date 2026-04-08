@@ -20,8 +20,8 @@ defineTable('orders', {
       default: true,
       render: (order) => (
         <Link
-          to="/orders/$orderId"
-          params={{ orderId: order.id }}
+          to="/$storeId/orders/$orderId"
+          params={{ orderId: order.id } as Record<string, string>}
           className="font-medium text-zinc-950 no-underline"
         >
           #{order.number}

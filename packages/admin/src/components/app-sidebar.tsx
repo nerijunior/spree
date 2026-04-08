@@ -9,6 +9,7 @@ import {
   UsersIcon,
 } from 'lucide-react'
 import type { ComponentProps } from 'react'
+import { useParams } from '@tanstack/react-router'
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import { StoreSwitcher } from '@/components/store-switcher'
@@ -21,63 +22,71 @@ export type NavItem = {
   items?: { title: string; url: string }[]
 }
 
-const navigation: NavItem[] = [
-  {
-    title: 'Home',
-    url: '/',
-    icon: HomeIcon,
-  },
-  {
-    title: 'Orders',
-    url: '/orders',
-    icon: InboxIcon,
-    items: [{ title: 'Draft Orders', url: '/orders/drafts' }],
-  },
-  {
-    title: 'Products',
-    url: '/products',
-    icon: PackageIcon,
-    items: [
-      { title: 'Price Lists', url: '/products/price-lists' },
-      { title: 'Stock', url: '/products/stock' },
-      { title: 'Categories', url: '/products/categories' },
-      { title: 'Options', url: '/products/options' },
-    ],
-  },
-  {
-    title: 'Customers',
-    url: '/customers',
-    icon: UsersIcon,
-  },
-  {
-    title: 'Promotions',
-    url: '/promotions',
-    icon: TagIcon,
-    items: [{ title: 'Gift Cards', url: '/promotions/gift-cards' }],
-  },
-  {
-    title: 'Reports',
-    url: '/reports',
-    icon: BarChart3Icon,
-  },
-]
+function buildNavigation(storeId: string): NavItem[] {
+  const p = `/${storeId}`
+  return [
+    {
+      title: 'Home',
+      url: p,
+      icon: HomeIcon,
+    },
+    {
+      title: 'Orders',
+      url: `${p}/orders`,
+      icon: InboxIcon,
+      items: [{ title: 'Draft Orders', url: `${p}/orders/drafts` }],
+    },
+    {
+      title: 'Products',
+      url: `${p}/products`,
+      icon: PackageIcon,
+      items: [
+        { title: 'Price Lists', url: `${p}/products/price-lists` },
+        { title: 'Stock', url: `${p}/products/stock` },
+        { title: 'Categories', url: `${p}/products/categories` },
+        { title: 'Options', url: `${p}/products/options` },
+      ],
+    },
+    {
+      title: 'Customers',
+      url: `${p}/customers`,
+      icon: UsersIcon,
+    },
+    {
+      title: 'Promotions',
+      url: `${p}/promotions`,
+      icon: TagIcon,
+      items: [{ title: 'Gift Cards', url: `${p}/promotions/gift-cards` }],
+    },
+    {
+      title: 'Reports',
+      url: `${p}/reports`,
+      icon: BarChart3Icon,
+    },
+  ]
+}
 
-const bottomNavigation: NavItem[] = [
-  {
-    title: 'Settings',
-    url: '/settings',
-    icon: SettingsIcon,
-  },
-]
+function buildBottomNavigation(storeId: string): NavItem[] {
+  return [
+    {
+      title: 'Settings',
+      url: `/${storeId}/settings`,
+      icon: SettingsIcon,
+    },
+  ]
+}
 
 export function AppSidebar(props: ComponentProps<typeof Sidebar>) {
+  const { storeId } = useParams({ strict: false }) as { storeId?: string }
+  const id = storeId || 'default'
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <StoreSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navigation} bottomItems={bottomNavigation} />
+        <NavMain items={buildNavigation(id)} bottomItems={buildBottomNavigation(id)} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

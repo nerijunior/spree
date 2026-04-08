@@ -82,9 +82,11 @@ function NavItemContent({
   currentPath: string;
   isCollapsed: boolean;
 }) {
-  const isExactActive = currentPath === item.url;
+  const isExactActive = currentPath === item.url || currentPath === item.url + '/';
+  // Only prefix-match for items with a sub-path after the storeId segment (e.g. /store_abc/orders)
+  const hasSubPath = item.url.split('/').filter(Boolean).length > 1;
   const isActive =
-    isExactActive || (item.url !== "/" && currentPath.startsWith(item.url));
+    isExactActive || (hasSubPath && currentPath.startsWith(item.url));
   const hasActiveChild = item.items?.some(
     (sub) => currentPath === sub.url || currentPath.startsWith(sub.url),
   );
