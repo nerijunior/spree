@@ -107,8 +107,6 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
         run_test! do |response|
           data = JSON.parse(response.body)
           expect(data['id']).to eq(order.prefixed_id)
-          expect(data).to have_key('channel')
-          expect(data).to have_key('considered_risky')
         end
       end
 

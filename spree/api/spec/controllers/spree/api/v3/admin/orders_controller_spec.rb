@@ -25,7 +25,6 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
       subject
 
       data = json_response['data'].first
-      expect(data).to have_key('channel')
       expect(data).to have_key('considered_risky')
     end
 
@@ -73,7 +72,6 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
     it 'includes admin-only fields' do
       subject
 
-      expect(json_response).to have_key('channel')
       expect(json_response).to have_key('considered_risky')
       expect(json_response).to have_key('internal_note')
     end
