@@ -20,8 +20,8 @@ defineTable("products", {
       default: true,
       render: (product) => (
         <Link
-          to="/$storeId/products/$productId"
-          params={{ productId: product.id } as Record<string, string>}
+          to={"/$storeId/products/$productId" as string}
+          params={{ productId: product.id }}
           className="flex items-center gap-3 no-underline"
         >
           <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 overflow-hidden">

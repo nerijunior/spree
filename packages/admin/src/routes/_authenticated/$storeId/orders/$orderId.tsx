@@ -1,8 +1,8 @@
 import type { Address, Order } from '@spree/admin-sdk'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { BackButton } from '@/components/back-button'
 import {
-  ArrowLeftIcon,
   CreditCardIcon,
   EllipsisVerticalIcon,
   ExternalLinkIcon,
@@ -156,9 +156,9 @@ function OrderDetailPage() {
 // ---------------------------------------------------------------------------
 
 function OrderHeader({ order }: { order: Order }) {
-  const { orderId, storeId } = Route.useParams()
+  const { orderId } = Route.useParams()
 
-  const backPath = order.completed_at ? '/$storeId/orders' : '/$storeId/orders/drafts'
+  const backFallback = order.completed_at ? 'orders' : 'orders/drafts'
 
   const cancelMutation = useOrderMutation(orderId, () =>
     adminClient.orders.cancel(orderId, {}),
@@ -169,14 +169,7 @@ function OrderHeader({ order }: { order: Order }) {
 
   return (
     <div className="flex items-center gap-3">
-      <Link
-        to={backPath}
-        params={{ storeId }}
-        search={{ filters: [], columns: [] }}
-        className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-gray-200/50 hover:text-foreground transition-colors"
-      >
-        <ArrowLeftIcon className="size-5" />
-      </Link>
+      <BackButton fallback={backFallback} />
 
       <h1 className="text-2xl font-medium">{order.number}</h1>
 

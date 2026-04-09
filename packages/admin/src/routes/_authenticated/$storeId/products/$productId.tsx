@@ -13,9 +13,9 @@ type Product = Omit<BaseProduct, 'master_variant' | 'variants'> & {
   variants?: Variant[]
 }
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { BackButton } from '@/components/back-button'
 import {
-  ArrowLeftIcon,
   ImagePlusIcon,
   Loader2Icon,
   SaveIcon,
@@ -167,14 +167,7 @@ function ProductForm({ product }: { product: Product }) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link
-          to="/$storeId/products"
-          params={{ storeId }}
-          search={{ filters: [], columns: [] }}
-          className="inline-flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-gray-100 hover:text-foreground transition-colors"
-        >
-          <ArrowLeftIcon className="size-5" />
-        </Link>
+        <BackButton fallback="products" />
 
         <h1 className="text-2xl font-medium truncate">{product.name}</h1>
         <StatusBadge status={product.status} />
