@@ -4,6 +4,7 @@ export type { AdminClientConfig, Client } from './client';
 
 // Admin client class (for advanced use / subclassing)
 export { AdminClient } from './admin-client';
+export type { AuthTokens, LoginCredentials, PermissionRule, MeResponse } from './admin-client';
 
 // Request infrastructure (re-export from sdk-core)
 export { SpreeError } from '@spree/sdk-core';

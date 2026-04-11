@@ -17,6 +17,27 @@ export interface LoginCredentials {
   email: string;
   password: string;
 }
+
+export interface PermissionRule {
+  /** true for `can`, false for `cannot` */
+  allow: boolean;
+  /** Action names, e.g. ["read", "update"] or ["manage"] */
+  actions: string[];
+  /** Subject class names, e.g. ["Spree::Product"] or ["all"] */
+  subjects: string[];
+  /** Whether the server rule has per-record conditions. If true, the action may be denied at the record level and the SPA should expect possible 403. */
+  has_conditions: boolean;
+}
+
+export interface MeResponse {
+  user: {
+    id: string;
+    email: string;
+    first_name: string | null;
+    last_name: string | null;
+  };
+  permissions: PermissionRule[];
+}
 import type { Store, Product, Order, Asset, Category, TaxCategory } from './types';
 import type {
   StoreUpdateParams,
@@ -49,6 +70,16 @@ export class AdminClient {
 
     refresh: (params: { refresh_token: string }, options?: RequestOptions): Promise<AuthTokens> =>
       this.request<AuthTokens>('POST', '/auth/refresh', { ...options, body: params }),
+  };
+
+  // ============================================
+  // Current admin user + permissions
+  // ============================================
+
+  readonly me = {
+    /** Get the current admin user profile and their serialized permissions. */
+    show: (options?: RequestOptions): Promise<MeResponse> =>
+      this.request<MeResponse>('GET', '/me', options),
   };
 
   // ============================================

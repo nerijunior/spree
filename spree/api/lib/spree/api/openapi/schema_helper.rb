@@ -86,6 +86,26 @@ module Spree
               },
               required: %w[token refresh_token user]
             },
+            PermissionRule: {
+              type: :object,
+              description: 'A single permission rule (CanCanCan rule). Rules are applied in order, last-matching-wins.',
+              properties: {
+                allow: { type: :boolean, description: 'true for `can`, false for `cannot`' },
+                actions: { type: :array, items: { type: :string }, description: 'Action names, e.g. ["read", "update"] or ["manage"]' },
+                subjects: { type: :array, items: { type: :string }, description: 'Subject class names, e.g. ["Spree::Product"] or ["all"]' },
+                has_conditions: { type: :boolean, description: 'True if the server-side rule has per-record conditions. The SPA shows the action optimistically and handles 403 from the API.' }
+              },
+              required: %w[allow actions subjects has_conditions]
+            },
+            MeResponse: {
+              type: :object,
+              description: 'Current admin user profile and serialized permissions',
+              properties: {
+                user: { '$ref' => '#/components/schemas/AdminUser' },
+                permissions: { type: :array, items: { '$ref' => '#/components/schemas/PermissionRule' } }
+              },
+              required: %w[user permissions]
+            },
             CheckoutRequirement: {
               type: :object,
               properties: {
