@@ -13,7 +13,8 @@ Use `/project:create-plan` and `/project:update-plan` for plan management.
 
 Current plans:
 - `6.0-cart-order-split.md` — Cart/Order model separation, polymorphic LineItem
-- `6.0-admin-spa.md` — React admin architecture, plugin system
+- `6.0-admin-api.md` — Admin REST API conventions, auth, endpoint list (~300 endpoints)
+- `6.0-admin-spa.md` — React admin architecture, extension points, table registry
 - `6.0-product-types.md` — Prototype → ProductType rename, MetafieldDefinition schema enforcement
 - `6.0-remove-master-variant.md` — Eliminate is_master, add default_variant_id FK on Product
 - `6.0-split-adjustments.md` — Replace polymorphic Adjustment with TaxLine, Discount, Fee
