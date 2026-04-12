@@ -48,7 +48,9 @@ module Spree
       end
 
       def permitted_resource_params
-        params.require(:promotion).permit(permitted_promotion_attributes)
+        attrs = params.require(:promotion).permit(permitted_promotion_attributes)
+        parse_datetime_in_store_timezone(attrs, :starts_at, :expires_at)
+        attrs
       end
     end
   end
