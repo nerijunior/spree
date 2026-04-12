@@ -129,7 +129,7 @@ export interface DirectUploadCreateParams {
   };
 }
 
-export interface AssetCreateParams {
+export interface MediaCreateParams {
   alt?: string;
   position?: number;
   type?: string;
@@ -137,7 +137,7 @@ export interface AssetCreateParams {
   signed_id?: string;
 }
 
-export interface AssetUpdateParams {
+export interface MediaUpdateParams {
   alt?: string;
   position?: number;
 }

@@ -2,7 +2,7 @@ module Spree
   module Api
     module V3
       module Admin
-        class AssetsController < ResourceController
+        class MediaController < ResourceController
           def create
             if permitted_params[:url].present?
               create_from_url
@@ -27,7 +27,7 @@ module Spree
           end
 
           def serializer_class
-            Spree.api.admin_asset_serializer
+            Spree.api.admin_media_serializer
           end
 
           def set_parent
@@ -45,19 +45,19 @@ module Spree
             :images
           end
 
-          ALLOWED_ASSET_TYPES = -> { [Spree::Asset, *Spree::Asset.descendants].map(&:name).to_set.freeze }
+          ALLOWED_MEDIA_TYPES = -> { [Spree::Asset, *Spree::Asset.descendants].map(&:name).to_set.freeze }
 
           def build_resource
-            asset_type = permitted_params[:type] || 'Spree::Image'
+            media_type = permitted_params[:type] || 'Spree::Image'
 
-            unless ALLOWED_ASSET_TYPES.call.include?(asset_type)
-              raise ArgumentError, "Invalid asset type: #{asset_type}"
+            unless ALLOWED_MEDIA_TYPES.call.include?(media_type)
+              raise ArgumentError, "Invalid media type: #{media_type}"
             end
 
-            asset = @parent.images.build(permitted_params.except(:type, :url, :signed_id))
-            asset.type = asset_type
+            media = @parent.images.build(permitted_params.except(:type, :url, :signed_id))
+            media.type = media_type
 
-            asset
+            media
           end
 
           def permitted_params

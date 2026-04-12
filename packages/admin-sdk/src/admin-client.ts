@@ -38,13 +38,13 @@ export interface MeResponse {
   };
   permissions: PermissionRule[];
 }
-import type { Store, Product, Order, Asset, Category, TaxCategory } from './types';
+import type { Store, Product, Order, Media, Category, TaxCategory } from './types';
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
   OrderUpdateParams,
-  AssetCreateParams,
-  AssetUpdateParams,
+  MediaCreateParams,
+  MediaUpdateParams,
   LineItemCreateParams,
   LineItemUpdateParams,
   AdjustmentCreateParams,
@@ -117,21 +117,21 @@ export class AdminClient {
     delete: (id: string, options?: RequestOptions): Promise<void> =>
       this.request<void>('DELETE', `/products/${id}`, options),
 
-    assets: {
-      list: (productId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Asset>> =>
-        this.request<PaginatedResponse<Asset>>('GET', `/products/${productId}/assets`, {
+    media: {
+      list: (productId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Media>> =>
+        this.request<PaginatedResponse<Media>>('GET', `/products/${productId}/media`, {
           ...options,
           params: params ? transformListParams(params) : undefined,
         }),
 
-      create: (productId: string, params: AssetCreateParams, options?: RequestOptions): Promise<Asset> =>
-        this.request<Asset>('POST', `/products/${productId}/assets`, { ...options, body: params }),
+      create: (productId: string, params: MediaCreateParams, options?: RequestOptions): Promise<Media> =>
+        this.request<Media>('POST', `/products/${productId}/media`, { ...options, body: params }),
 
-      update: (productId: string, id: string, params: AssetUpdateParams, options?: RequestOptions): Promise<Asset> =>
-        this.request<Asset>('PATCH', `/products/${productId}/assets/${id}`, { ...options, body: params }),
+      update: (productId: string, id: string, params: MediaUpdateParams, options?: RequestOptions): Promise<Media> =>
+        this.request<Media>('PATCH', `/products/${productId}/media/${id}`, { ...options, body: params }),
 
       delete: (productId: string, id: string, options?: RequestOptions): Promise<void> =>
-        this.request<void>('DELETE', `/products/${productId}/assets/${id}`, options),
+        this.request<void>('DELETE', `/products/${productId}/media/${id}`, options),
     },
   };
 

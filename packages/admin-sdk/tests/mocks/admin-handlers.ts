@@ -21,7 +21,7 @@ export const adminFixtures = {
     weight: '1.5',
     track_inventory: true,
   },
-  asset: {
+  media: {
     id: 'asset_1',
     alt: 'Product image',
     position: 1,
@@ -256,46 +256,46 @@ export const adminHandlers = [
   // ============================================
   // Product Assets
   // ============================================
-  http.get(`${API_PREFIX}/products/:productId/assets`, () =>
-    HttpResponse.json({ data: [adminFixtures.asset], meta: paginationMeta })
+  http.get(`${API_PREFIX}/products/:productId/media`, () =>
+    HttpResponse.json({ data: [adminFixtures.media], meta: paginationMeta })
   ),
 
-  http.post(`${API_PREFIX}/products/:productId/assets`, async ({ request }) => {
+  http.post(`${API_PREFIX}/products/:productId/media`, async ({ request }) => {
     const body = await request.json() as Record<string, unknown>;
     if (body.url) {
       return new HttpResponse(null, { status: 202 });
     }
-    return HttpResponse.json(adminFixtures.asset, { status: 201 });
+    return HttpResponse.json(adminFixtures.media, { status: 201 });
   }),
 
-  http.patch(`${API_PREFIX}/products/:productId/assets/:id`, () =>
-    HttpResponse.json({ ...adminFixtures.asset, alt: 'Updated alt' })
+  http.patch(`${API_PREFIX}/products/:productId/media/:id`, () =>
+    HttpResponse.json({ ...adminFixtures.media, alt: 'Updated alt' })
   ),
 
-  http.delete(`${API_PREFIX}/products/:productId/assets/:id`, () =>
+  http.delete(`${API_PREFIX}/products/:productId/media/:id`, () =>
     new HttpResponse(null, { status: 204 })
   ),
 
   // ============================================
   // Variant Assets
   // ============================================
-  http.get(`${API_PREFIX}/products/:productId/variants/:variantId/assets`, () =>
-    HttpResponse.json({ data: [adminFixtures.asset], meta: paginationMeta })
+  http.get(`${API_PREFIX}/products/:productId/variants/:variantId/media`, () =>
+    HttpResponse.json({ data: [adminFixtures.media], meta: paginationMeta })
   ),
 
-  http.post(`${API_PREFIX}/products/:productId/variants/:variantId/assets`, async ({ request }) => {
+  http.post(`${API_PREFIX}/products/:productId/variants/:variantId/media`, async ({ request }) => {
     const body = await request.json() as Record<string, unknown>;
     if (body.url) {
       return new HttpResponse(null, { status: 202 });
     }
-    return HttpResponse.json(adminFixtures.asset, { status: 201 });
+    return HttpResponse.json(adminFixtures.media, { status: 201 });
   }),
 
-  http.patch(`${API_PREFIX}/products/:productId/variants/:variantId/assets/:id`, () =>
-    HttpResponse.json({ ...adminFixtures.asset, alt: 'Updated variant alt' })
+  http.patch(`${API_PREFIX}/products/:productId/variants/:variantId/media/:id`, () =>
+    HttpResponse.json({ ...adminFixtures.media, alt: 'Updated variant alt' })
   ),
 
-  http.delete(`${API_PREFIX}/products/:productId/variants/:variantId/assets/:id`, () =>
+  http.delete(`${API_PREFIX}/products/:productId/variants/:variantId/media/:id`, () =>
     new HttpResponse(null, { status: 204 })
   ),
 

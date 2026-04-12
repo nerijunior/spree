@@ -1,47 +1,47 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminClient } from '@/client'
 
-export function useProductAssets(productId: string) {
+export function useProductMedia(productId: string) {
   return useQuery({
-    queryKey: ['products', productId, 'assets'],
-    queryFn: () => adminClient.products.assets.list(productId),
+    queryKey: ['products', productId, 'media'],
+    queryFn: () => adminClient.products.media.list(productId),
     enabled: !!productId,
   })
 }
 
-export function useCreateProductAsset(productId: string) {
+export function useCreateProductMedia(productId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (params: { signed_id: string; alt?: string; position?: number }) =>
-      adminClient.products.assets.create(productId, params),
+      adminClient.products.media.create(productId, params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', productId, 'assets'] })
+      queryClient.invalidateQueries({ queryKey: ['products', productId, 'media'] })
       queryClient.invalidateQueries({ queryKey: ['products', productId] })
     },
   })
 }
 
-export function useUpdateProductAsset(productId: string) {
+export function useUpdateProductMedia(productId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({ id, ...params }: { id: string; alt?: string; position?: number }) =>
-      adminClient.products.assets.update(productId, id, params),
+      adminClient.products.media.update(productId, id, params),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', productId, 'assets'] })
+      queryClient.invalidateQueries({ queryKey: ['products', productId, 'media'] })
     },
   })
 }
 
-export function useDeleteProductAsset(productId: string) {
+export function useDeleteProductMedia(productId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: string) =>
-      adminClient.products.assets.delete(productId, id),
+      adminClient.products.media.delete(productId, id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', productId, 'assets'] })
+      queryClient.invalidateQueries({ queryKey: ['products', productId, 'media'] })
       queryClient.invalidateQueries({ queryKey: ['products', productId] })
     },
   })

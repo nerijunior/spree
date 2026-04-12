@@ -110,9 +110,9 @@ Spree::Core::Engine.add_routes do
             post :clone
           end
           resources :variants, controller: 'products/variants' do
-            resources :assets, controller: 'assets', only: [:index, :create, :update, :destroy]
+            resources :media, controller: 'media', only: [:index, :create, :update, :destroy]
           end
-          resources :assets, controller: 'assets', only: [:index, :create, :update, :destroy]
+          resources :media, controller: 'media', only: [:index, :create, :update, :destroy]
         end
 
         # Categories

@@ -57,10 +57,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { useDirectUpload } from '@/hooks/use-direct-upload'
 import { useProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-product'
 import {
-  useProductAssets,
-  useCreateProductAsset,
-  useDeleteProductAsset,
-} from '@/hooks/use-product-assets'
+  useProductMedia,
+  useCreateProductMedia,
+  useDeleteProductMedia,
+} from '@/hooks/use-product-media'
 import { useTaxCategories } from '@/hooks/use-tax-categories'
 import { useCategories } from '@/hooks/use-categories'
 import { productFormSchema, type ProductFormValues } from '@/schemas/product'
@@ -280,14 +280,14 @@ interface PendingUpload {
 }
 
 function MediaCard({ productId }: { productId: string }) {
-  const { data: assetsResponse } = useProductAssets(productId)
-  const createAsset = useCreateProductAsset(productId)
-  const deleteAsset = useDeleteProductAsset(productId)
+  const { data: mediaResponse } = useProductMedia(productId)
+  const createMedia = useCreateProductMedia(productId)
+  const deleteMedia = useDeleteProductMedia(productId)
   const directUpload = useDirectUpload()
   const [pending, setPending] = useState<PendingUpload[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const assets = assetsResponse?.data ?? []
+  const mediaItems = mediaResponse?.data ?? []
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
@@ -306,10 +306,10 @@ function MediaCard({ productId }: { productId: string }) {
             prev.map((p) => (p.id === uploadId ? { ...p, progress: 'attaching' as const } : p)),
           )
 
-          await createAsset.mutateAsync({
+          await createMedia.mutateAsync({
             signed_id: result.signedId,
             alt: file.name,
-            position: assets.length + fileArray.indexOf(file) + 1,
+            position: mediaItems.length + fileArray.indexOf(file) + 1,
           })
 
           setPending((prev) => prev.filter((p) => p.id !== uploadId))
@@ -324,7 +324,7 @@ function MediaCard({ productId }: { productId: string }) {
         }
       }
     },
-    [directUpload, createAsset, assets.length],
+    [directUpload, createMedia, mediaItems.length],
   )
 
   const handleDrop = useCallback(
@@ -341,9 +341,9 @@ function MediaCard({ productId }: { productId: string }) {
     e.preventDefault()
   }, [])
 
-  const handleDeleteAsset = async (assetId: string) => {
+  const handleDeleteMedia = async (mediaId: string) => {
     try {
-      await deleteAsset.mutateAsync(assetId)
+      await deleteMedia.mutateAsync(mediaId)
       toast.success('Image deleted')
     } catch {
       toast.error('Failed to delete image')
@@ -357,13 +357,13 @@ function MediaCard({ productId }: { productId: string }) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {/* Image grid */}
-        {(assets.length > 0 || pending.length > 0) && (
+        {(mediaItems.length > 0 || pending.length > 0) && (
           <div className="grid grid-cols-4 gap-3">
-            {assets.map((asset) => (
+            {mediaItems.map((mediaItem) => (
               <MediaThumbnail
-                key={asset.id}
-                asset={asset as unknown as Media}
-                onDelete={() => handleDeleteAsset(asset.id)}
+                key={mediaItem.id}
+                mediaItem={mediaItem as unknown as Media}
+                onDelete={() => handleDeleteMedia(mediaItem.id)}
               />
             ))}
             {pending.map((upload) => (
@@ -418,18 +418,18 @@ function MediaCard({ productId }: { productId: string }) {
 }
 
 function MediaThumbnail({
-  asset,
+  mediaItem,
   onDelete,
 }: {
-  asset: Media
+  mediaItem: Media
   onDelete: () => void
 }) {
-  const imageUrl = asset.small_url || asset.mini_url || asset.original_url
+  const imageUrl = mediaItem.small_url || mediaItem.mini_url || mediaItem.original_url
 
   return (
     <div className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
       {imageUrl ? (
-        <img src={imageUrl} alt={asset.alt ?? ''} className="size-full object-cover" />
+        <img src={imageUrl} alt={mediaItem.alt ?? ''} className="size-full object-cover" />
       ) : (
         <div className="flex size-full items-center justify-center text-gray-400">
           <ImagePlusIcon className="size-6" />

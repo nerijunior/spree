@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
+RSpec.describe Spree::Api::V3::Admin::MediaController, type: :controller do
   render_views
 
   include_context 'API v3 Admin authenticated'
@@ -12,7 +12,7 @@ RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
 
   describe 'product assets' do
     describe 'GET #index' do
-      it 'returns assets for the product' do
+      it 'returns media for the product' do
         get :index, params: { product_id: product.prefixed_id }, as: :json
 
         expect(response).to have_http_status(:ok)
@@ -63,7 +63,7 @@ RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
     end
 
     describe 'PATCH #update' do
-      it 'updates the asset alt text' do
+      it 'updates the media alt text' do
         patch :update, params: {
           product_id: product.prefixed_id,
           id: image.prefixed_id,
@@ -75,7 +75,7 @@ RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
         expect(image.reload.alt).to eq('Updated alt text')
       end
 
-      it 'updates the asset position' do
+      it 'updates the media position' do
         patch :update, params: {
           product_id: product.prefixed_id,
           id: image.prefixed_id,
@@ -106,7 +106,7 @@ RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
     let!(:variant_image) { create(:image, viewable: variant) }
 
     describe 'GET #index' do
-      it 'returns assets for the variant' do
+      it 'returns media for the variant' do
         get :index, params: { product_id: product.prefixed_id, variant_id: variant.prefixed_id }, as: :json
 
         expect(response).to have_http_status(:ok)

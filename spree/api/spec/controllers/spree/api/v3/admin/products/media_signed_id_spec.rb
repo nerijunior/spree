@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
+RSpec.describe Spree::Api::V3::Admin::MediaController, type: :controller do
   render_views
 
   include_context 'API v3 Admin authenticated'
@@ -18,7 +18,7 @@ RSpec.describe Spree::Api::V3::Admin::AssetsController, type: :controller do
       )
     end
 
-    it 'creates an asset from a signed blob ID' do
+    it 'creates a media item from a signed blob ID' do
       post :create, params: {
         product_id: product.prefixed_id,
         signed_id: blob.signed_id,
