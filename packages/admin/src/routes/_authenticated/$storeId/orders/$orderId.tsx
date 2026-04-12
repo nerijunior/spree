@@ -491,20 +491,20 @@ function LineItemsCard({ order }: { order: Order }) {
 
 function EditTrackingDialog({
   orderId,
-  shipmentId,
+  fulfillmentId,
   currentTracking,
   open,
   onOpenChange,
 }: {
   orderId: string
-  shipmentId: string
+  fulfillmentId: string
   currentTracking: string | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
 
   const mutation = useOrderMutation(orderId, (params: { tracking: string }) =>
-    adminClient.orders.shipments.update(orderId, shipmentId, params),
+    adminClient.orders.fulfillments.update(orderId, fulfillmentId, params),
   )
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -521,7 +521,7 @@ function EditTrackingDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Tracking</DialogTitle>
-          <DialogDescription>Update the tracking number for this shipment.</DialogDescription>
+          <DialogDescription>Update the tracking number for this fulfillment.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <DialogBody>
@@ -555,11 +555,11 @@ function ShipmentsCard({ order }: { order: Order }) {
     tracking: string | null
   } | null>(null)
 
-  const shipMutation = useOrderMutation(orderId, (shipmentId: string) =>
-    adminClient.orders.shipments.ship(orderId, shipmentId, {}),
+  const fulfillMutation = useOrderMutation(orderId, (fulfillmentId: string) =>
+    adminClient.orders.fulfillments.fulfill(orderId, fulfillmentId, {}),
   )
-  const cancelShipmentMutation = useOrderMutation(orderId, (shipmentId: string) =>
-    adminClient.orders.shipments.cancel(orderId, shipmentId, {}),
+  const cancelFulfillmentMutation = useOrderMutation(orderId, (fulfillmentId: string) =>
+    adminClient.orders.fulfillments.cancel(orderId, fulfillmentId, {}),
   )
 
   if (fulfillments.length === 0) return null
@@ -578,12 +578,12 @@ function ShipmentsCard({ order }: { order: Order }) {
           </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {fulfillments.map((shipment) => (
-            <div key={shipment.id} className="rounded-lg border p-4 flex flex-col gap-3">
+          {fulfillments.map((fulfillment) => (
+            <div key={fulfillment.id} className="rounded-lg border p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={shipment.status} />
-                  <span className="text-sm font-medium">{shipment.number}</span>
+                  <StatusBadge status={fulfillment.status} />
+                  <span className="text-sm font-medium">{fulfillment.number}</span>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -594,17 +594,17 @@ function ShipmentsCard({ order }: { order: Order }) {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
                       onClick={() =>
-                        setEditTracking({ id: shipment.id, tracking: shipment.tracking })
+                        setEditTracking({ id: fulfillment.id, tracking: fulfillment.tracking })
                       }
                     >
                       <PencilIcon className="size-4" />
-                      {shipment.tracking ? 'Edit Tracking' : 'Add Tracking'}
+                      {fulfillment.tracking ? 'Edit Tracking' : 'Add Tracking'}
                     </DropdownMenuItem>
-                    {shipment.status === 'ready' && (
+                    {fulfillment.status === 'ready' && (
                       <DropdownMenuItem
                         onClick={() => {
-                          if (window.confirm('Ship this shipment?')) {
-                            shipMutation.mutate(shipment.id)
+                          if (window.confirm('Ship this fulfillment?')) {
+                            fulfillMutation.mutate(fulfillment.id)
                           }
                         }}
                       >
@@ -612,14 +612,14 @@ function ShipmentsCard({ order }: { order: Order }) {
                         Ship
                       </DropdownMenuItem>
                     )}
-                    {['pending', 'ready'].includes(shipment.status) && (
+                    {['pending', 'ready'].includes(fulfillment.status) && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
                           onClick={() => {
-                            if (window.confirm('Cancel this shipment?')) {
-                              cancelShipmentMutation.mutate(shipment.id)
+                            if (window.confirm('Cancel this fulfillment?')) {
+                              cancelFulfillmentMutation.mutate(fulfillment.id)
                             }
                           }}
                         >
@@ -632,41 +632,41 @@ function ShipmentsCard({ order }: { order: Order }) {
                 </DropdownMenu>
               </div>
 
-              {shipment.delivery_method && (
+              {fulfillment.delivery_method && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{shipment.delivery_method.name}</span>
-                  <span>{shipment.display_cost}</span>
+                  <span className="text-muted-foreground">{fulfillment.delivery_method.name}</span>
+                  <span>{fulfillment.display_cost}</span>
                 </div>
               )}
 
-              {shipment.stock_location && (
+              {fulfillment.stock_location && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <MapPinIcon className="size-3" />
-                  {shipment.stock_location.name}
+                  {fulfillment.stock_location.name}
                 </div>
               )}
 
-              {shipment.tracking && (
+              {fulfillment.tracking && (
                 <div className="text-sm">
                   <span className="text-muted-foreground">Tracking: </span>
-                  {shipment.tracking_url ? (
+                  {fulfillment.tracking_url ? (
                     <a
-                      href={shipment.tracking_url}
+                      href={fulfillment.tracking_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >
-                      {shipment.tracking}
+                      {fulfillment.tracking}
                     </a>
                   ) : (
-                    <span>{shipment.tracking}</span>
+                    <span>{fulfillment.tracking}</span>
                   )}
                 </div>
               )}
 
-              {shipment.fulfilled_at && (
+              {fulfillment.fulfilled_at && (
                 <span className="text-xs text-muted-foreground">
-                  Shipped {timeAgo(shipment.fulfilled_at)}
+                  Shipped {timeAgo(fulfillment.fulfilled_at)}
                 </span>
               )}
             </div>
@@ -677,7 +677,7 @@ function ShipmentsCard({ order }: { order: Order }) {
       {editTracking && (
         <EditTrackingDialog
           orderId={orderId}
-          shipmentId={editTracking.id}
+          fulfillmentId={editTracking.id}
           currentTracking={editTracking.tracking}
           open={!!editTracking}
           onOpenChange={(open) => !open && setEditTracking(null)}

@@ -3,10 +3,10 @@ module Spree
     module V3
       module Admin
         module Orders
-          class ShipmentsController < BaseController
-            before_action :set_resource, only: [:show, :update, :ship, :cancel, :resume, :split]
+          class FulfillmentsController < BaseController
+            before_action :set_resource, only: [:show, :update, :fulfill, :cancel, :resume, :split]
 
-            # PATCH /api/v3/admin/orders/:order_id/shipments/:id
+            # PATCH /api/v3/admin/orders/:order_id/fulfillments/:id
             def update
               with_order_lock do
                 result = Spree.shipment_update_service.call(
@@ -22,8 +22,8 @@ module Spree
               end
             end
 
-            # PATCH /api/v3/admin/orders/:order_id/shipments/:id/ship
-            def ship
+            # PATCH /api/v3/admin/orders/:order_id/fulfillments/:id/fulfill
+            def fulfill
               with_order_lock do
                 @resource.ship!
                 render json: serialize_resource(@resource.reload)
@@ -32,7 +32,7 @@ module Spree
               end
             end
 
-            # PATCH /api/v3/admin/orders/:order_id/shipments/:id/cancel
+            # PATCH /api/v3/admin/orders/:order_id/fulfillments/:id/cancel
             def cancel
               with_order_lock do
                 @resource.cancel!
@@ -42,7 +42,7 @@ module Spree
               end
             end
 
-            # PATCH /api/v3/admin/orders/:order_id/shipments/:id/resume
+            # PATCH /api/v3/admin/orders/:order_id/fulfillments/:id/resume
             def resume
               with_order_lock do
                 @resource.resume!
@@ -52,7 +52,7 @@ module Spree
               end
             end
 
-            # PATCH /api/v3/admin/orders/:order_id/shipments/:id/split
+            # PATCH /api/v3/admin/orders/:order_id/fulfillments/:id/split
             def split
               with_order_lock do
                 variant = Spree::Variant.find_by_prefix_id!(params[:variant_id])
@@ -67,10 +67,9 @@ module Spree
                 fulfilment_changer = @resource.transfer_to_location(variant, quantity, stock_location)
 
                 if fulfilment_changer.run!
-                  # Original shipment may be destroyed if all items were transferred
-                  shipments = @order.reload.shipments
+                  fulfillments = @order.reload.shipments
                   render json: {
-                    data: shipments.map { |s| serialize_resource(s) }
+                    data: fulfillments.map { |s| serialize_resource(s) }
                   }
                 else
                   render_validation_error(fulfilment_changer.errors)
@@ -85,7 +84,7 @@ module Spree
             end
 
             def serializer_class
-              Spree.api.admin_shipment_serializer
+              Spree.api.admin_fulfillment_serializer
             end
 
             def parent_association

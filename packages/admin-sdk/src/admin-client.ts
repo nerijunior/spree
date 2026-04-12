@@ -48,7 +48,7 @@ import type {
   LineItemCreateParams,
   LineItemUpdateParams,
   AdjustmentCreateParams,
-  ShipmentUpdateParams,
+  FulfillmentUpdateParams,
   DirectUploadCreateParams,
 } from './params';
 
@@ -172,15 +172,15 @@ export class AdminClient {
         this.request<void>('DELETE', `/orders/${orderId}/line_items/${id}`, options),
     },
 
-    shipments: {
-      update: (orderId: string, id: string, params: ShipmentUpdateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/shipments/${id}`, { ...options, body: params }),
+    fulfillments: {
+      update: (orderId: string, id: string, params: FulfillmentUpdateParams, options?: RequestOptions): Promise<unknown> =>
+        this.request('PATCH', `/orders/${orderId}/fulfillments/${id}`, { ...options, body: params }),
 
-      ship: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/shipments/${id}/ship`, options),
+      fulfill: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
+        this.request('PATCH', `/orders/${orderId}/fulfillments/${id}/fulfill`, options),
 
       cancel: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/shipments/${id}/cancel`, options),
+        this.request('PATCH', `/orders/${orderId}/fulfillments/${id}/cancel`, options),
     },
 
     payments: {

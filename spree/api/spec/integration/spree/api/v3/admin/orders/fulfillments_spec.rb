@@ -2,18 +2,18 @@
 
 require 'swagger_helper'
 
-RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-reference/admin.yaml' do
+RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api-reference/admin.yaml' do
   include_context 'API v3 Admin'
 
   let!(:order) { create(:order_ready_to_ship, store: store) }
   let!(:shipment) { order.shipments.first }
   let(:Authorization) { "Bearer #{admin_jwt_token}" }
 
-  path '/api/v3/admin/orders/{order_id}/shipments' do
+  path '/api/v3/admin/orders/{order_id}/fulfillments' do
     let(:order_id) { order.prefixed_id }
 
-    get 'List shipments' do
-      tags 'Shipments'
+    get 'List fulfillments' do
+      tags 'Fulfillments'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns all shipments for an order.'
@@ -24,7 +24,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
 
-      response '200', 'shipments found' do
+      response '200', 'fulfillments found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
 
         run_test! do |response|
@@ -36,12 +36,12 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/shipments/{id}' do
+  path '/api/v3/admin/orders/{order_id}/fulfillments/{id}' do
     let(:order_id) { order.prefixed_id }
     let(:id) { shipment.prefixed_id }
 
     get 'Show a shipment' do
-      tags 'Shipments'
+      tags 'Fulfillments'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns details of a specific shipment.'
@@ -52,7 +52,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Shipment prefixed ID'
+                description: 'Fulfillment prefixed ID'
 
       response '200', 'shipment found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -66,7 +66,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
     end
 
     patch 'Update a shipment' do
-      tags 'Shipments'
+      tags 'Fulfillments'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
@@ -78,7 +78,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Shipment prefixed ID'
+                description: 'Fulfillment prefixed ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
@@ -99,12 +99,12 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/shipments/{id}/ship' do
-    patch 'Ship a shipment' do
-      tags 'Shipments'
+  path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/fulfill' do
+    patch 'Fulfill a fulfillment' do
+      tags 'Fulfillments'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Marks a shipment as shipped.'
+      description 'Marks a fulfillment as fulfilled.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -112,9 +112,9 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Shipment prefixed ID'
+                description: 'Fulfillment prefixed ID'
 
-      response '200', 'shipment shipped' do
+      response '200', 'fulfillment fulfilled' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:order_id) { order.prefixed_id }
         let(:id) { shipment.prefixed_id }
@@ -131,12 +131,12 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/shipments/{id}/cancel' do
-    patch 'Cancel a shipment' do
-      tags 'Shipments'
+  path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/cancel' do
+    patch 'Cancel a fulfillment' do
+      tags 'Fulfillments'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Cancels a pending or ready shipment.'
+      description 'Cancels a fulfillment.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -144,9 +144,9 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Shipment prefixed ID'
+                description: 'Fulfillment prefixed ID'
 
-      response '200', 'shipment canceled' do
+      response '200', 'fulfillment canceled' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:order_id) { order.prefixed_id }
         let(:id) { shipment.prefixed_id }
@@ -159,12 +159,12 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/shipments/{id}/resume' do
-    patch 'Resume a shipment' do
-      tags 'Shipments'
+  path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/resume' do
+    patch 'Resume a fulfillment' do
+      tags 'Fulfillments'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Resumes a canceled shipment.'
+      description 'Resumes a canceled fulfillment.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -172,9 +172,9 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Shipment prefixed ID'
+                description: 'Fulfillment prefixed ID'
 
-      response '200', 'shipment resumed' do
+      response '200', 'fulfillment resumed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:order_id) { order.prefixed_id }
         let(:id) { shipment.prefixed_id }
@@ -191,9 +191,9 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/shipments/{id}/split' do
-    patch 'Split a shipment' do
-      tags 'Shipments'
+  path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/split' do
+    patch 'Split a fulfillment' do
+      tags 'Fulfillments'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
@@ -205,7 +205,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Shipment prefixed ID'
+                description: 'Fulfillment prefixed ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         required: %w[variant_id quantity],
@@ -216,7 +216,7 @@ RSpec.describe 'Admin Order Shipments API', type: :request, swagger_doc: 'api-re
         }
       }
 
-      response '200', 'shipment split' do
+      response '200', 'fulfillment split' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:order_id) { order.prefixed_id }
         let(:id) { shipment.prefixed_id }

@@ -63,7 +63,7 @@ export const adminFixtures = {
     permalink: 'categories/clothing',
     position: 1,
   },
-  shipment: {
+  fulfillment: {
     id: 'ship_1',
     number: 'H12345',
     state: 'ready',
@@ -71,7 +71,7 @@ export const adminFixtures = {
     tracking_url: null,
     cost: '5.00',
     display_cost: '$5.00',
-    shipped_at: null,
+    fulfilled_at: null,
     created_at: '2026-03-06T12:00:00.000Z',
     updated_at: '2026-03-06T12:00:00.000Z',
     order_id: 'or_1',
@@ -382,35 +382,35 @@ export const adminHandlers = [
   // ============================================
   // Order Shipments
   // ============================================
-  http.get(`${API_PREFIX}/orders/:orderId/shipments`, () =>
-    HttpResponse.json({ data: [adminFixtures.shipment], meta: paginationMeta })
+  http.get(`${API_PREFIX}/orders/:orderId/fulfillments`, () =>
+    HttpResponse.json({ data: [adminFixtures.fulfillment], meta: paginationMeta })
   ),
 
-  http.get(`${API_PREFIX}/orders/:orderId/shipments/:id`, () =>
-    HttpResponse.json(adminFixtures.shipment)
+  http.get(`${API_PREFIX}/orders/:orderId/fulfillments/:id`, () =>
+    HttpResponse.json(adminFixtures.fulfillment)
   ),
 
-  http.patch(`${API_PREFIX}/orders/:orderId/shipments/:id/ship`, () =>
-    HttpResponse.json({ ...adminFixtures.shipment, state: 'shipped', shipped_at: '2026-03-06T14:00:00.000Z' })
+  http.patch(`${API_PREFIX}/orders/:orderId/fulfillments/:id/ship`, () =>
+    HttpResponse.json({ ...adminFixtures.fulfillment, state: 'shipped', fulfilled_at: '2026-03-06T14:00:00.000Z' })
   ),
 
-  http.patch(`${API_PREFIX}/orders/:orderId/shipments/:id/cancel`, () =>
-    HttpResponse.json({ ...adminFixtures.shipment, state: 'canceled' })
+  http.patch(`${API_PREFIX}/orders/:orderId/fulfillments/:id/cancel`, () =>
+    HttpResponse.json({ ...adminFixtures.fulfillment, state: 'canceled' })
   ),
 
-  http.patch(`${API_PREFIX}/orders/:orderId/shipments/:id/resume`, () =>
-    HttpResponse.json({ ...adminFixtures.shipment, state: 'ready' })
+  http.patch(`${API_PREFIX}/orders/:orderId/fulfillments/:id/resume`, () =>
+    HttpResponse.json({ ...adminFixtures.fulfillment, state: 'ready' })
   ),
 
-  http.patch(`${API_PREFIX}/orders/:orderId/shipments/:id/split`, () =>
+  http.patch(`${API_PREFIX}/orders/:orderId/fulfillments/:id/split`, () =>
     HttpResponse.json({ data: [
-      { ...adminFixtures.shipment, id: 'ship_1' },
-      { ...adminFixtures.shipment, id: 'ship_2', stock_location_id: 'sl_2' },
+      { ...adminFixtures.fulfillment, id: 'ship_1' },
+      { ...adminFixtures.fulfillment, id: 'ship_2', stock_location_id: 'sl_2' },
     ] })
   ),
 
-  http.patch(`${API_PREFIX}/orders/:orderId/shipments/:id`, () =>
-    HttpResponse.json({ ...adminFixtures.shipment, tracking: '1Z999AA10123456784' })
+  http.patch(`${API_PREFIX}/orders/:orderId/fulfillments/:id`, () =>
+    HttpResponse.json({ ...adminFixtures.fulfillment, tracking: '1Z999AA10123456784' })
   ),
 
   // ============================================

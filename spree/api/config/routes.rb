@@ -137,9 +137,9 @@ Spree::Core::Engine.add_routes do
           end
 
           resources :line_items, controller: 'orders/line_items'
-          resources :shipments, controller: 'orders/shipments', only: [:index, :show, :update] do
+          resources :fulfillments, controller: 'orders/fulfillments', only: [:index, :show, :update] do
             member do
-              patch :ship
+              patch :fulfill
               patch :cancel
               patch :resume
               patch :split

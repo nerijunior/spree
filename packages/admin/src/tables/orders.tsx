@@ -47,7 +47,7 @@ defineTable('orders', {
       render: (order) => order.email ?? '—',
     },
     {
-      key: 'payment_state',
+      key: 'payment_status',
       label: 'Payment',
       sortable: true,
       filterable: true,
@@ -60,11 +60,11 @@ defineTable('orders', {
         { value: 'paid', label: 'Paid' },
         { value: 'void', label: 'Void' },
       ],
-      render: (order) => (order.payment_state ? <StatusBadge status={order.payment_state} /> : '—'),
+      render: (order) => (order.payment_status ? <StatusBadge status={order.payment_status} /> : '—'),
     },
     {
-      key: 'shipment_state',
-      label: 'Shipment',
+      key: 'fulfillment_status',
+      label: 'Fulfillment',
       sortable: true,
       filterable: true,
       default: true,
@@ -75,19 +75,19 @@ defineTable('orders', {
         { value: 'partial', label: 'Partial' },
         { value: 'pending', label: 'Pending' },
         { value: 'ready', label: 'Ready' },
-        { value: 'shipped', label: 'Shipped' },
+        { value: 'fulfilled', label: 'Fulfilled' },
       ],
       render: (order) =>
-        order.shipment_state ? <StatusBadge status={order.shipment_state} /> : '—',
+        order.fulfillment_status ? <StatusBadge status={order.fulfillment_status} /> : '—',
     },
     {
-      key: 'item_count',
+      key: 'total_quantity',
       label: 'Items',
       sortable: true,
       default: true,
       className: 'text-right tabular-nums text-sm text-muted-foreground',
       render: (order) => {
-        const count = order.item_count ?? 0
+        const count = order.total_quantity ?? 0
         return `${count} ${count === 1 ? 'item' : 'items'}`
       },
     },

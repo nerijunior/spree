@@ -76,9 +76,9 @@ export interface RefundCreateParams {
   refund_reason_id?: string;
 }
 
-export interface ShipmentUpdateParams {
+export interface FulfillmentUpdateParams {
   tracking?: string;
-  selected_shipping_rate_id?: string;
+  selected_delivery_rate_id?: string;
 }
 
 export interface OrderCreateParams {

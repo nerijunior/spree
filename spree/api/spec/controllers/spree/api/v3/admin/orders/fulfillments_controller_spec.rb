@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :controller do
+RSpec.describe Spree::Api::V3::Admin::Orders::FulfillmentsController, type: :controller do
   render_views
 
   include_context 'API v3 Admin authenticated'
@@ -11,7 +11,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
   before { request.headers.merge!(headers) }
 
   describe 'GET #index' do
-    it 'returns shipments for the order' do
+    it 'returns fulfillments for the order' do
       get :index, params: { order_id: order.prefixed_id }, as: :json
 
       expect(response).to have_http_status(:ok)
@@ -21,7 +21,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
   end
 
   describe 'GET #show' do
-    it 'returns the shipment' do
+    it 'returns the fulfillment' do
       get :show, params: { order_id: order.prefixed_id, id: shipment.prefixed_id }, as: :json
 
       expect(response).to have_http_status(:ok)
@@ -32,7 +32,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
   end
 
   describe 'PATCH #update' do
-    it 'updates shipment tracking' do
+    it 'updates fulfillment tracking' do
       patch :update, params: {
         order_id: order.prefixed_id,
         id: shipment.prefixed_id,
@@ -44,11 +44,11 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
     end
   end
 
-  describe 'PATCH #ship' do
-    it 'marks the shipment as shipped' do
+  describe 'PATCH #fulfill' do
+    it 'marks the fulfillment as shipped' do
       shipment.ready! if shipment.can_ready?
 
-      patch :ship, params: {
+      patch :fulfill, params: {
         order_id: order.prefixed_id,
         id: shipment.prefixed_id
       }, as: :json
@@ -59,7 +59,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
   end
 
   describe 'PATCH #cancel' do
-    it 'cancels the shipment' do
+    it 'cancels the fulfillment' do
       patch :cancel, params: {
         order_id: order.prefixed_id,
         id: shipment.prefixed_id
@@ -71,7 +71,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
   end
 
   describe 'PATCH #resume' do
-    it 'resumes a canceled shipment' do
+    it 'resumes a canceled fulfillment' do
       shipment.cancel!
 
       patch :resume, params: {
@@ -85,7 +85,7 @@ RSpec.describe Spree::Api::V3::Admin::Orders::ShipmentsController, type: :contro
   end
 
   describe 'PATCH #split' do
-    it 'splits items to a new shipment at a different stock location' do
+    it 'splits items to a new fulfillment at a different stock location' do
       variant = shipment.inventory_units.first.variant
       target_stock_location = create(:stock_location, name: 'Warehouse 2')
       target_stock_location.stock_items.find_or_create_by(variant: variant).set_count_on_hand(10)
