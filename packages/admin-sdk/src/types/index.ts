@@ -13,7 +13,6 @@ export type { default as Address } from './generated/Address';
 export type { default as Adjustment } from './generated/Adjustment';
 export type { default as AdminUser } from './generated/AdminUser';
 export type { default as AllowedOrigin } from './generated/AllowedOrigin';
-export type { default as Asset } from './generated/Asset';
 export type { default as Category } from './generated/Category';
 export type { default as Country } from './generated/Country';
 export type { default as CreditCard } from './generated/CreditCard';
