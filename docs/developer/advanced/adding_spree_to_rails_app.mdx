@@ -23,9 +23,7 @@ Add these lines to your project `Gemfile`:
 spree_opts = { 'github': 'spree/spree', 'branch': 'main' }
 gem 'spree', spree_opts # core, API, and CLI
 gem 'spree_admin', spree_opts # Admin panel (optional)
-gem 'spree_storefront', spree_opts # Storefront (optional)
 gem 'spree_emails', spree_opts # transactional emails (optional)
-gem 'spree_sample', spree_opts # dummy data like products, taxons, etc (optional)
 ```
 
 And run the following command to install the gems:
@@ -66,45 +64,35 @@ bin/rails g spree:admin:install
 bin/rails g spree:admin:devise  # if using Devise authentication
 ```
 
-### Install Storefront (optional)
-
-```bash
-bin/rails g spree:storefront:install
-bin/rails g spree:storefront:devise  # if using Devise authentication
-```
-
-## 3. Add sample data (optional)
+### Add sample data (optional)
 
 To add sample data to your store, run:
 
 ```bash
-bin/rake spree_sample:load
+bin/rake spree:load_sample_data
 ```
 
-This will add some products, categories, and will setup a checkout flow to your store.
+This will add some products, categories and multiple markets to your store.
 
-## 4. Exploring Your Store
+## Accessing Admin Panel
 
-Feel free to explore your store. You can do so because Spree comes with a default pre-built Storefront and Admin Panel.
+Navigate to [http://localhost:3000/admin](http://localhost:3000/admin) and log in with the default credentials:
 
-### Logging into the Admin Dashboard
-
-Use your browser window to navigate to [http://localhost:3000/admin](http://localhost:3000/admin). You can log in with the default credentials:
-  - login: `spree@example.com`
-  - password: `spree123`
+| | |
+|---|---|
+| **Email** | `spree@example.com` |
+| **Password** | `spree123` |
 
 Upon successful authentication, you should see the admin screen:
 
-![](https://vendo-production-res.cloudinary.com/image/upload/v1740668008/docs/admin_dashboard.png)
+<Frame caption="Spree Admin Dashboard">
+  <img src="/images/spree_admin_dashboard.png" />
+</Frame>
 
-Feel free to explore some of the Admin Panel features that Spree has to offer and to verify that your installation is working properly.
+---
 
-### Browsing Storefront
+Congrats! You've set up your Spree Commerce and it's looking amazing!
 
-Spree comes with a default pre-built Storefront. You can access it by navigating to [http://localhost:3000](http://localhost:3000).
+Give Spree a [GitHub Star](https://github.com/spree/spree)<Icon icon="star" iconType="solid" color="#FFD43B" />, why dont't ya? Thank you for supporting Spree open-source! <Icon icon="heart" iconType="solid" color="#FF0000" />
 
-You can later customize this Storefront or choose another one if you prefer Next.js or Vue.js.
-
-## All Done!
-
-Congrats! You've set up your Spree Commerce and it's looking amazing! Need support or want to give some feedback? You can join our [community](https://slack.spreecommerce.org/) or drop us an email at [hello@spreecommerce.org](mailto:hello@spreecommerce.org).
+Need support or want to give some feedback? Join our [community](https://slack.spreecommerce.org/) with 6000+ members or drop us an email at [hello@spreecommerce.org](mailto:hello@spreecommerce.org).

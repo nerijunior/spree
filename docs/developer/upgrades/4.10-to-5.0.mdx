@@ -10,10 +10,13 @@ description: This guide covers upgrading a Spree 4.10 application to Spree 5.0.
 Spree 5.0 is a major upgrade that introduces many breaking changes. The major changes are:
 
 - Dropped support for Rails < 7.2
-- Dropped support for Spree Auth Devise gem (now using Devise gem directly via generator)
-- Completely new modern mobile-friendly Storefront (old customizations won't work)
-- Completely new Admin Dashboard (old customizations won't work)
+- Dropped support for Spree Auth Devise gem (now using Devise gem directly via generator, you're in more control of the authentication now)
+- Completely new Admin Dashboard (old customizations unfortunately won't work)
 - Completely new native Stripe extension
+- [Spree 5.1](https://github.com/spree/spree/releases/tag/v5.1.0) includes native [Gift Cards](/developer/core-concepts/store-credits-gift-cards), Admin Staff Management & Invitations
+- [Spree 5.2](https://github.com/spree/spree/releases/tag/v5.2.0) includes [Metafields](/developer/core-concepts/metafields), CSV Importer, Store Policies & Newsletter Subscribers
+- [Spree 5.3](https://github.com/spree/spree/releases/tag/v5.3.0) includes new highly flexible [Pricing Engine](/user/manage-products/price-lists) for B2B, Wholesale and Volume discounts, [Events & Subscribers Engine](/developer/core-concepts/events), [Webhooks](/developer/core-concepts/webhooks), [Customer Groups](/user/customers/customer-groups)
+- [Spree 5.4](https://github.com/spree/spree/releases/tag/v5.4.0) includes new [API v3](/api-reference/store-api) and [Next.js Storefront](https://github.com/spree/storefront)
 
 ## Prerequisites
 
@@ -50,13 +53,12 @@ bin/rake spree:install:migrations && bin/rails db:migrate
 ### 4. Add new Spree gems
 
 ```bash
-bundle add spree_storefront spree_admin spree_stripe
+bundle add spree_admin spree_stripe
 ```
 
 And run the following generators:
 
 ```bash
-bin/rails g spree:storefront:install
 bin/rails g spree:admin:install
 bin/rails g spree_stripe:install
 ```
