@@ -7,6 +7,19 @@ RSpec.describe Spree::Api::V3::Webhooks::PaymentsController, type: :controller d
   let(:payment_method) { create(:bogus_payment_method, stores: [store]) }
 
   describe 'POST #create' do
+    context 'when resolving the current store' do
+      before do
+        allow_any_instance_of(Spree::PaymentMethod).to receive(:parse_webhook_event).and_return(nil)
+        request.host = store.url
+      end
+
+      it 'sets current_store from the request' do
+        post :create, params: { payment_method_id: payment_method.prefixed_id }
+
+        expect(controller.current_store).to eq(store)
+      end
+    end
+
     context 'when webhook event is unsupported' do
       before do
         allow_any_instance_of(Spree::PaymentMethod).to receive(:parse_webhook_event).and_return(nil)
@@ -35,6 +48,17 @@ RSpec.describe Spree::Api::V3::Webhooks::PaymentsController, type: :controller d
     context 'when payment method is not found' do
       it 'returns not found' do
         post :create, params: { payment_method_id: 'pm_nonexistent' }
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when payment method belongs to a different store' do
+      let(:other_store) { create(:store) }
+      let(:other_payment_method) { create(:bogus_payment_method, stores: [other_store]) }
+
+      it 'returns not found' do
+        post :create, params: { payment_method_id: other_payment_method.prefixed_id }
 
         expect(response).to have_http_status(:not_found)
       end

@@ -4,6 +4,7 @@ module Spree
       module Webhooks
         class PaymentsController < ActionController::API
           include ActionController::RateLimiting
+          include Spree::Core::ControllerHelpers::Store
 
           RATE_LIMIT_RESPONSE = -> {
             [429, { 'Content-Type' => 'application/json', 'Retry-After' => '60' },
@@ -20,7 +21,7 @@ module Spree
           # Verifies the webhook signature synchronously (returns 401 if invalid),
           # then enqueues async processing and returns 200 immediately.
           def create
-            payment_method = Spree::PaymentMethod.find_by_prefix_id!(params[:payment_method_id])
+            payment_method = current_store.payment_methods.find_by_prefix_id!(params[:payment_method_id])
 
             # Signature verification must be synchronous — invalid = 401
             result = payment_method.parse_webhook_event(request.raw_post, request.headers)
