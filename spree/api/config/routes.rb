@@ -124,6 +124,9 @@ Spree::Core::Engine.add_routes do
         # Tax Categories
         resources :tax_categories, only: [:index, :show]
 
+        # Countries (with ?expand=states for state/province dropdown)
+        resources :countries, only: [:index, :show]
+
         # Orders
         resources :orders do
           member do

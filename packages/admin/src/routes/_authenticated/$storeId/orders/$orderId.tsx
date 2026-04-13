@@ -1,6 +1,8 @@
-import type { Address, Order } from '@spree/admin-sdk'
+import type { Order } from '@spree/admin-sdk'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { AddressBlock } from '@/components/address-block'
+import { AddressFormDialog, type AddressParams } from '@/components/address-form-dialog'
 import { BackButton } from '@/components/back-button'
 import {
   CreditCardIcon,
@@ -1047,155 +1049,22 @@ function OrderSummaryCard({ order }: { order: Order }) {
 // Customer Sidebar
 // ---------------------------------------------------------------------------
 
-function AddressBlock({
-  title,
-  address,
-}: {
-  title: string
-  address: Address | null | undefined
-}) {
-  return (
-    <div>
-      <h6 className="font-semibold text-sm mb-1.5">{title}</h6>
-      {address ? (
-        <div className="text-sm text-muted-foreground flex flex-col gap-0.5">
-          <div>{address.full_name}</div>
-          {address.company && <div>{address.company}</div>}
-          <div>{address.address1}</div>
-          {address.address2 && <div>{address.address2}</div>}
-          <div>
-            {[address.city, address.state_text, address.postal_code].filter(Boolean).join(', ')}
-          </div>
-          <div>{address.country_name}</div>
-          {address.phone && <div>{address.phone}</div>}
-        </div>
-      ) : (
-        <span className="text-sm text-muted-foreground">Not provided</span>
-      )}
-    </div>
-  )
-}
-
-function EditAddressDialog({
-  orderId,
-  type,
-  address,
-  open,
-  onOpenChange,
-}: {
-  orderId: string
-  type: 'shipping_address' | 'billing_address'
-  address: Address | null | undefined
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}) {
-
-  const mutation = useOrderMutation(orderId, (params: Record<string, unknown>) =>
-    adminClient.orders.update(orderId, { [type]: params } as any),
-  )
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const fd = new FormData(e.currentTarget)
-    mutation.mutate(
-      {
-        first_name: fd.get('first_name') as string,
-        last_name: fd.get('last_name') as string,
-        address1: fd.get('address1') as string,
-        city: fd.get('city') as string,
-        postal_code: fd.get('postal_code') as string,
-        country_iso: fd.get('country_iso') as string,
-        state_abbr: fd.get('state_abbr') as string,
-        phone: fd.get('phone') as string,
-      },
-      { onSuccess: () => onOpenChange(false) },
-    )
-  }
-
-  const title = type === 'shipping_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>Update the address details.</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <DialogBody>
-            <FieldGroup>
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor={`${type}-fn`}>First Name</FieldLabel>
-                  <Input
-                    id={`${type}-fn`}
-                    name="first_name"
-                    defaultValue={address?.first_name ?? ''}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor={`${type}-ln`}>Last Name</FieldLabel>
-                  <Input id={`${type}-ln`} name="last_name" defaultValue={address?.last_name ?? ''} />
-                </Field>
-              </div>
-              <Field>
-                <FieldLabel htmlFor={`${type}-a1`}>Address</FieldLabel>
-                <Input id={`${type}-a1`} name="address1" defaultValue={address?.address1 ?? ''} />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor={`${type}-city`}>City</FieldLabel>
-                  <Input id={`${type}-city`} name="city" defaultValue={address?.city ?? ''} />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor={`${type}-zip`}>Zip Code</FieldLabel>
-                  <Input id={`${type}-zip`} name="postal_code" defaultValue={address?.postal_code ?? ''} />
-                </Field>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor={`${type}-country`}>Country ISO</FieldLabel>
-                  <Input
-                    id={`${type}-country`}
-                    name="country_iso"
-                    defaultValue={address?.country_iso ?? ''}
-                    placeholder="US"
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor={`${type}-state`}>State</FieldLabel>
-                  <Input
-                    id={`${type}-state`}
-                    name="state_abbr"
-                    defaultValue={address?.state_abbr ?? ''}
-                    placeholder="CA"
-                  />
-                </Field>
-              </div>
-              <Field>
-                <FieldLabel htmlFor={`${type}-phone`}>Phone</FieldLabel>
-                <Input id={`${type}-phone`} name="phone" defaultValue={address?.phone ?? ''} />
-              </Field>
-            </FieldGroup>
-          </DialogBody>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Saving…' : 'Save'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
 function CustomerCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
+  const queryClient = useQueryClient()
   const user = order.customer
   const [editAddress, setEditAddress] = useState<'shipping_address' | 'billing_address' | null>(null)
+
+  const addressMutation = useMutation({
+    mutationFn: (params: { type: 'shipping_address' | 'billing_address'; address: AddressParams }) =>
+      adminClient.orders.update(orderId, { [params.type]: params.address } as any),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['order', orderId] })
+      setEditAddress(null)
+    },
+  })
+
+  const editTitle = editAddress === 'shipping_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
 
   return (
     <>
@@ -1252,12 +1121,13 @@ function CustomerCard({ order }: { order: Order }) {
       </Card>
 
       {editAddress && (
-        <EditAddressDialog
-          orderId={orderId}
-          type={editAddress}
+        <AddressFormDialog
+          title={editTitle}
           address={editAddress === 'shipping_address' ? order.shipping_address : order.billing_address}
           open={!!editAddress}
           onOpenChange={(open) => !open && setEditAddress(null)}
+          onSave={(address) => addressMutation.mutate({ type: editAddress, address })}
+          isPending={addressMutation.isPending}
         />
       )}
     </>

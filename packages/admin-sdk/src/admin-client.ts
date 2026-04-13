@@ -38,7 +38,7 @@ export interface MeResponse {
   };
   permissions: PermissionRule[];
 }
-import type { Store, Product, Order, Media, Category, TaxCategory } from './types';
+import type { Store, Product, Order, Media, Category, TaxCategory, Country } from './types';
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
@@ -221,6 +221,24 @@ export class AdminClient {
       this.request<PaginatedResponse<TaxCategory>>('GET', '/tax_categories', {
         ...options,
         params: params ? transformListParams(params) : undefined,
+      }),
+  };
+
+  // ============================================
+  // Countries
+  // ============================================
+
+  readonly countries = {
+    list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Country>> =>
+      this.request<PaginatedResponse<Country>>('GET', '/countries', {
+        ...options,
+        params: params ? transformListParams(params) : undefined,
+      }),
+
+    get: (iso: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Country> =>
+      this.request<Country>('GET', `/countries/${iso}`, {
+        ...options,
+        params: getParams(params),
       }),
   };
 
