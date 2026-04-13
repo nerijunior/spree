@@ -73,7 +73,7 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        'rounded-lg border border-gray-200 bg-white shadow-xs transition-all duration-100 ease-in-out focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2',
+        'rounded-lg border border-gray-200 bg-white shadow-xs transition-all duration-100 ease-in-out focus-within:border-blue-500 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.15)]',
         disabled && 'pointer-events-none bg-gray-50 border-gray-100',
         className,
       )}

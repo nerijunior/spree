@@ -20,7 +20,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card-header"
       className={cn(
-        'flex items-center p-5 pr-3 h-14 border-b border-gray-100 rounded-t-[calc(var(--radius-xl)-1px)]',
+        'flex items-center p-3 pr-3 h-12 border-b border-gray-100 rounded-t-[calc(var(--radius-xl)-1px)]',
         className,
       )}
       {...props}
@@ -53,7 +53,7 @@ function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div data-slot="card-content" className={cn('p-5', className)} {...props} />
+  return <div data-slot="card-content" className={cn('p-3', className)} {...props} />
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
@@ -61,7 +61,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card-footer"
       className={cn(
-        'flex items-center p-5 bg-transparent border-t border-gray-100 rounded-b-[calc(var(--radius-xl)-1px)]',
+        'flex items-center p-3 bg-transparent border-t border-gray-100 rounded-b-[calc(var(--radius-xl)-1px)]',
         className,
       )}
       {...props}

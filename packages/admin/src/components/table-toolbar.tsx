@@ -136,7 +136,7 @@ export function TableToolbar({
         {title && <CardTitle>{title}</CardTitle>}
         <div className="flex gap-2 items-center flex-wrap ml-auto">
           {/* Search */}
-          <div className="flex items-center gap-2 border border-gray-200 bg-white rounded-lg shadow-xs px-2.5 h-[2.125rem] lg:w-[300px] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-blue-500 transition-all duration-100 ease-in-out">
+          <div className="flex items-center gap-2 border border-gray-200 bg-white rounded-lg shadow-xs px-2.5 h-[2.125rem] lg:w-[300px] focus-within:border-blue-500 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.15)] transition-all duration-100 ease-in-out">
             <SearchIcon className="size-4 text-gray-600 shrink-0" />
             <input
               ref={searchRef}
@@ -441,17 +441,12 @@ function FilterDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" showCloseButton={false}>
+      <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Filters</SheetTitle>
           <SheetDescription className="sr-only">
             Build filters for the table
           </SheetDescription>
-          <SheetClose asChild>
-            <Button variant="ghost" size="icon-sm">
-              <XIcon />
-            </Button>
-          </SheetClose>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
