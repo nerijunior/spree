@@ -22,7 +22,7 @@ import {
   TrashIcon,
   XIcon,
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Controller, useForm, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import { StatusBadge } from '@/components/ui/badge'
@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Combobox,
   ComboboxChip,
@@ -241,16 +241,16 @@ function GeneralCard({ form }: FormCardProps) {
         <CardTitle>General</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Name</Label>
+        <Field>
+          <FieldLabel htmlFor="name">Name</FieldLabel>
           <Input id="name" placeholder="Product name" {...form.register('name')} />
           {form.formState.errors.name && (
             <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
           )}
-        </div>
+        </Field>
 
-        <div className="grid gap-2">
-          <Label>Description</Label>
+        <Field>
+          <FieldLabel>Description</FieldLabel>
           <Controller
             name="description"
             control={form.control}
@@ -262,7 +262,7 @@ function GeneralCard({ form }: FormCardProps) {
               />
             )}
           />
-        </div>
+        </Field>
       </CardContent>
     </Card>
   )
@@ -458,8 +458,8 @@ function PricingCard({ form }: FormCardProps) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="price">Price</Label>
+          <Field>
+            <FieldLabel htmlFor="price">Price</FieldLabel>
             <Input
               id="price"
               type="number"
@@ -468,9 +468,9 @@ function PricingCard({ form }: FormCardProps) {
               placeholder="0.00"
               {...form.register('price')}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="compare_at_price">Compare at price</Label>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="compare_at_price">Compare at price</FieldLabel>
             <Input
               id="compare_at_price"
               type="number"
@@ -482,10 +482,10 @@ function PricingCard({ form }: FormCardProps) {
             <p className="text-xs text-muted-foreground">
               Original price shown as strikethrough
             </p>
-          </div>
+          </Field>
         </div>
-        <div className="grid gap-2 max-w-[50%]">
-          <Label htmlFor="cost_price">Cost price</Label>
+        <Field className="max-w-[50%]">
+          <FieldLabel htmlFor="cost_price">Cost price</FieldLabel>
           <Input
             id="cost_price"
             type="number"
@@ -495,7 +495,7 @@ function PricingCard({ form }: FormCardProps) {
             {...form.register('cost_price')}
           />
           <p className="text-xs text-muted-foreground">Not visible to customers</p>
-        </div>
+        </Field>
       </CardContent>
     </Card>
   )
@@ -515,17 +515,17 @@ function InventoryCard({ form }: FormCardProps) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="sku">SKU</Label>
+          <Field>
+            <FieldLabel htmlFor="sku">SKU</FieldLabel>
             <Input id="sku" placeholder="SKU-001" {...form.register('sku')} />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="barcode">Barcode</Label>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="barcode">Barcode</FieldLabel>
             <Input id="barcode" placeholder="ISBN, UPC, GTIN..." {...form.register('barcode')} />
-          </div>
+          </Field>
         </div>
 
-        <div className="flex items-center gap-3">
+        <Field orientation="horizontal">
           <Controller
             name="track_inventory"
             control={form.control}
@@ -537,8 +537,8 @@ function InventoryCard({ form }: FormCardProps) {
               />
             )}
           />
-          <Label htmlFor="track_inventory">Track inventory</Label>
-        </div>
+          <FieldLabel htmlFor="track_inventory">Track inventory</FieldLabel>
+        </Field>
 
         {trackInventory && (
           <p className="text-sm text-muted-foreground">
@@ -578,25 +578,25 @@ function SEOCard({ form, product }: FormCardProps & { product: Product }) {
           )}
         </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor="slug">URL handle</Label>
+        <Field>
+          <FieldLabel htmlFor="slug">URL handle</FieldLabel>
           <Input id="slug" placeholder="product-url-handle" {...form.register('slug')} />
-        </div>
+        </Field>
 
-        <div className="grid gap-2">
-          <Label htmlFor="meta_title">Meta title</Label>
+        <Field>
+          <FieldLabel htmlFor="meta_title">Meta title</FieldLabel>
           <Input id="meta_title" placeholder="SEO title" {...form.register('meta_title')} />
-        </div>
+        </Field>
 
-        <div className="grid gap-2">
-          <Label htmlFor="meta_description">Meta description</Label>
+        <Field>
+          <FieldLabel htmlFor="meta_description">Meta description</FieldLabel>
           <Textarea
             id="meta_description"
             placeholder="SEO description"
             rows={3}
             {...form.register('meta_description')}
           />
-        </div>
+        </Field>
       </CardContent>
     </Card>
   )
@@ -615,8 +615,8 @@ function StatusCard({ form }: FormCardProps) {
         <CardTitle>Status</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="grid gap-2">
-          <Label>Status</Label>
+        <Field>
+          <FieldLabel>Status</FieldLabel>
           <Controller
             name="status"
             control={form.control}
@@ -633,11 +633,11 @@ function StatusCard({ form }: FormCardProps) {
               </Select>
             )}
           />
-        </div>
+        </Field>
 
         {status !== 'active' && (
-          <div className="grid gap-2">
-            <Label>Schedule activation</Label>
+          <Field>
+            <FieldLabel>Schedule activation</FieldLabel>
             <Controller
               name="make_active_at"
               control={form.control}
@@ -650,11 +650,11 @@ function StatusCard({ form }: FormCardProps) {
                 />
               )}
             />
-          </div>
+          </Field>
         )}
 
-        <div className="grid gap-2">
-          <Label>Available on</Label>
+        <Field>
+          <FieldLabel>Available on</FieldLabel>
           <Controller
             name="available_on"
             control={form.control}
@@ -667,10 +667,10 @@ function StatusCard({ form }: FormCardProps) {
               />
             )}
           />
-        </div>
+        </Field>
 
-        <div className="grid gap-2">
-          <Label>Discontinue on</Label>
+        <Field>
+          <FieldLabel>Discontinue on</FieldLabel>
           <Controller
             name="discontinue_on"
             control={form.control}
@@ -683,7 +683,7 @@ function StatusCard({ form }: FormCardProps) {
               />
             )}
           />
-        </div>
+        </Field>
       </CardContent>
     </Card>
   )
@@ -703,8 +703,8 @@ function CategorizationCard({ form }: FormCardProps) {
         <CardTitle>Categorization</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="grid gap-2">
-          <Label>Categories</Label>
+        <Field>
+          <FieldLabel>Categories</FieldLabel>
           <Controller
             name="category_ids"
             control={form.control}
@@ -716,10 +716,10 @@ function CategorizationCard({ form }: FormCardProps) {
               />
             )}
           />
-        </div>
+        </Field>
 
-        <div className="grid gap-2">
-          <Label>Tags</Label>
+        <Field>
+          <FieldLabel>Tags</FieldLabel>
           <Controller
             name="tags"
             control={form.control}
@@ -730,7 +730,7 @@ function CategorizationCard({ form }: FormCardProps) {
               />
             )}
           />
-        </div>
+        </Field>
       </CardContent>
     </Card>
   )
@@ -739,6 +739,7 @@ function CategorizationCard({ form }: FormCardProps) {
 interface CategoryOption {
   id: string
   name: string
+  pretty_name: string
 }
 
 function CategoryCombobox({
@@ -752,18 +753,33 @@ function CategoryCombobox({
 }) {
   const anchorRef = useComboboxAnchor()
 
+  // Convert string[] of IDs to CategoryOption[] for the combobox
+  const selectedItems = useMemo(
+    () => value.map((id) => categories.find((c) => c.id === id)).filter(Boolean) as CategoryOption[],
+    [value, categories],
+  )
+
+  const handleChange = useCallback(
+    (items: CategoryOption[]) => onChange(items.map((c) => c.id)),
+    [onChange],
+  )
+
   return (
     <Combobox
       multiple
-      value={value}
-      onValueChange={onChange}
+      items={categories}
+      value={selectedItems}
+      onValueChange={handleChange as any}
+      itemToStringLabel={(c: any) => (c as CategoryOption).pretty_name}
+      itemToStringValue={(c: any) => (c as CategoryOption).id}
+      isItemEqualToValue={(a: any, b: any) => (a as CategoryOption).id === (b as CategoryOption).id}
     >
       <ComboboxChips ref={anchorRef}>
         <ComboboxValue>
-          {(selectedValues: string[]) =>
-            selectedValues.map((id) => (
-              <ComboboxChip key={id}>
-                {categories.find((c) => c.id === id)?.name ?? id}
+          {(selected: CategoryOption[]) =>
+            selected.map((c) => (
+              <ComboboxChip key={c.id}>
+                {c.pretty_name}
               </ComboboxChip>
             ))
           }
@@ -771,13 +787,13 @@ function CategoryCombobox({
         <ComboboxChipsInput placeholder="Search categories..." />
       </ComboboxChips>
       <ComboboxContent anchor={anchorRef}>
+        <ComboboxEmpty>No categories found</ComboboxEmpty>
         <ComboboxList>
-          {categories.map((category) => (
-            <ComboboxItem key={category.id} value={category.id}>
-              {category.name}
+          {(category: CategoryOption) => (
+            <ComboboxItem key={category.id} value={category}>
+              {category.pretty_name}
             </ComboboxItem>
-          ))}
-          <ComboboxEmpty>No categories found</ComboboxEmpty>
+          )}
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
@@ -794,6 +810,15 @@ function TagCombobox({
   const anchorRef = useComboboxAnchor()
   const [inputValue, setInputValue] = useState('')
 
+  // Items = current tags + any new typed value
+  const tagItems = useMemo(() => {
+    const trimmed = inputValue.trim()
+    if (trimmed && !value.includes(trimmed)) {
+      return [...value, trimmed]
+    }
+    return value
+  }, [value, inputValue])
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue.trim()) {
       e.preventDefault()
@@ -808,6 +833,7 @@ function TagCombobox({
   return (
     <Combobox
       multiple
+      items={tagItems}
       value={value}
       onValueChange={onChange}
     >
@@ -829,18 +855,13 @@ function TagCombobox({
         />
       </ComboboxChips>
       <ComboboxContent anchor={anchorRef}>
+        <ComboboxEmpty>Type and press Enter to create a tag</ComboboxEmpty>
         <ComboboxList>
-          {value.map((tag) => (
+          {(tag: string) => (
             <ComboboxItem key={tag} value={tag}>
-              {tag}
-            </ComboboxItem>
-          ))}
-          {inputValue.trim() && !value.includes(inputValue.trim()) && (
-            <ComboboxItem value={inputValue.trim()}>
-              Create &ldquo;{inputValue.trim()}&rdquo;
+              {value.includes(tag) ? tag : <>Create &ldquo;{tag}&rdquo;</>}
             </ComboboxItem>
           )}
-          <ComboboxEmpty>Type and press Enter to create a tag</ComboboxEmpty>
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
@@ -861,8 +882,8 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
         {!hasVariants && (
           <>
             <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-2">
-                <Label htmlFor="weight">Weight</Label>
+              <Field>
+                <FieldLabel htmlFor="weight">Weight</FieldLabel>
                 <Input
                   id="weight"
                   type="number"
@@ -870,9 +891,9 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
                   placeholder="0.0"
                   {...form.register('weight')}
                 />
-              </div>
-              <div className="grid gap-2">
-                <Label>Unit</Label>
+              </Field>
+              <Field>
+                <FieldLabel>Unit</FieldLabel>
                 <Controller
                   name="weight_unit"
                   control={form.control}
@@ -893,12 +914,12 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
                     </Select>
                   )}
                 />
-              </div>
+              </Field>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="grid gap-2">
-                <Label htmlFor="height">H</Label>
+              <Field>
+                <FieldLabel htmlFor="height">H</FieldLabel>
                 <Input
                   id="height"
                   type="number"
@@ -906,9 +927,9 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
                   placeholder="0.0"
                   {...form.register('height')}
                 />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="width">W</Label>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="width">W</FieldLabel>
                 <Input
                   id="width"
                   type="number"
@@ -916,9 +937,9 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
                   placeholder="0.0"
                   {...form.register('width')}
                 />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="depth">D</Label>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="depth">D</FieldLabel>
                 <Input
                   id="depth"
                   type="number"
@@ -926,11 +947,11 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
                   placeholder="0.0"
                   {...form.register('depth')}
                 />
-              </div>
+              </Field>
             </div>
 
-            <div className="grid gap-2">
-              <Label>Dimensions unit</Label>
+            <Field>
+              <FieldLabel>Dimensions unit</FieldLabel>
               <Controller
                 name="dimensions_unit"
                 control={form.control}
@@ -951,7 +972,7 @@ function ShippingCard({ form, hasVariants }: FormCardProps & { hasVariants: bool
                   </Select>
                 )}
               />
-            </div>
+            </Field>
           </>
         )}
       </CardContent>
@@ -973,8 +994,8 @@ function TaxCard({ form }: FormCardProps) {
         <CardTitle>Tax</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-2">
-          <Label>Tax category</Label>
+        <Field>
+          <FieldLabel>Tax category</FieldLabel>
           <Controller
             name="tax_category_id"
             control={form.control}
@@ -993,7 +1014,7 @@ function TaxCard({ form }: FormCardProps) {
               </Select>
             )}
           />
-        </div>
+        </Field>
       </CardContent>
     </Card>
   )
