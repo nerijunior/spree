@@ -108,7 +108,7 @@ function SheetContent({
         dir={dir}
         className={cn(
           'fixed z-50 flex flex-col bg-white text-sm shadow-[0px_0px_0px_1px_rgba(179,179,179,0.5),0px_6px_12px_-3px_rgba(179,179,179,0.35),0px_6px_18px_0px_rgba(179,179,179,0.35)] transition duration-250 ease-out',
-          'data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-[calc(100dvh-1rem)] data-[side=right]:max-h-[calc(100dvh-1rem)] data-[side=right]:w-[calc(100vw-1rem)] data-[side=right]:max-w-[600px] data-[side=right]:min-w-[320px] data-[side=right]:m-2 data-[side=right]:rounded-2xl',
+          'data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-[calc(100dvh-1rem)] data-[side=right]:max-h-[calc(100dvh-1rem)] data-[side=right]:w-[calc(100vw-1rem)] data-[side=right]:max-w-[600px] data-[side=right]:min-w-[320px] data-[side=right]:m-2 data-[side=right]:rounded-xl',
           'data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-3/4 data-[side=left]:border-r data-[side=left]:sm:max-w-sm',
           'data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t',
           'data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b',
@@ -136,7 +136,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn('flex items-center justify-between p-4 border-b border-gray-100', className)}
+      className={cn('relative flex flex-col gap-1.5 border-b p-4 pr-12', className)}
       {...props}
     />
   )
@@ -147,7 +147,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        'flex items-center justify-between p-4 bg-muted border-t border-gray-100 rounded-b-2xl',
+        'flex flex-col-reverse gap-2 border-t bg-muted/50 p-4 sm:flex-row sm:justify-end rounded-b-xl',
         className,
       )}
       {...props}
@@ -159,7 +159,7 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPr
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn('text-base font-semibold text-foreground', className)}
+      className={cn('text-base leading-none font-medium', className)}
       {...props}
     />
   )
