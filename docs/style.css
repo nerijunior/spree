@@ -2,7 +2,7 @@
   height: 32px;
 }
 
-html:not(.dark) body > div {
+html:not(.dark) body {
   background: #fcfaf8;
 }
 
