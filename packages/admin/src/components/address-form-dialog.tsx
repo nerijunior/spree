@@ -2,14 +2,13 @@ import type { Address } from '@spree/admin-sdk'
 import { type FormEvent, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogBody,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
@@ -59,7 +58,7 @@ export function AddressFormDialog({
   )
 
   const statesRequired = selectedCountry?.states_required ?? false
-  const states = selectedCountry?.states ?? []
+  const states = (selectedCountry as any)?.states ?? []
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -78,14 +77,14 @@ export function AddressFormDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>Update the address details.</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <DialogBody>
+    <Sheet open={open} onOpenChange={(o) => onOpenChange(o as boolean)}>
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>Update the address details.</SheetDescription>
+        </SheetHeader>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-4">
             <FieldGroup>
               <div className="grid grid-cols-2 gap-3">
                 <Field>
@@ -169,7 +168,7 @@ export function AddressFormDialog({
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
                     <SelectContent>
-                      {states.map((state) => (
+                      {states.map((state: { abbr: string; name: string }) => (
                         <SelectItem key={state.abbr} value={state.abbr}>
                           {state.name}
                         </SelectItem>
@@ -180,7 +179,7 @@ export function AddressFormDialog({
                   <Input
                     id="addr-state"
                     name="state_abbr"
-                    defaultValue={address?.state_abbr ?? address?.state_name ?? ''}
+                    defaultValue={address?.state_abbr ?? ''}
                   />
                 )}
               </Field>
@@ -193,17 +192,17 @@ export function AddressFormDialog({
                 />
               </Field>
             </FieldGroup>
-          </DialogBody>
-          <DialogFooter>
+          </div>
+          <SheetFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? 'Saving...' : 'Save'}
             </Button>
-          </DialogFooter>
+          </SheetFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }
