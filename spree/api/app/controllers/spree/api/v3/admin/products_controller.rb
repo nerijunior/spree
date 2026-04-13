@@ -68,6 +68,7 @@ module Spree
             params.permit(
               *Spree::PermittedAttributes.product_attributes,
               tags: [],
+              category_ids: [],
               variants: [
                 :id, :sku, :barcode, :price, :compare_at_price,
                 :cost_price, :cost_currency,
@@ -88,6 +89,13 @@ module Spree
 
           def update_params
             p = permitted_params.to_h.with_indifferent_access
+
+            # Map 6.0 API name (category_ids) to model column (taxon_ids)
+            if p.key?(:category_ids)
+              p[:taxon_ids] = Array(p.delete(:category_ids)).filter_map do |id|
+                id.to_s.include?('_') ? Spree::Taxon.decode_prefixed_id(id) : id
+              end
+            end
 
             if p.key?(:taxon_ids)
               other_store_taxon_ids = @resource.taxons

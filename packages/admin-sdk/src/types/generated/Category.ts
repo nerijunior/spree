@@ -6,6 +6,7 @@ import type {CustomField} from '@/types'
 interface Category {
   id: string;
   name: string;
+  pretty_name: string;
   permalink: string;
   position: number;
   depth: number;

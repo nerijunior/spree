@@ -151,48 +151,80 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
   end
 
   describe 'POST #create' do
-    subject { post :create, params: product_params, as: :json }
-
     before { request.headers.merge!(headers) }
 
     let(:tax_category) { create(:tax_category) }
     let(:shipping_category) { create(:shipping_category) }
-    let(:product_params) do
-      {
-        name: 'New Product',
-        price: 19.99,
-        shipping_category_id: shipping_category.id
-      }
-    end
+    let(:taxonomy) { create(:taxonomy, store: store) }
+    let(:category1) { create(:taxon, taxonomy: taxonomy) }
+    let(:category2) { create(:taxon, taxonomy: taxonomy) }
 
-    it 'creates a product' do
-      expect { subject }.to change(Spree::Product, :count).by(1)
+    it 'creates a minimal product' do
+      expect {
+        post :create, params: { name: 'Simple Product', price: 19.99, shipping_category_id: shipping_category.id }, as: :json
+      }.to change(Spree::Product, :count).by(1)
 
       expect(response).to have_http_status(:created)
-      expect(json_response['name']).to eq('New Product')
+      expect(json_response['name']).to eq('Simple Product')
     end
 
-    context 'with nested variants, prices, tags, and taxon_ids' do
-      let(:taxonomy) { create(:taxonomy, store: store) }
-      let(:taxon) { create(:taxon, taxonomy: taxonomy) }
+    context 'with full payload: multiple variants, multi-currency prices, categories, tags' do
       let(:product_params) do
         {
-          name: 'Test product',
-          price: 10.99,
+          name: 'Premium T-Shirt',
+          description: 'A premium cotton t-shirt',
+          status: 'draft',
+          price: 29.99,
+          compare_at_price: 39.99,
+          cost_price: 8.50,
+          sku: 'PREM-TEE',
           shipping_category_id: shipping_category.id,
           tax_category_id: tax_category.prefixed_id,
-          taxon_ids: [taxon.prefixed_id],
-          tags: ['eco', 'best-seller'],
+          category_ids: [category1.prefixed_id, category2.prefixed_id],
+          tags: ['premium', 'cotton', 'summer'],
+          slug: 'premium-t-shirt',
+          meta_title: 'Premium T-Shirt',
+          meta_description: 'Shop our premium cotton t-shirt',
           variants: [
             {
-              options: [{ name: 'size', value: 'small' }],
-              sku: 'TEST-SM',
-              total_on_hand: 10,
+              sku: 'PREM-TEE-S',
+              options: [{ name: 'size', value: 'Small' }],
+              weight: 0.2,
+              width: 30,
+              height: 40,
+              depth: 2,
+              weight_unit: 'kg',
+              dimensions_unit: 'cm',
               track_inventory: true,
-              weight: 0.5,
+              total_on_hand: 50,
               prices: [
-                { currency: 'USD', amount: 10.99 },
-                { currency: 'EUR', amount: 9.99 }
+                { currency: 'USD', amount: 29.99, compare_at_amount: 39.99 },
+                { currency: 'EUR', amount: 27.99 },
+                { currency: 'GBP', amount: 24.99 }
+              ]
+            },
+            {
+              sku: 'PREM-TEE-M',
+              options: [{ name: 'size', value: 'Medium' }],
+              weight: 0.22,
+              track_inventory: true,
+              total_on_hand: 100,
+              prices: [
+                { currency: 'USD', amount: 29.99 },
+                { currency: 'EUR', amount: 27.99 },
+                { currency: 'GBP', amount: 24.99 }
+              ]
+            },
+            {
+              sku: 'PREM-TEE-L',
+              options: [{ name: 'size', value: 'Large' }],
+              weight: 0.25,
+              track_inventory: true,
+              total_on_hand: 75,
+              prices: [
+                { currency: 'USD', amount: 31.99 },
+                { currency: 'EUR', amount: 29.99 },
+                { currency: 'GBP', amount: 26.99 }
               ]
             }
           ]
@@ -200,30 +232,65 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
       end
 
       it 'creates product with all nested data' do
-        expect { subject }.to change(Spree::Product, :count).by(1)
-                          .and change(Spree::Variant, :count).by(2) # master + variant
+        expect {
+          post :create, params: product_params, as: :json
+        }.to change(Spree::Product, :count).by(1)
+                          .and change(Spree::Variant, :count).by(4) # master + 3 variants
 
         expect(response).to have_http_status(:created)
-        expect(json_response['name']).to eq('Test product')
 
-        created_product = Spree::Product.find_by(name: 'Test product')
-        expect(created_product.tag_list).to match_array(['eco', 'best-seller'])
-        expect(created_product.taxons).to include(taxon)
-        expect(created_product.tax_category).to eq(tax_category)
+        created = Spree::Product.find_by(name: 'Premium T-Shirt')
+        expect(created).to be_present
 
-        variant = created_product.variants.first
-        expect(variant.sku).to eq('TEST-SM')
-        expect(variant.option_values.first.presentation).to eq('small')
-        expect(variant.prices.count).to be >= 2
-        expect(variant.prices.find_by(currency: 'EUR').amount.to_f).to eq(9.99)
+        # Product attributes
+        expect(created.description.to_plain_text).to include('premium cotton')
+        expect(created.status).to eq('draft')
+        expect(created.slug).to eq('premium-t-shirt')
+        expect(created.meta_title).to eq('Premium T-Shirt')
+        expect(created.tax_category).to eq(tax_category)
+        expect(created.tag_list).to match_array(['premium', 'cotton', 'summer'])
+        expect(created.taxons).to match_array([category1, category2])
+
+        # Master variant
+        master = created.master
+        expect(master.sku).to eq('PREM-TEE')
+        expect(master.price.to_f).to eq(29.99)
+        expect(master.compare_at_price.to_f).to eq(39.99)
+        expect(master.cost_price.to_f).to eq(8.50)
+
+        # Variants
+        expect(created.variants.count).to eq(3)
+
+        small = created.variants.find_by(sku: 'PREM-TEE-S')
+        expect(small).to be_present
+        expect(small.weight.to_f).to eq(0.2)
+        expect(small.width.to_f).to eq(30.0)
+        expect(small.height.to_f).to eq(40.0)
+        expect(small.depth.to_f).to eq(2.0)
+        expect(small.option_values.first.name).to eq('Small')
+        expect(small.option_values.first.option_type.name).to eq('size')
+
+        # Multi-currency prices
+        expect(small.prices.count).to be >= 3
+        expect(small.prices.find_by(currency: 'USD').amount.to_f).to eq(29.99)
+        expect(small.prices.find_by(currency: 'USD').compare_at_amount.to_f).to eq(39.99)
+        expect(small.prices.find_by(currency: 'EUR').amount.to_f).to eq(27.99)
+        expect(small.prices.find_by(currency: 'GBP').amount.to_f).to eq(24.99)
+
+        medium = created.variants.find_by(sku: 'PREM-TEE-M')
+        expect(medium).to be_present
+        expect(medium.total_on_hand).to eq(100)
+
+        large = created.variants.find_by(sku: 'PREM-TEE-L')
+        expect(large).to be_present
+        expect(large.prices.find_by(currency: 'USD').amount.to_f).to eq(31.99)
+        expect(large.prices.find_by(currency: 'GBP').amount.to_f).to eq(26.99)
       end
     end
 
     context 'with invalid params' do
-      let(:product_params) { { name: '' } }
-
       it 'returns validation errors' do
-        subject
+        post :create, params: { name: '' }, as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(json_response['error']['code']).to eq('validation_error')
@@ -233,16 +300,131 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
   end
 
   describe 'PATCH #update' do
-    subject { patch :update, params: { id: product.prefixed_id, name: 'Updated Name' }, as: :json }
-
     before { request.headers.merge!(headers) }
 
-    it 'updates the product' do
-      subject
+    let(:taxonomy) { create(:taxonomy, store: store) }
+    let(:category1) { create(:taxon, taxonomy: taxonomy) }
+    let(:category2) { create(:taxon, taxonomy: taxonomy) }
+    let(:tax_category) { create(:tax_category) }
+
+    it 'updates basic product attributes' do
+      patch :update, params: { id: product.prefixed_id, name: 'Updated Name' }, as: :json
 
       expect(response).to have_http_status(:ok)
       expect(json_response['name']).to eq('Updated Name')
       expect(product.reload.name).to eq('Updated Name')
+    end
+
+    context 'with full payload: name, description, status, categories, tags, SEO, variants with multi-currency prices' do
+      let!(:product_to_update) do
+        create(:product_with_option_types, stores: [store]).tap do |p|
+          p.master.update!(sku: 'OLD-SKU')
+        end
+      end
+
+      let(:update_params) do
+        {
+          id: product_to_update.prefixed_id,
+          name: 'Updated Premium Shirt',
+          description: 'Updated description for the premium shirt',
+          status: 'active',
+          slug: 'updated-premium-shirt',
+          meta_title: 'Updated Premium Shirt | Shop',
+          meta_description: 'Buy the updated premium shirt',
+          category_ids: [category1.prefixed_id, category2.prefixed_id],
+          tags: ['updated', 'premium', 'new-arrival'],
+          tax_category_id: tax_category.prefixed_id,
+          variants: [
+            {
+              sku: 'UPD-SHIRT-S',
+              options: [{ name: 'size', value: 'Small' }],
+              weight: 0.3,
+              track_inventory: true,
+              prices: [
+                { currency: 'USD', amount: 34.99, compare_at_amount: 49.99 },
+                { currency: 'EUR', amount: 31.99 },
+                { currency: 'GBP', amount: 28.99 }
+              ]
+            },
+            {
+              sku: 'UPD-SHIRT-XL',
+              options: [{ name: 'size', value: 'XL' }],
+              weight: 0.4,
+              track_inventory: true,
+              prices: [
+                { currency: 'USD', amount: 36.99 },
+                { currency: 'EUR', amount: 33.99 },
+                { currency: 'GBP', amount: 30.99 }
+              ]
+            }
+          ]
+        }
+      end
+
+      it 'updates product with all nested data' do
+        patch :update, params: update_params, as: :json
+
+        expect(response).to have_http_status(:ok)
+
+        updated = product_to_update.reload
+        expect(updated.name).to eq('Updated Premium Shirt')
+        expect(updated.status).to eq('active')
+        expect(updated.slug).to eq('updated-premium-shirt')
+        expect(updated.meta_title).to eq('Updated Premium Shirt | Shop')
+        expect(updated.tax_category).to eq(tax_category)
+        expect(updated.tag_list).to match_array(['updated', 'premium', 'new-arrival'])
+        expect(updated.taxons).to match_array([category1, category2])
+
+        # Variants created
+        small = updated.variants.find_by(sku: 'UPD-SHIRT-S')
+        expect(small).to be_present
+        expect(small.weight.to_f).to eq(0.3)
+        expect(small.option_values.first.name).to eq('Small')
+
+        # Multi-currency prices on small variant
+        expect(small.prices.find_by(currency: 'USD').amount.to_f).to eq(34.99)
+        expect(small.prices.find_by(currency: 'USD').compare_at_amount.to_f).to eq(49.99)
+        expect(small.prices.find_by(currency: 'EUR').amount.to_f).to eq(31.99)
+        expect(small.prices.find_by(currency: 'GBP').amount.to_f).to eq(28.99)
+
+        xl = updated.variants.find_by(sku: 'UPD-SHIRT-XL')
+        expect(xl).to be_present
+        expect(xl.prices.find_by(currency: 'GBP').amount.to_f).to eq(30.99)
+      end
+    end
+
+    context 'with category_ids' do
+      it 'assigns categories via prefixed IDs' do
+        patch :update, params: {
+          id: product.prefixed_id,
+          category_ids: [category1.prefixed_id, category2.prefixed_id]
+        }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(product.reload.taxons).to match_array([category1, category2])
+      end
+
+      it 'replaces existing categories' do
+        product.taxons << category1
+        patch :update, params: {
+          id: product.prefixed_id,
+          category_ids: [category2.prefixed_id]
+        }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(product.reload.taxons.where(taxonomy: taxonomy)).to eq([category2])
+      end
+
+      it 'clears categories when empty array' do
+        product.taxons << category1
+        patch :update, params: {
+          id: product.prefixed_id,
+          category_ids: []
+        }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(product.reload.taxons.where(taxonomy: taxonomy)).to be_empty
+      end
     end
 
     context 'with tags' do

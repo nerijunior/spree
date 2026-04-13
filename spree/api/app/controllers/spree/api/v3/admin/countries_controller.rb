@@ -17,6 +17,12 @@ module Spree
             Spree::Country.all.order(:name)
           end
 
+          # Return all countries without pagination — there are ~250 and they're
+          # needed in full for address form dropdowns.
+          def limit
+            1000
+          end
+
           def find_resource
             scope.find_by!(iso: params[:id].upcase)
           end
