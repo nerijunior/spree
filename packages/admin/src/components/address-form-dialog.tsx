@@ -21,6 +21,11 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useCountries } from '@/hooks/use-countries'
 
+/** Convert 2-letter ISO code to flag emoji (e.g. "US" → "🇺🇸") */
+function countryFlag(iso: string): string {
+  return [...iso.toUpperCase()].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join('')
+}
+
 export interface AddressParams {
   first_name: string
   last_name: string
@@ -146,7 +151,10 @@ export function AddressFormDialog({
                   items={countryItems}
                   value={selectedCountry}
                   onValueChange={handleCountryChange as any}
-                  itemToStringLabel={(c: any) => (c as CountryOption)?.name ?? ''}
+                  itemToStringLabel={(c: any) => {
+                    const co = c as CountryOption
+                    return co?.iso ? `${countryFlag(co.iso)} ${co.name}` : co?.name ?? ''
+                  }}
                   itemToStringValue={(c: any) => (c as CountryOption)?.iso ?? ''}
                 >
                   <ComboboxInput placeholder="Search countries..." />
@@ -155,6 +163,7 @@ export function AddressFormDialog({
                     <ComboboxList>
                       {(country: CountryOption) => (
                         <ComboboxItem key={country.iso} value={country}>
+                          <span className="mr-1.5">{countryFlag(country.iso)}</span>
                           {country.name}
                         </ComboboxItem>
                       )}
