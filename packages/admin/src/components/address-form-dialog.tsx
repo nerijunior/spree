@@ -33,6 +33,9 @@ export interface AddressParams {
   phone: string
 }
 
+type CountryOption = { iso: string; name: string }
+type StateOption = { abbr: string; name: string }
+
 export function AddressFormDialog({
   address,
   open,
@@ -50,37 +53,39 @@ export function AddressFormDialog({
 }) {
   const { countries } = useCountries()
 
-  const [selectedCountryIso, setSelectedCountryIso] = useState<string>(
-    address?.country_iso ?? '',
-  )
-  const [selectedStateAbbr, setSelectedStateAbbr] = useState<string>(
-    address?.state_abbr ?? '',
+  const countryItems: CountryOption[] = useMemo(
+    () => countries.map((c) => ({ iso: c.iso, name: c.name })),
+    [countries],
   )
 
+  const initialCountry = useMemo(
+    () => countryItems.find((c) => c.iso === address?.country_iso) ?? null,
+    [countryItems, address?.country_iso],
+  )
+
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(initialCountry)
+
   const countryData = useMemo(
-    () => countries.find((c) => c.iso === selectedCountryIso),
-    [countries, selectedCountryIso],
+    () => countries.find((c) => c.iso === selectedCountry?.iso),
+    [countries, selectedCountry],
   )
 
   const statesRequired = countryData?.states_required ?? false
-  const states: Array<{ abbr: string; name: string }> = (countryData as any)?.states ?? []
+  const stateItems: StateOption[] = useMemo(
+    () => ((countryData as any)?.states ?? []) as StateOption[],
+    [countryData],
+  )
 
-  // Map ISO → name for the combobox display
-  const countryNameByIso = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const c of countries) map.set(c.iso, c.name)
-    return map
-  }, [countries])
+  const initialState = useMemo(
+    () => stateItems.find((s) => s.abbr === address?.state_abbr) ?? null,
+    [stateItems, address?.state_abbr],
+  )
 
-  const stateNameByAbbr = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const s of states) map.set(s.abbr, s.name)
-    return map
-  }, [states])
+  const [selectedState, setSelectedState] = useState<StateOption | null>(initialState)
 
-  const handleCountryChange = useCallback((iso: string) => {
-    setSelectedCountryIso(iso)
-    setSelectedStateAbbr('')
+  const handleCountryChange = useCallback((country: CountryOption | null) => {
+    setSelectedCountry(country)
+    setSelectedState(null)
   }, [])
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -93,8 +98,8 @@ export function AddressFormDialog({
       address2: fd.get('address2') as string,
       city: fd.get('city') as string,
       postal_code: fd.get('postal_code') as string,
-      country_iso: selectedCountryIso,
-      state_abbr: statesRequired ? selectedStateAbbr : (fd.get('state_abbr') as string),
+      country_iso: selectedCountry?.iso ?? '',
+      state_abbr: statesRequired ? (selectedState?.abbr ?? '') : (fd.get('state_abbr') as string),
       phone: fd.get('phone') as string,
     })
   }
@@ -102,7 +107,7 @@ export function AddressFormDialog({
   // Prevent Enter in combobox inputs from submitting the form
   function handleKeyDown(e: React.KeyboardEvent) {
     const target = e.target as HTMLElement
-    if (e.key === 'Enter' && (target.getAttribute('role') === 'combobox' || target.closest('[data-slot="combobox-content"]'))) {
+    if (e.key === 'Enter' && target.getAttribute('role') === 'combobox') {
       e.preventDefault()
     }
   }
@@ -111,10 +116,8 @@ export function AddressFormDialog({
     <Sheet open={open} onOpenChange={(o) => onOpenChange(o as boolean)}>
       <SheetContent side="right">
         <SheetHeader>
-          <div>
-            <SheetTitle>{title}</SheetTitle>
-            <SheetDescription>Update the address details.</SheetDescription>
-          </div>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>Update the address details.</SheetDescription>
         </SheetHeader>
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4">
@@ -140,19 +143,21 @@ export function AddressFormDialog({
               <Field>
                 <FieldLabel>Country</FieldLabel>
                 <Combobox
-                  value={selectedCountryIso}
-                  onValueChange={(v) => handleCountryChange(v as string)}
-                  itemToStringLabel={(iso) => countryNameByIso.get(iso as string) ?? (iso as string)}
+                  items={countryItems}
+                  value={selectedCountry}
+                  onValueChange={handleCountryChange as any}
+                  itemToStringLabel={(c: any) => (c as CountryOption)?.name ?? ''}
+                  itemToStringValue={(c: any) => (c as CountryOption)?.iso ?? ''}
                 >
                   <ComboboxInput placeholder="Search countries..." />
                   <ComboboxContent>
+                    <ComboboxEmpty>No countries found</ComboboxEmpty>
                     <ComboboxList>
-                      {countries.map((c) => (
-                        <ComboboxItem key={c.iso} value={c.iso}>
-                          {c.name}
+                      {(country: CountryOption) => (
+                        <ComboboxItem key={country.iso} value={country}>
+                          {country.name}
                         </ComboboxItem>
-                      ))}
-                      <ComboboxEmpty>No countries found</ComboboxEmpty>
+                      )}
                     </ComboboxList>
                   </ComboboxContent>
                 </Combobox>
@@ -164,22 +169,24 @@ export function AddressFormDialog({
                 </Field>
                 <Field>
                   <FieldLabel>State / Province</FieldLabel>
-                  {statesRequired && states.length > 0 ? (
+                  {statesRequired && stateItems.length > 0 ? (
                     <Combobox
-                      key={selectedCountryIso}
-                      value={selectedStateAbbr}
-                      onValueChange={(v) => setSelectedStateAbbr(v as string)}
-                      itemToStringLabel={(abbr) => stateNameByAbbr.get(abbr as string) ?? (abbr as string)}
+                      key={selectedCountry?.iso ?? 'no-country'}
+                      items={stateItems}
+                      value={selectedState}
+                      onValueChange={setSelectedState as any}
+                      itemToStringLabel={(s: any) => (s as StateOption)?.name ?? ''}
+                      itemToStringValue={(s: any) => (s as StateOption)?.abbr ?? ''}
                     >
                       <ComboboxInput placeholder="Search states..." />
                       <ComboboxContent>
+                        <ComboboxEmpty>No states found</ComboboxEmpty>
                         <ComboboxList>
-                          {states.map((s) => (
-                            <ComboboxItem key={s.abbr} value={s.abbr}>
-                              {s.name}
+                          {(state: StateOption) => (
+                            <ComboboxItem key={state.abbr} value={state}>
+                              {state.name}
                             </ComboboxItem>
-                          ))}
-                          <ComboboxEmpty>No states found</ComboboxEmpty>
+                          )}
                         </ComboboxList>
                       </ComboboxContent>
                     </Combobox>
