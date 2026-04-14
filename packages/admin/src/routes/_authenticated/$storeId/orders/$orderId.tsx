@@ -20,6 +20,7 @@ import {
   XCircleIcon,
 } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
+import { useConfirm } from '@/components/confirm-dialog'
 import { adminClient } from '@/client'
 import { Badge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -159,6 +160,7 @@ function OrderDetailPage() {
 
 function OrderHeader({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
+  const confirm = useConfirm()
 
   const backFallback = order.completed_at ? 'orders' : 'orders/drafts'
 
@@ -211,8 +213,8 @@ function OrderHeader({ order }: { order: Order }) {
             {(order as any).state !== 'canceled' && (
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to cancel this order?')) {
+                onClick={async () => {
+                  if (await confirm({ message: 'Are you sure you want to cancel this order?', variant: 'destructive', confirmLabel: 'Cancel Order' })) {
                     cancelMutation.mutate(undefined)
                   }
                 }}
@@ -355,6 +357,7 @@ function EditQuantityDialog({
 
 function LineItemsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
+  const confirm = useConfirm()
 
   const items = order.items ?? []
   const [addOpen, setAddOpen] = useState(false)
@@ -448,8 +451,8 @@ function LineItemsCard({ order }: { order: Order }) {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
-                            onClick={() => {
-                              if (window.confirm('Remove this item from the order?')) {
+                            onClick={async () => {
+                              if (await confirm({ message: 'Remove this item from the order?', variant: 'destructive', confirmLabel: 'Remove' })) {
                                 deleteMutation.mutate(item.id)
                               }
                             }}
@@ -550,6 +553,7 @@ function EditTrackingDialog({
 
 function ShipmentsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
+  const confirm = useConfirm()
 
   const fulfillments = order.fulfillments ?? []
   const [editTracking, setEditTracking] = useState<{
@@ -604,8 +608,8 @@ function ShipmentsCard({ order }: { order: Order }) {
                     </DropdownMenuItem>
                     {fulfillment.status === 'ready' && (
                       <DropdownMenuItem
-                        onClick={() => {
-                          if (window.confirm('Ship this fulfillment?')) {
+                        onClick={async () => {
+                          if (await confirm({ message: 'Ship this fulfillment?', variant: 'default', confirmLabel: 'Fulfill' })) {
                             fulfillMutation.mutate(fulfillment.id)
                           }
                         }}
@@ -619,8 +623,8 @@ function ShipmentsCard({ order }: { order: Order }) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
-                          onClick={() => {
-                            if (window.confirm('Cancel this fulfillment?')) {
+                          onClick={async () => {
+                            if (await confirm({ message: 'Cancel this fulfillment?', variant: 'destructive', confirmLabel: 'Cancel Fulfillment' })) {
                               cancelFulfillmentMutation.mutate(fulfillment.id)
                             }
                           }}
@@ -695,6 +699,7 @@ function ShipmentsCard({ order }: { order: Order }) {
 
 function PaymentsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
+  const confirm = useConfirm()
 
   const payments = order.payments ?? []
 
@@ -754,8 +759,8 @@ function PaymentsCard({ order }: { order: Order }) {
                       <DropdownMenuContent align="end">
                         {(payment.status === 'checkout' || payment.status === 'pending') && (
                           <DropdownMenuItem
-                            onClick={() => {
-                              if (window.confirm('Capture this payment?')) {
+                            onClick={async () => {
+                              if (await confirm({ message: 'Capture this payment?', variant: 'default', confirmLabel: 'Capture' })) {
                                 captureMutation.mutate(payment.id)
                               }
                             }}
@@ -769,8 +774,8 @@ function PaymentsCard({ order }: { order: Order }) {
                           payment.status === 'completed') && (
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
-                            onClick={() => {
-                              if (window.confirm('Void this payment?')) {
+                            onClick={async () => {
+                              if (await confirm({ message: 'Void this payment?', variant: 'destructive', confirmLabel: 'Void Payment' })) {
                                 voidMutation.mutate(payment.id)
                               }
                             }}
@@ -864,6 +869,7 @@ function AddAdjustmentDialog({
 
 function AdjustmentsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
+  const confirm = useConfirm()
 
   const adjustments = (order.adjustments ?? []).filter(
     (a) => a.source_type !== 'Spree::TaxRate' && a.source_type !== 'Spree::PromotionAction',
@@ -922,8 +928,8 @@ function AdjustmentsCard({ order }: { order: Order }) {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
                               className="text-destructive focus:text-destructive"
-                              onClick={() => {
-                                if (window.confirm('Remove this adjustment?')) {
+                              onClick={async () => {
+                                if (await confirm({ message: 'Remove this adjustment?', variant: 'destructive', confirmLabel: 'Remove' })) {
                                   deleteMutation.mutate(adj.id)
                                 }
                               }}

@@ -15,6 +15,7 @@ type Product = Omit<BaseProduct, 'master_variant' | 'variants'> & {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { BackButton } from '@/components/back-button'
+import { useConfirm } from '@/components/confirm-dialog'
 import {
   ImagePlusIcon,
   Loader2Icon,
@@ -127,6 +128,7 @@ function ProductDetailPage() {
 // ---------------------------------------------------------------------------
 
 function ProductForm({ product }: { product: Product }) {
+  const confirm = useConfirm()
   const { productId, storeId } = Route.useParams()
   const router = useRouter()
   const updateProduct = useUpdateProduct()
@@ -153,7 +155,8 @@ function ProductForm({ product }: { product: Product }) {
   }
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return
+    const confirmed = await confirm({ message: 'Are you sure you want to delete this product?', variant: 'destructive', confirmLabel: 'Delete' })
+    if (!confirmed) return
     try {
       await deleteProduct.mutateAsync(productId)
       toast.success('Product deleted')
