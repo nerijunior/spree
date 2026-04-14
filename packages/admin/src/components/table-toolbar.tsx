@@ -7,7 +7,7 @@ import {
   Trash2Icon,
   XIcon,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
@@ -23,21 +23,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import type { ColumnDef, FilterRule, SortOption } from "@/lib/table-registry";
 
@@ -163,24 +159,35 @@ export function TableToolbar({
         <div className="flex gap-2 items-center">
           {/* Filter button */}
           {filterableColumns.length > 0 && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-[2.125rem]"
-                  onClick={() => setFilterOpen(true)}
-                >
-                  <FilterIcon className="size-4" />
-                  {activeFilterCount > 0 && (
-                    <Badge className="ml-1 px-1.5 py-0 text-xs">
-                      {activeFilterCount}
-                    </Badge>
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Filters</TooltipContent>
-            </Tooltip>
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-[2.125rem]"
+                    >
+                      <FilterIcon className="size-4" />
+                      {activeFilterCount > 0 && (
+                        <Badge className="ml-1 px-1.5 py-0 text-xs">
+                          {activeFilterCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>Filters</TooltipContent>
+              </Tooltip>
+              <PopoverContent align="end" className="w-[480px] p-0">
+                <FilterPanel
+                  columns={filterableColumns}
+                  filters={filters}
+                  onApply={(f) => { onFiltersChange(f); setFilterOpen(false); }}
+                  onClose={() => setFilterOpen(false)}
+                />
+              </PopoverContent>
+            </Popover>
           )}
 
           {/* Sort dropdown */}
@@ -243,14 +250,6 @@ export function TableToolbar({
         </div>
       )}
 
-      {/* Filter drawer */}
-      <FilterDrawer
-        open={filterOpen}
-        onOpenChange={setFilterOpen}
-        columns={filterableColumns}
-        filters={filters}
-        onApply={onFiltersChange}
-      />
     </>
   );
 }
@@ -383,25 +382,18 @@ function ColumnSelector({
 // Filter Drawer
 // ============================================================================
 
-function FilterDrawer({
-  open,
-  onOpenChange,
+function FilterPanel({
   columns,
   filters: initialFilters,
   onApply,
+  onClose,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   columns: ColumnDef[];
   filters: FilterRule[];
   onApply: (filters: FilterRule[]) => void;
+  onClose: () => void;
 }) {
   const [draft, setDraft] = useState<FilterRule[]>(initialFilters);
-
-  // Sync draft when opened
-  useEffect(() => {
-    if (open) setDraft(initialFilters);
-  }, [open, initialFilters]);
 
   const addFilter = useCallback(() => {
     const first = columns[0];
@@ -431,168 +423,160 @@ function FilterDrawer({
   }, []);
 
   function handleApply() {
-    // Remove filters with no value (unless operator doesn't need one)
     const valid = draft.filter(
       (f) => noValueOperators.includes(f.operator) || f.value.trim() !== "",
     );
     onApply(valid);
-    onOpenChange(false);
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>Filters</SheetTitle>
-          <SheetDescription className="sr-only">
-            Build filters for the table
-          </SheetDescription>
-        </SheetHeader>
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between border-b px-3 py-2">
+        <span className="text-sm font-medium">Filters</span>
+        <button type="button" onClick={onClose} className="p-1 rounded hover:bg-muted">
+          <XIcon className="size-3.5" />
+        </button>
+      </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {draft.map((filter) => {
-            const col = columns.find((c) => c.key === filter.field);
-            const type = col?.filterType ?? "string";
-            const ops = getOperators(type);
+      <div className="max-h-[320px] overflow-y-auto p-3 space-y-2">
+        {draft.map((filter) => {
+          const col = columns.find((c) => c.key === filter.field);
+          const type = col?.filterType ?? "string";
+          const ops = getOperators(type);
 
-            return (
-              <div
-                key={filter.id}
-                className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
+          return (
+            <div
+              key={filter.id}
+              className="flex items-center gap-1.5"
+            >
+              <Select
+                value={filter.field}
+                onValueChange={(val) => {
+                  const newCol = columns.find((c) => c.key === val);
+                  const newOps = getOperators(newCol?.filterType ?? "string");
+                  updateFilter(filter.id, {
+                    field: val,
+                    operator: newOps[0].value,
+                    value: "",
+                  });
+                }}
               >
-                {/* Field select */}
-                <Select
-                  value={filter.field}
-                  onValueChange={(val) => {
-                    const newCol = columns.find((c) => c.key === val);
-                    const newOps = getOperators(newCol?.filterType ?? "string");
-                    updateFilter(filter.id, {
-                      field: val,
-                      operator: newOps[0].value,
-                      value: "",
-                    });
-                  }}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {columns.map((c) => (
-                      <SelectItem key={c.key} value={c.key}>
-                        {c.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {/* Operator select */}
-                <Select
-                  value={filter.operator}
-                  onValueChange={(val) =>
-                    updateFilter(filter.id, { operator: val })
-                  }
-                >
-                  <SelectTrigger className="w-[140px] shrink-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ops.map((op) => (
-                      <SelectItem key={op.value} value={op.value}>
-                        {op.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {/* Value input */}
-                {!noValueOperators.includes(filter.operator) &&
-                  (col?.filterType === "status" && col.filterOptions ? (
-                    <Select
-                      value={filter.value || undefined}
-                      onValueChange={(val) =>
-                        updateFilter(filter.id, { value: val })
-                      }
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {col.filterOptions.map((opt) => (
-                          <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : col?.filterType === "boolean" ? (
-                    <Select
-                      value={filter.value || undefined}
-                      onValueChange={(val) =>
-                        updateFilter(filter.id, { value: val })
-                      }
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">Yes</SelectItem>
-                        <SelectItem value="false">No</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Input
-                      type={
-                        col?.filterType === "number"
-                          ? "number"
-                          : col?.filterType === "date"
-                            ? "date"
-                            : "text"
-                      }
-                      className="flex-1 py-1.5 px-2"
-                      placeholder="Enter value..."
-                      value={filter.value}
-                      onChange={(e) =>
-                        updateFilter(filter.id, { value: e.target.value })
-                      }
-                    />
+                <SelectTrigger size="sm" className="flex-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {columns.map((c) => (
+                    <SelectItem key={c.key} value={c.key}>
+                      {c.label}
+                    </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
 
-                {/* Remove button */}
-                <button
-                  type="button"
-                  className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 shrink-0"
-                  onClick={() => removeFilter(filter.id)}
-                >
-                  <Trash2Icon className="size-4" />
-                </button>
-              </div>
-            );
-          })}
+              <Select
+                value={filter.operator}
+                onValueChange={(val) =>
+                  updateFilter(filter.id, { operator: val })
+                }
+              >
+                <SelectTrigger size="sm" className="w-[120px] shrink-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ops.map((op) => (
+                    <SelectItem key={op.value} value={op.value}>
+                      {op.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          {draft.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              No filters applied. Click "Add filter" to get started.
-            </p>
+              {!noValueOperators.includes(filter.operator) &&
+                (col?.filterType === "status" && col.filterOptions ? (
+                  <Select
+                    value={filter.value || undefined}
+                    onValueChange={(val) =>
+                      updateFilter(filter.id, { value: val })
+                    }
+                  >
+                    <SelectTrigger size="sm" className="flex-1">
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {col.filterOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : col?.filterType === "boolean" ? (
+                  <Select
+                    value={filter.value || undefined}
+                    onValueChange={(val) =>
+                      updateFilter(filter.id, { value: val })
+                    }
+                  >
+                    <SelectTrigger size="sm" className="flex-1">
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Yes</SelectItem>
+                      <SelectItem value="false">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    type={
+                      col?.filterType === "number"
+                        ? "number"
+                        : col?.filterType === "date"
+                          ? "date"
+                          : "text"
+                    }
+                    className="flex-1 py-1 px-2 text-sm h-7"
+                    placeholder="Value..."
+                    value={filter.value}
+                    onChange={(e) =>
+                      updateFilter(filter.id, { value: e.target.value })
+                    }
+                  />
+                ))}
+
+              <button
+                type="button"
+                className="p-1 rounded text-muted-foreground hover:text-red-600 hover:bg-red-50 shrink-0"
+                onClick={() => removeFilter(filter.id)}
+              >
+                <Trash2Icon className="size-3.5" />
+              </button>
+            </div>
+          );
+        })}
+
+        {draft.length === 0 && (
+          <p className="text-xs text-muted-foreground text-center py-4">
+            No filters. Click below to add one.
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between border-t px-3 py-2">
+        <Button variant="ghost" size="sm" onClick={addFilter}>
+          <PlusIcon className="size-3.5" />
+          Add filter
+        </Button>
+        <div className="flex gap-1.5">
+          {draft.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={() => setDraft([])}>
+              Clear
+            </Button>
           )}
-
-          <Button variant="outline" size="sm" onClick={addFilter}>
-            <PlusIcon className="size-4" />
-            Add filter
+          <Button size="sm" onClick={handleApply}>
+            Apply
           </Button>
         </div>
-
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button variant="outline">Discard</Button>
-          </SheetClose>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setDraft([])}>
-              Clear all
-            </Button>
-            <Button onClick={handleApply}>Apply filters</Button>
-          </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 }
