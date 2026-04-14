@@ -95,6 +95,11 @@ Spree::Core::Engine.add_routes do
         post 'auth/login', to: 'auth#create'
         post 'auth/refresh', to: 'auth#refresh'
 
+        # Dashboard
+        namespace :dashboard do
+          get :analytics
+        end
+
         # Current admin user + permissions (for UI permission checks)
         get 'me', to: 'me#show'
 

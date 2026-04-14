@@ -34,6 +34,7 @@ function Calendar({
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
           'aria-selected:bg-blue-600 aria-selected:text-white aria-selected:hover:bg-blue-700 aria-selected:focus:bg-blue-700',
         ),
+        range_start: 'day-range-start rounded-l-md',
         range_end: 'day-range-end rounded-r-md',
         selected: 'bg-blue-600 text-white hover:bg-blue-700 focus:bg-blue-700',
         today: 'bg-gray-100 text-gray-950',

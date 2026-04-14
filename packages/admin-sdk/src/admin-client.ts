@@ -2,6 +2,37 @@ import type { RequestFn, RequestOptions } from '@spree/sdk-core';
 import { transformListParams, getParams } from '@spree/sdk-core';
 import type { PaginatedResponse, ListParams } from '@spree/sdk-core';
 
+export interface DashboardAnalytics {
+  currency: string;
+  date_from: string;
+  date_to: string;
+  summary: {
+    sales_total: number;
+    display_sales_total: string;
+    sales_growth: number;
+    orders_count: number;
+    orders_growth: number;
+    avg_order_value: number;
+    display_avg_order_value: string;
+    avg_order_value_growth: number;
+  };
+  chart_data: Array<{
+    date: string;
+    sales: number;
+    orders: number;
+    avg_order_value: number;
+  }>;
+  top_products: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    image_url: string | null;
+    price: string | null;
+    quantity: number;
+    total: string;
+  }>;
+}
+
 export interface AuthTokens {
   token: string;
   refresh_token?: string;
@@ -80,6 +111,18 @@ export class AdminClient {
     /** Get the current admin user profile and their serialized permissions. */
     show: (options?: RequestOptions): Promise<MeResponse> =>
       this.request<MeResponse>('GET', '/me', options),
+  };
+
+  // ============================================
+  // Dashboard
+  // ============================================
+
+  readonly dashboard = {
+    analytics: (params?: { date_from?: string; date_to?: string; currency?: string }, options?: RequestOptions): Promise<DashboardAnalytics> =>
+      this.request<DashboardAnalytics>('GET', '/dashboard/analytics', {
+        ...options,
+        params: params as Record<string, string>,
+      }),
   };
 
   // ============================================
