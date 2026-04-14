@@ -92,7 +92,7 @@ function AnalyticsChart({ data }: { data: DashboardAnalytics }) {
 
   return (
     <Card>
-      <CardHeader className="flex h-auto flex-col border-b p-0 sm:flex-row">
+      <CardHeader className="flex h-auto flex-col border-b p-0 sm:flex-row gap-0">
         {chartTabs.map((tab) => (
           <button
             key={tab.key}

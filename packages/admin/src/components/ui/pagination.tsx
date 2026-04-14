@@ -72,8 +72,8 @@ export function Pagination({
             </span>
             <div className="flex items-center gap-1">
               <Button
-                variant="outline"
                 size="icon-sm"
+                variant="outline"
                 className="hidden lg:flex"
                 disabled={!meta.previous}
                 onClick={() => onPageChange(1)}
@@ -82,8 +82,8 @@ export function Pagination({
                 <ChevronsLeftIcon />
               </Button>
               <Button
-                variant="outline"
                 size="icon-sm"
+                variant="outline"
                 disabled={!meta.previous}
                 onClick={() => meta.previous && onPageChange(meta.previous)}
               >
@@ -91,8 +91,8 @@ export function Pagination({
                 <ChevronLeftIcon />
               </Button>
               <Button
-                variant="outline"
                 size="icon-sm"
+                variant="outline"
                 disabled={!meta.next}
                 onClick={() => meta.next && onPageChange(meta.next)}
               >
@@ -100,9 +100,9 @@ export function Pagination({
                 <ChevronRightIcon />
               </Button>
               <Button
-                variant="outline"
                 size="icon-sm"
                 className="hidden lg:flex"
+                variant="outline"
                 disabled={!meta.next}
                 onClick={() => onPageChange(meta.pages)}
               >

@@ -169,7 +169,7 @@ module Spree
     self.whitelisted_ransackable_associations = %w[option_values product tax_category prices default_price]
     self.whitelisted_ransackable_attributes = %w[weight depth width height sku discontinue_on is_master cost_price cost_currency track_inventory
                                                  deleted_at]
-    self.whitelisted_ransackable_scopes = %i(product_name_or_sku_cont search_by_product_name_or_sku)
+    self.whitelisted_ransackable_scopes = %i(product_name_or_sku_cont search_by_product_name_or_sku search)
 
     def self.product_name_or_sku_cont(query)
       sanitized_query = ActiveRecord::Base.sanitize_sql_like(query.to_s.downcase.strip)

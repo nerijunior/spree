@@ -2,9 +2,9 @@ import { format, parseISO } from 'date-fns'
 import { CalendarIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 
 interface DatePickerProps {
   value?: string | null
@@ -19,7 +19,7 @@ function DatePicker({
   value,
   onChange,
   placeholder = 'Pick a date',
-  className,
+  className: _,
   disabled = false,
   includeTime = false,
 }: DatePickerProps) {
@@ -66,10 +66,6 @@ function DatePicker({
           type="button"
           variant="outline"
           data-empty={!isValidDate}
-          className={cn(
-            'w-full justify-start text-left font-normal data-[empty=true]:text-gray-500',
-            className,
-          )}
         >
           <CalendarIcon className="size-4 shrink-0 text-gray-400" />
           <span className="flex-1 truncate">
@@ -98,11 +94,10 @@ function DatePicker({
         />
         {includeTime && (
           <div className="border-t border-gray-200 px-3 py-2">
-            <input
+            <Input
               type="time"
               value={timeValue}
               onChange={handleTimeChange}
-              className="block w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
             />
           </div>
         )}

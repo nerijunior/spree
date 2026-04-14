@@ -178,7 +178,7 @@ function ProductForm({ product }: { product: Product }) {
         <div className="ml-auto flex items-center gap-2">
           <Button
             type="button"
-            variant="outline"
+            variant="destructive"
             size="sm"
             onClick={handleDelete}
             disabled={deleteProduct.isPending}
@@ -188,6 +188,7 @@ function ProductForm({ product }: { product: Product }) {
           </Button>
           <Button
             type="submit"
+           
             size="sm"
             disabled={updateProduct.isPending || !form.formState.isDirty}
           >

@@ -72,7 +72,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-2 text-sm font-normal">
+        <Button size="sm" variant="outline" className="h-8 gap-2 text-sm font-normal">
           <CalendarIcon className="size-3.5" />
           {activePresetLabel}
           <ChevronDownIcon className="size-3.5 text-muted-foreground" />
@@ -119,7 +119,6 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={() => setSelecting('presets')}
                 >
@@ -127,6 +126,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
                 </Button>
                 <Button
                   size="sm"
+                 
                   disabled={!customRange?.from || !customRange?.to}
                   onClick={handleCustomApply}
                 >

@@ -1,4 +1,4 @@
-import type { Order } from '@spree/admin-sdk'
+import type { Order, Variant } from '@spree/admin-sdk'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { AddressBlock } from '@/components/address-block'
@@ -22,6 +22,7 @@ import {
 import { type FormEvent, useState } from 'react'
 import { useConfirm } from '@/components/confirm-dialog'
 import { adminClient } from '@/client'
+import { formatRelativeTime } from '@/lib/formatters'
 import { Badge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -41,6 +42,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -107,16 +116,6 @@ function formatDate(iso: string | null) {
   })
 }
 
-function timeAgo(iso: string | null) {
-  if (!iso) return ''
-  const diff = Date.now() - new Date(iso).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
 
 // ---------------------------------------------------------------------------
 // Page
@@ -182,14 +181,14 @@ function OrderHeader({ order }: { order: Order }) {
 
       {order.completed_at && (
         <span className="text-sm text-muted-foreground">
-          Completed {timeAgo(order.completed_at)}
+          Completed {order.completed_at ? formatRelativeTime(order.completed_at) : ''}
         </span>
       )}
 
       <div className="ml-auto">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon-sm">
+            <Button size="icon-sm" variant="outline">
               <EllipsisVerticalIcon className="size-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -244,6 +243,18 @@ function AddLineItemDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
+  const [search, setSearch] = useState('')
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null)
+  const [quantity, setQuantity] = useState(1)
+
+  const { data: variantsData } = useQuery({
+    queryKey: ['variants', 'search', search],
+    queryFn: () => adminClient.variants.list({ search, limit: 10 }),
+    enabled: search.length >= 3,
+    staleTime: 30_000,
+  })
+
+  const variants = variantsData?.data ?? []
 
   const mutation = useOrderMutation(orderId, (params: { variant_id: string; quantity: number }) =>
     adminClient.orders.lineItems.create(orderId, params),
@@ -251,44 +262,114 @@ function AddLineItemDialog({
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const fd = new FormData(e.currentTarget)
+    if (!selectedVariant) return
     mutation.mutate(
-      { variant_id: fd.get('variant_id') as string, quantity: Number(fd.get('quantity')) || 1 },
-      { onSuccess: () => onOpenChange(false) },
+      { variant_id: selectedVariant.id, quantity },
+      {
+        onSuccess: () => {
+          onOpenChange(false)
+          setSelectedVariant(null)
+          setSearch('')
+          setQuantity(1)
+        },
+      },
     )
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Line Item</DialogTitle>
-          <DialogDescription>Add a product variant to this order.</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <DialogBody>
+    <Sheet open={open} onOpenChange={(o) => onOpenChange(o as boolean)}>
+      <SheetContent side="right">
+        <SheetHeader>
+          <SheetTitle>Add Line Item</SheetTitle>
+          <SheetDescription>Search for a product variant to add to this order.</SheetDescription>
+        </SheetHeader>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-4">
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="variant_id">Variant ID</FieldLabel>
-                <Input id="variant_id" name="variant_id" placeholder="variant_xxx" required />
+                <FieldLabel>Search variant</FieldLabel>
+                <Input
+                  placeholder="Type product name or SKU (min 3 chars)..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value)
+                    setSelectedVariant(null)
+                  }}
+                  autoFocus
+                />
+                {search.length >= 3 && variants.length > 0 && !selectedVariant && (
+                  <div className="mt-1 rounded-lg border border-gray-200 bg-white shadow-xs max-h-[280px] overflow-y-auto">
+                    {variants.map((v) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedVariant(v)
+                          setSearch('')
+                        }}
+                        className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors border-b last:border-0"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">{v.product_name ?? v.sku}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {v.options_text && <span>{v.options_text} · </span>}
+                            SKU: {v.sku || '—'}
+                          </div>
+                        </div>
+                        <div className="text-sm font-medium whitespace-nowrap">
+                          {v.display_price ?? ''}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {search.length >= 3 && variants.length === 0 && !selectedVariant && (
+                  <p className="mt-1 text-xs text-muted-foreground">No variants found</p>
+                )}
               </Field>
+
+              {selectedVariant && (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 flex items-center justify-between">
+                  <div>
+                    <div className="font-medium text-sm">{selectedVariant.product_name ?? selectedVariant.sku}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {selectedVariant.options_text && <span>{selectedVariant.options_text} · </span>}
+                      SKU: {selectedVariant.sku || '—'} · {selectedVariant.display_price ?? ''}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVariant(null)}
+                    className="p-1 rounded hover:bg-blue-100 text-blue-600"
+                  >
+                    <XCircleIcon className="size-4" />
+                  </button>
+                </div>
+              )}
+
               <Field>
                 <FieldLabel htmlFor="quantity">Quantity</FieldLabel>
-                <Input id="quantity" name="quantity" type="number" min={1} defaultValue={1} />
+                <Input
+                  id="quantity"
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value) || 1)}
+                />
               </Field>
             </FieldGroup>
-          </DialogBody>
-          <DialogFooter>
+          </div>
+          <SheetFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending}>
+            <Button type="submit" disabled={!selectedVariant || mutation.isPending}>
               {mutation.isPending ? 'Adding…' : 'Add Item'}
             </Button>
-          </DialogFooter>
+          </SheetFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -374,10 +455,10 @@ function LineItemsCard({ order }: { order: Order }) {
           <CardTitle>
             <ShoppingCartIcon className="size-4" />
             Line Items
+            {items.length > 0 && <Badge>{items.length}</Badge>}
           </CardTitle>
           <CardAction className="flex items-center gap-2">
-            {items.length > 0 && <Badge variant="info">{items.length}</Badge>}
-            <Button size="sm" variant="secondary" onClick={() => setAddOpen(true)}>
+            <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
               <PlusIcon data-icon="inline-start" />
               Add Item
             </Button>
@@ -576,10 +657,10 @@ function ShipmentsCard({ order }: { order: Order }) {
         <CardHeader>
           <CardTitle>
             <TruckIcon className="size-4" />
-            Shipments
+            Fulfillments
+            <Badge>{fulfillments.length}</Badge>
           </CardTitle>
           <CardAction className="flex items-center gap-2">
-            <Badge variant="info">{fulfillments.length}</Badge>
             {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
           </CardAction>
         </CardHeader>
@@ -672,7 +753,7 @@ function ShipmentsCard({ order }: { order: Order }) {
 
               {fulfillment.fulfilled_at && (
                 <span className="text-xs text-muted-foreground">
-                  Shipped {timeAgo(fulfillment.fulfilled_at)}
+                  Shipped {fulfillment.fulfilled_at ? formatRelativeTime(fulfillment.fulfilled_at) : ''}
                 </span>
               )}
             </div>
@@ -718,9 +799,9 @@ function PaymentsCard({ order }: { order: Order }) {
         <CardTitle>
           <CreditCardIcon className="size-4" />
           Payments
+          <Badge>{payments.length}</Badge>
         </CardTitle>
         <CardAction className="flex items-center gap-2">
-          <Badge variant="info">{payments.length}</Badge>
           {order.payment_status && <StatusBadge status={order.payment_status} />}
         </CardAction>
       </CardHeader>
@@ -889,8 +970,8 @@ function AdjustmentsCard({ order }: { order: Order }) {
             Adjustments
           </CardTitle>
           <CardAction className="flex items-center gap-2">
-            {adjustments.length > 0 && <Badge variant="info">{adjustments.length}</Badge>}
-            <Button size="sm" variant="secondary" onClick={() => setAddOpen(true)}>
+            {adjustments.length > 0 && <Badge>{adjustments.length}</Badge>}
+            <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
               <PlusIcon data-icon="inline-start" />
               Add
             </Button>

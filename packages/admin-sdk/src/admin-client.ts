@@ -69,7 +69,7 @@ export interface MeResponse {
   };
   permissions: PermissionRule[];
 }
-import type { Store, Product, Order, Media, Category, TaxCategory, Country } from './types';
+import type { Store, Product, Order, Media, Category, TaxCategory, Country, Variant } from './types';
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
@@ -252,6 +252,24 @@ export class AdminClient {
       this.request<PaginatedResponse<Category>>('GET', '/categories', {
         ...options,
         params: params ? transformListParams(params) : undefined,
+      }),
+  };
+
+  // ============================================
+  // Variants (top-level, for search/autocomplete)
+  // ============================================
+
+  readonly variants = {
+    list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Variant>> =>
+      this.request<PaginatedResponse<Variant>>('GET', '/variants', {
+        ...options,
+        params: params ? transformListParams(params) : undefined,
+      }),
+
+    get: (id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Variant> =>
+      this.request<Variant>('GET', `/variants/${id}`, {
+        ...options,
+        params: getParams(params),
       }),
   };
 
