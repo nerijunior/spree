@@ -14,15 +14,15 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
       classNames={{
-        months: 'flex flex-col sm:flex-row gap-2',
+        months: 'flex flex-col sm:flex-row gap-2 relative',
         month: 'flex flex-col gap-4',
         month_caption: 'flex justify-center pt-1 relative items-center w-full',
         caption_label: 'text-sm font-medium',
-        nav: 'flex items-center gap-1',
+        nav: 'absolute top-1 inset-x-0 flex items-center justify-between px-1 z-10',
         button_previous:
-          'absolute left-2 top-2 inline-flex size-7 items-center justify-center rounded-md border border-gray-200 bg-transparent p-0 text-gray-600 opacity-50 hover:opacity-100 transition-opacity',
+          'inline-flex size-7 items-center justify-center rounded-md border border-gray-200 bg-transparent p-0 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950',
         button_next:
-          'absolute right-2 top-2 inline-flex size-7 items-center justify-center rounded-md border border-gray-200 bg-transparent p-0 text-gray-600 opacity-50 hover:opacity-100 transition-opacity',
+          'inline-flex size-7 items-center justify-center rounded-md border border-gray-200 bg-transparent p-0 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950',
         month_grid: 'w-full border-collapse',
         weekdays: 'flex',
         weekday: 'text-muted-foreground rounded-md w-8 font-normal text-xs',

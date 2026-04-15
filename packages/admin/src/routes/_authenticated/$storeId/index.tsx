@@ -52,7 +52,7 @@ function DashboardPage() {
     to: new Date(),
   })
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['dashboard', 'analytics', dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: () =>
       adminClient.dashboard.analytics({
@@ -60,6 +60,7 @@ function DashboardPage() {
         date_to: dateRange.to.toISOString(),
       }),
     staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
   })
 
   if (!data) {
