@@ -90,6 +90,7 @@ function TooltipContent({
         side={side}
         sideOffset={sideOffset}
         align={align}
+        className="z-50"
       >
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"

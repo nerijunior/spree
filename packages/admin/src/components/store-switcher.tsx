@@ -1,36 +1,42 @@
-import { ChevronsUpDownIcon, ExternalLinkIcon, PaletteIcon, StoreIcon } from 'lucide-react'
+import { ChevronsUpDownIcon, ExternalLinkIcon } from 'lucide-react'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useStore } from '@/providers/store-provider'
 
 export function StoreSwitcher() {
   const { isMobile, state } = useSidebar()
   const isCollapsed = state === 'collapsed'
 
+  const { store, isLoading } = useStore()
+
+  if (isLoading) return <Skeleton className="h-header-height w-full rounded-xl" />
+
+  const storeInitials = store?.name.split(' ').map(name => name[0]).join('')
+
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem className="h-header-height flex items-center">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="flex w-full items-center">
             <button
               type="button"
-              className={
-                'flex w-full items-center rounded-xl outline-hidden transition-colors duration-100 hover:bg-gray-200/50 data-[state=open]:bg-gray-200/50 ' +
-                (isCollapsed ? 'size-10 justify-center p-0' : 'h-[58px] gap-2 p-1')
-              }
+              className="rounded-xl outline-hidden transition-colors duration-100 hover:bg-gray-200/50 data-[state=open]:bg-gray-200/50 gap-2 p-1.5"
             >
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-white">
-                <StoreIcon className="size-4" />
-              </div>
+              <Avatar>
+                {store?.logo_url && <AvatarImage src={store.logo_url} />}
+                <AvatarFallback>{storeInitials}</AvatarFallback>
+              </Avatar>
               {!isCollapsed && (
                 <>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium text-zinc-950">Spree Store</span>
+                    <span className="truncate font-medium text-zinc-950">{store?.name}</span>
                   </div>
                   <ChevronsUpDownIcon className="ml-auto size-4 text-gray-400" />
                 </>
@@ -46,11 +52,6 @@ export function StoreSwitcher() {
             <DropdownMenuItem>
               <ExternalLinkIcon className="size-4" />
               View Store
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <PaletteIcon className="size-4" />
-              Edit Theme
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

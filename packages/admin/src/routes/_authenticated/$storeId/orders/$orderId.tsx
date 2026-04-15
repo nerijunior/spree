@@ -968,9 +968,9 @@ function AdjustmentsCard({ order }: { order: Order }) {
           <CardTitle>
             <SlidersHorizontalIcon className="size-4" />
             Adjustments
+            {adjustments.length > 0 && <Badge>{adjustments.length}</Badge>}
           </CardTitle>
           <CardAction className="flex items-center gap-2">
-            {adjustments.length > 0 && <Badge>{adjustments.length}</Badge>}
             <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
               <PlusIcon data-icon="inline-start" />
               Add

@@ -163,7 +163,7 @@ export function NavMain({
       </SidebarGroup>
 
       {bottomItems && bottomItems.length > 0 && (
-        <SidebarGroup className="mt-auto">
+        <SidebarGroup className="mt-auto mb-2">
           <SidebarMenu>
             {bottomItems.map((item) => {
               const isActive =
