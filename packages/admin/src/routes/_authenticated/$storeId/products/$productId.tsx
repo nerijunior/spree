@@ -6,10 +6,10 @@ type Variant = BaseVariant & {
   weight_unit?: string | null
   dimensions_unit?: string | null
 }
-type Product = Omit<BaseProduct, 'master_variant' | 'variants'> & {
+type Product = Omit<BaseProduct, 'default_variant' | 'variants'> & {
   tax_category_id?: string | null
   meta_title?: string | null
-  master_variant?: Variant
+  default_variant?: Variant
   variants?: Variant[]
 }
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -55,6 +55,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { useStore } from '@/providers/store-provider'
 import { useDirectUpload } from '@/hooks/use-direct-upload'
 import { useProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-product'
 import {
@@ -74,8 +75,19 @@ export const Route = createFileRoute('/_authenticated/$storeId/products/$product
 // Helpers
 // ---------------------------------------------------------------------------
 
-function productToFormValues(product: Product): ProductFormValues {
-  const master = product.master_variant
+function productToFormValues(product: Product, currencies: string[]): ProductFormValues {
+  const master = product.default_variant
+  const basePrices = master?.prices?.filter((p) => !p.price_list_id) ?? []
+
+  // Build prices array for all store currencies, filling in existing values
+  const prices = currencies.map((currency) => {
+    const existing = basePrices.find((p) => p.currency === currency)
+    return {
+      currency,
+      amount: existing?.amount ? Number(existing.amount) : null,
+      compare_at_amount: existing?.compare_at_amount ? Number(existing.compare_at_amount) : null,
+    }
+  })
 
   return {
     name: product.name,
@@ -86,10 +98,7 @@ function productToFormValues(product: Product): ProductFormValues {
     discontinue_on: product.discontinue_on ?? null,
     category_ids: product.categories?.map((t) => t.id) ?? [],
     tags: product.tags?.map((t: any) => t.name ?? t) ?? [],
-    price: master?.price?.amount ? Number(master.price.amount) : undefined,
-    compare_at_price: master?.original_price?.amount
-      ? Number(master.original_price.amount)
-      : null,
+    prices,
     cost_price: product.cost_price ? Number(product.cost_price) : null,
     sku: master?.sku ?? '',
     barcode: master?.barcode ?? '',
@@ -131,6 +140,7 @@ function ProductForm({ product }: { product: Product }) {
   const confirm = useConfirm()
   const { productId, storeId } = Route.useParams()
   const router = useRouter()
+  const { currencies } = useStore()
   const updateProduct = useUpdateProduct()
   const deleteProduct = useDeleteProduct()
   const hasVariants = (product.variant_count ?? 0) > 0
@@ -138,12 +148,12 @@ function ProductForm({ product }: { product: Product }) {
   const form = useForm<ProductFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(productFormSchema) as any,
-    defaultValues: productToFormValues(product),
+    defaultValues: productToFormValues(product, currencies),
   })
 
   useEffect(() => {
-    form.reset(productToFormValues(product))
-  }, [product, form])
+    form.reset(productToFormValues(product, currencies))
+  }, [product, form, currencies])
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
@@ -455,51 +465,66 @@ function MediaThumbnail({
 // ---------------------------------------------------------------------------
 
 function PricingCard({ form }: FormCardProps) {
+  const prices = form.watch('prices') ?? []
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Pricing</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel htmlFor="price">Price</FieldLabel>
+      <CardContent className="p-0">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b text-left text-muted-foreground">
+              <th className="px-4 py-2 font-medium">Currency</th>
+              <th className="px-4 py-2 font-medium">Amount</th>
+              <th className="px-4 py-2 font-medium">
+                Compare at amount
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {prices.map((_, index) => (
+              <tr key={form.getValues(`prices.${index}.currency`)} className="border-b last:border-0">
+                <td className="px-4 py-2 font-medium">
+                  {form.getValues(`prices.${index}.currency`)}
+                </td>
+                <td className="px-4 py-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...form.register(`prices.${index}.amount`)}
+                  />
+                </td>
+                <td className="px-4 py-2">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...form.register(`prices.${index}.compare_at_amount`)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="p-4 border-t">
+          <Field className="max-w-[50%]">
+            <FieldLabel htmlFor="cost_price">Cost price</FieldLabel>
             <Input
-              id="price"
+              id="cost_price"
               type="number"
               step="0.01"
               min="0"
               placeholder="0.00"
-              {...form.register('price')}
+              {...form.register('cost_price')}
             />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="compare_at_price">Compare at price</FieldLabel>
-            <Input
-              id="compare_at_price"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              {...form.register('compare_at_price')}
-            />
-            <p className="text-xs text-muted-foreground">
-              Original price shown as strikethrough
-            </p>
+            <p className="text-xs text-muted-foreground">Not visible to customers</p>
           </Field>
         </div>
-        <Field className="max-w-[50%]">
-          <FieldLabel htmlFor="cost_price">Cost price</FieldLabel>
-          <Input
-            id="cost_price"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            {...form.register('cost_price')}
-          />
-          <p className="text-xs text-muted-foreground">Not visible to customers</p>
-        </Field>
       </CardContent>
     </Card>
   )

@@ -234,7 +234,7 @@ module Spree
         #
         # Override in subclass for custom parameter handling
         def permitted_params
-          params.permit(permitted_attributes)
+          normalize_params(params.permit(permitted_attributes))
         end
 
         # Returns the permitted attributes list for the model

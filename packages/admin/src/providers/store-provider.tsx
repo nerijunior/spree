@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { Store } from '@spree/admin-sdk'
 import { adminClient } from '@/client'
 
@@ -6,6 +6,10 @@ interface StoreContextValue {
   store: Store | null
   storeId: string
   isLoading: boolean
+  currencies: string[]
+  locales: string[]
+  defaultCurrency: string
+  defaultLocale: string
   refetch: () => Promise<void>
 }
 
@@ -31,8 +35,13 @@ export function StoreProvider({ storeId, children }: { storeId: string; children
     fetchStore()
   }, [storeId, fetchStore])
 
+  const currencies = store?.supported_currencies ?? []
+  const locales = store?.supported_locales ?? []
+  const defaultCurrency = store?.default_currency ?? 'USD'
+  const defaultLocale = store?.default_locale ?? 'en'
+
   return (
-    <StoreContext.Provider value={{ store, storeId, isLoading, refetch: fetchStore }}>
+    <StoreContext.Provider value={{ store, storeId, isLoading, currencies, locales, defaultCurrency, defaultLocale, refetch: fetchStore }}>
       {children}
     </StoreContext.Provider>
   )

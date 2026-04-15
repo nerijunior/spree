@@ -144,7 +144,6 @@ export interface MediaUpdateParams {
 
 export interface ProductCreateParams {
   name: string;
-  price: number;
   description?: string;
   slug?: string;
   status?: 'draft' | 'active' | 'archived';
@@ -168,7 +167,6 @@ export interface ProductCreateParams {
 
 export interface ProductUpdateParams {
   name?: string;
-  price?: number;
   description?: string;
   slug?: string;
   status?: 'draft' | 'active' | 'archived';

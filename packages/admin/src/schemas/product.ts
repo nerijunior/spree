@@ -1,5 +1,11 @@
 import { z } from 'zod/v4'
 
+export const priceSchema = z.object({
+  currency: z.string(),
+  amount: z.coerce.number().nullable().optional(),
+  compare_at_amount: z.coerce.number().nullable().optional(),
+})
+
 export const productFormSchema = z.object({
   // General
   name: z.string().min(1, 'Name is required'),
@@ -16,8 +22,7 @@ export const productFormSchema = z.object({
   tags: z.array(z.string()).optional(),
 
   // Pricing (master variant)
-  price: z.coerce.number().optional(),
-  compare_at_price: z.coerce.number().nullable().optional(),
+  prices: z.array(priceSchema).optional(),
   cost_price: z.coerce.number().nullable().optional(),
 
   // Inventory (master variant)

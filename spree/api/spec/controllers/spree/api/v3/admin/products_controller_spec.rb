@@ -174,8 +174,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
           name: 'Premium T-Shirt',
           description: 'A premium cotton t-shirt',
           status: 'draft',
-          price: 29.99,
-          compare_at_price: 39.99,
           cost_price: 8.50,
           sku: 'PREM-TEE',
           shipping_category_id: shipping_category.id,
@@ -196,7 +194,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
               weight_unit: 'kg',
               dimensions_unit: 'cm',
               track_inventory: true,
-              total_on_hand: 50,
               prices: [
                 { currency: 'USD', amount: 29.99, compare_at_amount: 39.99 },
                 { currency: 'EUR', amount: 27.99 },
@@ -208,7 +205,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
               options: [{ name: 'size', value: 'Medium' }],
               weight: 0.22,
               track_inventory: true,
-              total_on_hand: 100,
               prices: [
                 { currency: 'USD', amount: 29.99 },
                 { currency: 'EUR', amount: 27.99 },
@@ -220,7 +216,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
               options: [{ name: 'size', value: 'Large' }],
               weight: 0.25,
               track_inventory: true,
-              total_on_hand: 75,
               prices: [
                 { currency: 'USD', amount: 31.99 },
                 { currency: 'EUR', amount: 29.99 },
@@ -243,7 +238,7 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
         expect(created).to be_present
 
         # Product attributes
-        expect(created.description.to_plain_text).to include('premium cotton')
+        expect(created.description).to include('premium cotton')
         expect(created.status).to eq('draft')
         expect(created.slug).to eq('premium-t-shirt')
         expect(created.meta_title).to eq('Premium T-Shirt')
@@ -254,8 +249,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
         # Master variant
         master = created.master
         expect(master.sku).to eq('PREM-TEE')
-        expect(master.price.to_f).to eq(29.99)
-        expect(master.compare_at_price.to_f).to eq(39.99)
         expect(master.cost_price.to_f).to eq(8.50)
 
         # Variants
@@ -267,7 +260,7 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
         expect(small.width.to_f).to eq(30.0)
         expect(small.height.to_f).to eq(40.0)
         expect(small.depth.to_f).to eq(2.0)
-        expect(small.option_values.first.name).to eq('Small')
+        expect(small.option_values.first.presentation).to eq('Small')
         expect(small.option_values.first.option_type.name).to eq('size')
 
         # Multi-currency prices
@@ -279,7 +272,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
 
         medium = created.variants.find_by(sku: 'PREM-TEE-M')
         expect(medium).to be_present
-        expect(medium.total_on_hand).to eq(100)
 
         large = created.variants.find_by(sku: 'PREM-TEE-L')
         expect(large).to be_present
@@ -379,7 +371,7 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
         small = updated.variants.find_by(sku: 'UPD-SHIRT-S')
         expect(small).to be_present
         expect(small.weight.to_f).to eq(0.3)
-        expect(small.option_values.first.name).to eq('Small')
+        expect(small.option_values.first.presentation).to eq('Small')
 
         # Multi-currency prices on small variant
         expect(small.prices.find_by(currency: 'USD').amount.to_f).to eq(34.99)

@@ -3,15 +3,6 @@ module Spree
     module V3
       module Admin
         class ProductsController < ResourceController
-          # PATCH /api/v3/admin/products/:id
-          def update
-            if @resource.update(update_params)
-              render json: serialize_resource(@resource)
-            else
-              render_validation_error(@resource.errors)
-            end
-          end
-
           # POST /api/v3/admin/products/:id/clone
           def clone
             @resource = find_resource
@@ -69,6 +60,7 @@ module Spree
               *Spree::PermittedAttributes.product_attributes,
               tags: [],
               category_ids: [],
+              prices: [:amount, :compare_at_amount, :currency],
               variants: [
                 :id, :sku, :barcode, :price, :compare_at_price,
                 :cost_price, :cost_currency,
@@ -85,27 +77,6 @@ module Spree
 
           def search_provider
             @search_provider ||= Spree::SearchProvider::Database.new(current_store)
-          end
-
-          def update_params
-            p = permitted_params.to_h.with_indifferent_access
-
-            # Map 6.0 API name (category_ids) to model column (taxon_ids)
-            if p.key?(:category_ids)
-              p[:taxon_ids] = Array(p.delete(:category_ids)).filter_map do |id|
-                id.to_s.include?('_') ? Spree::Taxon.decode_prefixed_id(id) : id
-              end
-            end
-
-            if p.key?(:taxon_ids)
-              other_store_taxon_ids = @resource.taxons
-                                               .joins(:taxonomy)
-                                               .where.not(spree_taxonomies: { store_id: current_store.id })
-                                               .pluck(:id)
-              p[:taxon_ids] = (Array(p[:taxon_ids]) + other_store_taxon_ids).uniq
-            end
-
-            p
           end
         end
       end

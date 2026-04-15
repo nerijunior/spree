@@ -21,7 +21,7 @@ RSpec.describe Spree::Api::V3::Admin::CountriesController, type: :controller do
       subject
       total_countries = Spree::Country.count
       expect(json_response['data'].length).to eq(total_countries)
-      expect(json_response['meta']['total_count']).to eq(total_countries)
+      expect(json_response['meta']['count']).to eq(total_countries)
     end
 
     it 'returns countries ordered by name' do

@@ -70,7 +70,6 @@ RSpec.describe Spree::Api::V3::Admin::Products::VariantsController, type: :contr
           post :create, params: {
             product_id: product.prefixed_id,
             sku: 'MULTI-001',
-            price: 19.99,
             options: [{ name: option_type.name, value: 'New Value' }],
             prices: [
               { currency: 'USD', amount: 19.99, compare_at_amount: 24.99 },

@@ -10,20 +10,13 @@ module Spree
       #    to Rails `_attributes` format (e.g. `taxon_rules_attributes: [...]`) based on
       #    the model's `accepts_nested_attributes_for` declarations.
       #
-      # This runs automatically in the ResourceController's `permitted_params` method,
-      # eliminating boilerplate ID resolution and nested attribute transformation in
-      # individual controllers and services.
+      # Uses `prepend` so it always wraps `permitted_params` regardless of which
+      # controller in the hierarchy defines it — no manual calls needed.
       module ParamsNormalizer
         extend ActiveSupport::Concern
 
-        protected
+        private
 
-        # Override permitted_params to apply normalization after permitting
-        def permitted_params
-          normalize_params(super)
-        end
-
-        # Normalize params: resolve prefixed IDs and convert nested attributes
         def normalize_params(permitted)
           hash = permitted.to_h.with_indifferent_access
           hash = resolve_prefixed_ids(hash)
@@ -31,13 +24,6 @@ module Spree
           ActionController::Parameters.new(hash).permit!
         end
 
-        private
-
-        # Recursively resolve prefixed IDs in params.
-        #
-        # - Params ending in `_id` with string values matching prefix format → decoded to integer
-        # - Params ending in `_ids` with array values → each element decoded
-        # - Nested hashes and arrays of hashes are processed recursively
         def resolve_prefixed_ids(hash)
           hash.each_with_object({}.with_indifferent_access) do |(key, value), result|
             result[key] = case
@@ -55,30 +41,33 @@ module Spree
           end
         end
 
-        # Convert flat nested arrays to Rails _attributes format.
-        #
-        # Uses the model's `nested_attributes_options` to detect which keys
-        # should be renamed. For example, if Spree::Taxon has
-        # `accepts_nested_attributes_for :taxon_rules`, then:
-        #
-        #   { taxon_rules: [{type: "...", value: "..."}] }
-        #
-        # becomes:
-        #
-        #   { taxon_rules_attributes: [{type: "...", value: "..."}] }
-        def normalize_nested_attributes(hash)
-          return hash unless model_class.respond_to?(:nested_attributes_options)
+        def normalize_nested_attributes(hash, klass = model_class)
+          return hash unless klass.respond_to?(:nested_attributes_options)
 
-          nested_keys = model_class.nested_attributes_options.keys.map(&:to_s)
+          nested_keys = klass.nested_attributes_options.keys.map(&:to_s)
           return hash if nested_keys.empty?
 
           hash.each_with_object({}.with_indifferent_access) do |(key, value), result|
             key_str = key.to_s
             if nested_keys.include?(key_str) && !key_str.end_with?('_attributes')
-              result["#{key_str}_attributes"] = value
+              child_class = klass.reflect_on_association(key_str)&.klass
+              result["#{key_str}_attributes"] = normalize_nested_values(value, child_class)
             else
               result[key] = value
             end
+          end
+        end
+
+        def normalize_nested_values(value, child_class)
+          return value unless child_class
+
+          case value
+          when Array
+            value.map { |v| v.is_a?(Hash) ? normalize_nested_attributes(v.with_indifferent_access, child_class) : v }
+          when Hash
+            normalize_nested_attributes(value.with_indifferent_access, child_class)
+          else
+            value
           end
         end
 

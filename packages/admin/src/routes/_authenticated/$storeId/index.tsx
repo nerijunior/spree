@@ -62,7 +62,7 @@ function DashboardPage() {
     staleTime: 5 * 60 * 1000,
   })
 
-  if (isLoading || !data) {
+  if (!data) {
     return <DashboardSkeleton />
   }
 

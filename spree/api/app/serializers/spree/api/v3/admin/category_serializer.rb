@@ -5,12 +5,10 @@ module Spree
         # Admin API Category Serializer
         # Full category data including admin-only fields
         class CategorySerializer < V3::CategorySerializer
-          typelize pretty_name: :string, lft: :number, rgt: :number,
-                   hide_from_nav: :boolean, sort_order: :string, rules_match_policy: :string,
-                   automatic: :boolean
+          typelize pretty_name: :string, lft: :number, rgt: :number, sort_order: :string
 
           # Admin-only attributes
-          attributes :pretty_name, :lft, :rgt, :hide_from_nav, :sort_order, :rules_match_policy, :automatic
+          attributes :pretty_name, :lft, :rgt, created_at: :iso8601, updated_at: :iso8601
 
           # Override inherited associations to use admin serializers
           one :parent,

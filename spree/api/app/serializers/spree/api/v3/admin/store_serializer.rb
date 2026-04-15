@@ -21,14 +21,28 @@ module Spree
                    mailer_logo_url: [:string, nullable: true]
 
           attributes :id, :name, :url, :code,
-                     :default_currency, :default_locale,
-                     :supported_currencies, :supported_locales,
                      :mail_from_address, :customer_support_email,
                      :new_order_notifications_email,
                      :description, :address, :contact_phone,
                      :seo_title, :meta_keywords, :meta_description,
                      :default,
                      created_at: :iso8601, updated_at: :iso8601
+
+          attribute :default_currency do |store|
+            store.default_market&.currency
+          end
+
+          attribute :default_locale do |store|
+            store.default_market&.default_locale
+          end
+
+          attribute :supported_currencies do |store|
+            store.supported_currencies_list.map(&:iso_code)
+          end
+
+          attribute :supported_locales do |store|
+            store.supported_locales_list
+          end
 
           attribute :logo_url do |store|
             store.logo.attached? ? Rails.application.routes.url_helpers.url_for(store.logo) : nil

@@ -20,7 +20,8 @@ module Spree
           attributes :last_ip_address, :considered_risky,
                      :confirmation_delivered, :store_owner_notification_delivered,
                      :payment_total, :display_payment_total,
-                     canceled_at: :iso8601, approved_at: :iso8601
+                     canceled_at: :iso8601, approved_at: :iso8601,
+                     created_at: :iso8601, updated_at: :iso8601
 
           attribute :internal_note do |order|
             order.internal_note&.to_plain_text.presence

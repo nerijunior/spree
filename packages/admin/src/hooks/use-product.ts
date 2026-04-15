@@ -7,7 +7,10 @@ export function useProduct(id: string) {
     queryFn: () =>
       adminClient.products.get(id, {
         expand: [
+          'default_variant',
+          'default_variant.prices',
           'variants',
+          'variants.prices',
           'images',
           'option_types',
           'categories',

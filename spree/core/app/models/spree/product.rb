@@ -204,6 +204,20 @@ module Spree
       self.tag_list = tags
     end
 
+    # Sets prices on the master variant.
+    # Accepts array of { currency:, amount:, compare_at_amount: } hashes.
+    def prices=(prices_params)
+      find_or_build_master.prices = prices_params
+    end
+
+    # Maps 6.0 API name (category_ids) to model column (taxon_ids).
+    # Accepts both prefixed IDs and raw integer IDs.
+    def category_ids=(ids)
+      self.taxon_ids = Array(ids).filter_map do |id|
+        id.to_s.include?('_') ? Spree::Taxon.decode_prefixed_id(id) : id
+      end
+    end
+
     # Syncs variants from an array of hashes.
     # Creates new variants, updates existing ones (matched by :id), and removes unlisted ones.
     # Must be called on a persisted product (use after_save or call explicitly after create).
