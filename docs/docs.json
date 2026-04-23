@@ -612,6 +612,7 @@
             "group": "How-to Guides",
             "pages": [
               "user/how-to/multi-currency-pricing",
+              "user/how-to/multiple-languages",
               "user/how-to/multi-region-pricing",
               "user/how-to/wholesale-pricing",
               "user/how-to/volume-pricing",
@@ -747,14 +748,6 @@
               "use-case/digital-products/model",
               "use-case/digital-products/capabilities",
               "use-case/digital-products/admin-capabilities"
-            ]
-          },
-          {
-            "group": "ChatGPT Integration",
-            "pages": [
-              "use-case/chatgpt-integration/chatgpt-shopping",
-              "use-case/chatgpt-integration/chatgpt-instant-checkout",
-              "use-case/chatgpt-integration/chatgpt-buyer-experience"
             ]
           },
           {
