@@ -28,6 +28,7 @@ module Spree
     # Callbacks
     #
     before_save :ensure_single_default
+    before_destroy :ensure_can_be_deleted
 
     #
     # Scopes
@@ -80,12 +81,36 @@ module Spree
       @supported_locales_list ||= (supported_locales.to_s.split(',').map(&:strip) << default_locale).compact.uniq.sort
     end
 
+    # Returns true when the market is safe to delete. A market cannot be deleted
+    # if it is the default market or the only market in the store, since
+    # Spree::Current.currency would have no fallback.
+    #
+    # @return [Boolean]
+    def can_be_deleted?
+      !default? && !last_in_store?
+    end
+
     private
+
+    def last_in_store?
+      !self.class.where(store_id: store_id).where.not(id: id).exists?
+    end
 
     def ensure_single_default
       return unless default? && default_changed?
 
       self.class.where(store_id: store_id, default: true).where.not(id: id).update_all(default: false)
+    end
+
+    def ensure_can_be_deleted
+      return if can_be_deleted?
+
+      if default?
+        errors.add(:base, :cannot_destroy_default_market)
+      else
+        errors.add(:base, :cannot_destroy_last_market)
+      end
+      throw(:abort)
     end
   end
 end

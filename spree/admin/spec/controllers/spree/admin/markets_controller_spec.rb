@@ -129,6 +129,7 @@ RSpec.describe Spree::Admin::MarketsController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
+    let!(:default_market) { create(:market, :default, store: store) }
     let!(:market) { create(:market, store: store, countries: [country]) }
 
     it 'soft deletes the market' do
