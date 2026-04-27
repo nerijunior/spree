@@ -51,7 +51,7 @@ To generate a Webhook ID:
 2. Scroll down to the **Webhooks** section (Live or Sandbox depending on the environment).
 3. Click **Add Webhook**.
 4. Enter your Spree webhook URL: `https://your-store-url.com/api/v3/webhooks/payments/[payment_method_id]`
-   - The `payment_method_id` is the numeric ID visible in the URL when editing your PayPal payment method in Spree (e.g. `/payment_methods/3/edit`).
+   - The `payment_method_id` is the prefixed ID visible in the URL when editing your PayPal payment method in Spree (e.g. `/payment_methods/pm_1example23/edit`).
 5. Select the event types to subscribe to. At minimum:
    - Checkout order approved
    - Checkout order completed
