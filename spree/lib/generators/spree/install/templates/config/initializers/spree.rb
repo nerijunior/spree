@@ -110,6 +110,26 @@ Rails.application.config.after_initialize do
   # - Spree::PermissionSets::RoleManagement
 end
 
+# Background job queue configuration
+# Spree.queues.default = :default
+# Spree.queues.events = :default
+# Spree.queues.exports = :default
+# Spree.queues.images = :default
+# Spree.queues.imports = :default
+# Spree.queues.products = :default
+# Spree.queues.reports = :default
+# Spree.queues.variants = :default
+# Spree.queues.taxons = :default
+# Spree.queues.stock_location_stock_items = :default
+# Spree.queues.coupon_codes = :default
+# Spree.queues.themes = :default
+# Spree.queues.addresses = :default
+# Spree.queues.gift_cards = :default
+# Spree.queues.webhooks = :default
+# Spree.queues.payment_webhooks = :default
+# Spree.queues.api_keys = :default
+# Spree.queues.search = :default
+
 # Search provider
 # Spree.search_provider = 'Spree::SearchProvider::Meilisearch'
 
