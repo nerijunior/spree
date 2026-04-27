@@ -1,5 +1,5 @@
 module Spree
-  VERSION = '5.4.1'.freeze
+  VERSION = '5.4.2'.freeze
 
   def self.version
     VERSION
