@@ -138,8 +138,6 @@ Spree::Core::Engine.add_routes do
         # Orders
         resources :orders do
           member do
-            patch :next
-            patch :advance
             patch :complete
             patch :cancel
             patch :approve
@@ -163,7 +161,7 @@ Spree::Core::Engine.add_routes do
             end
           end
           resources :refunds, controller: 'orders/refunds', only: [:index, :create]
-          resources :adjustments, controller: 'orders/adjustments', only: [:index, :show, :create, :update, :destroy]
+          resources :adjustments, controller: 'orders/adjustments', only: [:index, :show]
         end
       end
 

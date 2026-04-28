@@ -78,7 +78,6 @@ import type {
   MediaUpdateParams,
   LineItemCreateParams,
   LineItemUpdateParams,
-  AdjustmentCreateParams,
   FulfillmentUpdateParams,
   DirectUploadCreateParams,
 } from './params';
@@ -232,14 +231,6 @@ export class AdminClient {
 
       void: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
         this.request('PATCH', `/orders/${orderId}/payments/${id}/void`, options),
-    },
-
-    adjustments: {
-      create: (orderId: string, params: AdjustmentCreateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('POST', `/orders/${orderId}/adjustments`, { ...options, body: params }),
-
-      delete: (orderId: string, id: string, options?: RequestOptions): Promise<void> =>
-        this.request<void>('DELETE', `/orders/${orderId}/adjustments/${id}`, options),
     },
   };
 

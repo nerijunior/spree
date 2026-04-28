@@ -14,7 +14,6 @@ import {
   PencilIcon,
   PlusIcon,
   ShoppingCartIcon,
-  SlidersHorizontalIcon,
   TrashIcon,
   TruckIcon,
   XCircleIcon,
@@ -82,7 +81,6 @@ function useOrder(orderId: string) {
           'billing_address',
           'shipping_address',
           'customer',
-          'adjustments',
         ],
       }),
     enabled: isAuthenticated,
@@ -138,7 +136,6 @@ function OrderDetailPage() {
           <LineItemsCard order={order} />
           <ShipmentsCard order={order} />
           <PaymentsCard order={order} />
-          <AdjustmentsCard order={order} />
           <OrderSummaryCard order={order} />
         </div>
 
@@ -875,167 +872,6 @@ function PaymentsCard({ order }: { order: Order }) {
         </table>
       </div>
     </Card>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Adjustments
-// ---------------------------------------------------------------------------
-
-function AddAdjustmentDialog({
-  orderId,
-  open,
-  onOpenChange,
-}: {
-  orderId: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}) {
-
-  const mutation = useOrderMutation(orderId, (params: { label: string; amount: number }) =>
-    adminClient.orders.adjustments.create(orderId, params),
-  )
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const fd = new FormData(e.currentTarget)
-    mutation.mutate(
-      { label: fd.get('label') as string, amount: Number(fd.get('amount')) },
-      { onSuccess: () => onOpenChange(false) },
-    )
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Adjustment</DialogTitle>
-          <DialogDescription>
-            Add a manual adjustment to this order. Use a negative amount for discounts.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <DialogBody>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="adj-label">Label</FieldLabel>
-                <Input id="adj-label" name="label" placeholder="e.g. Manual discount" required />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="adj-amount">Amount</FieldLabel>
-                <Input
-                  id="adj-amount"
-                  name="amount"
-                  type="number"
-                  step="0.01"
-                  placeholder="-10.00"
-                  required
-                />
-              </Field>
-            </FieldGroup>
-          </DialogBody>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Adding…' : 'Add Adjustment'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-function AdjustmentsCard({ order }: { order: Order }) {
-  const { orderId } = Route.useParams()
-  const confirm = useConfirm()
-
-  const adjustments = (order.adjustments ?? []).filter(
-    (a) => a.source_type !== 'Spree::TaxRate' && a.source_type !== 'Spree::PromotionAction',
-  )
-  const [addOpen, setAddOpen] = useState(false)
-
-  const deleteMutation = useOrderMutation(orderId, (adjustmentId: string) =>
-    adminClient.orders.adjustments.delete(orderId, adjustmentId),
-  )
-
-  return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <SlidersHorizontalIcon className="size-4" />
-            Adjustments
-            {adjustments.length > 0 && <Badge>{adjustments.length}</Badge>}
-          </CardTitle>
-          <CardAction className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
-              <PlusIcon data-icon="inline-start" />
-              Add
-            </Button>
-          </CardAction>
-        </CardHeader>
-        {adjustments.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50 text-muted-foreground">
-                  <th className="p-3 pl-5 text-left font-normal">Label</th>
-                  <th className="p-3 text-left font-normal">State</th>
-                  <th className="p-3 text-right font-normal">Amount</th>
-                  <th className="p-3 pr-5 w-10" />
-                </tr>
-              </thead>
-              <tbody>
-                {adjustments.map((adj) => (
-                  <tr key={adj.id} className="border-b last:border-b-0">
-                    <td className="p-3 pl-5">{adj.label ?? '—'}</td>
-                    <td className="p-3">
-                      <StatusBadge status={adj.state} />
-                    </td>
-                    <td className="p-3 text-right font-medium whitespace-nowrap">
-                      {order.currency} {Number.parseFloat(adj.amount).toFixed(2)}
-                    </td>
-                    <td className="p-3 pr-5">
-                      {!adj.source_type && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon-xs">
-                              <EllipsisVerticalIcon className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={async () => {
-                                if (await confirm({ message: 'Remove this adjustment?', variant: 'destructive', confirmLabel: 'Remove' })) {
-                                  deleteMutation.mutate(adj.id)
-                                }
-                              }}
-                            >
-                              <TrashIcon className="size-4" />
-                              Remove
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <CardContent>
-            <p className="text-center text-muted-foreground py-8">No adjustments</p>
-          </CardContent>
-        )}
-      </Card>
-
-      <AddAdjustmentDialog orderId={orderId} open={addOpen} onOpenChange={setAddOpen} />
-    </>
   )
 }
 

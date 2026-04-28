@@ -6,7 +6,7 @@ module Spree
           include Spree::Api::V3::OrderLock
 
           skip_before_action :set_resource, only: [:index, :create]
-          before_action :set_resource, only: [:show, :update, :destroy, :next, :advance, :complete, :cancel, :approve, :resume, :resend_confirmation]
+          before_action :set_resource, only: [:show, :update, :destroy, :complete, :cancel, :approve, :resume, :resend_confirmation]
 
           # POST /api/v3/admin/orders
           def create
@@ -43,32 +43,6 @@ module Spree
           def destroy
             @resource.destroy
             head :no_content
-          end
-
-          # PATCH /api/v3/admin/orders/:id/next
-          def next
-            with_order_lock do
-              result = Spree.checkout_next_service.call(order: @resource)
-
-              if result.success?
-                render json: serialize_resource(@resource.reload)
-              else
-                render_service_error(result.error, code: ERROR_CODES[:order_cannot_transition])
-              end
-            end
-          end
-
-          # PATCH /api/v3/admin/orders/:id/advance
-          def advance
-            with_order_lock do
-              result = Spree.checkout_advance_service.call(order: @resource)
-
-              if result.success?
-                render json: serialize_resource(@resource.reload)
-              else
-                render_service_error(result.error, code: ERROR_CODES[:order_cannot_transition])
-              end
-            end
           end
 
           # PATCH /api/v3/admin/orders/:id/complete
@@ -138,7 +112,7 @@ module Spree
           # Map state transition actions to :update permission
           def authorize_resource!(resource = @resource, action = action_name.to_sym)
             mapped_action = case action
-                            when :next, :advance, :complete, :cancel, :approve, :resume, :resend_confirmation
+                            when :complete, :cancel, :approve, :resume, :resend_confirmation
                               :update
                             else
                               action

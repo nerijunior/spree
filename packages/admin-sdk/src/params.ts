@@ -44,17 +44,6 @@ export interface OptionTypeUpdateParams {
   }>;
 }
 
-export interface AdjustmentCreateParams {
-  amount: number;
-  label: string;
-}
-
-export interface AdjustmentUpdateParams {
-  amount?: number;
-  label?: string;
-  eligible?: boolean;
-}
-
 export interface LineItemCreateParams {
   variant_id: string;
   quantity?: number;
