@@ -31,6 +31,8 @@ Open-source headless eCommerce platform with a complete REST API, TypeScript SDK
 
 Everything you need to launch cross-border storefronts, B2B wholesale, multi-vendor marketplaces, or multi-tenant SaaS.
 
+Have questions or need help getting started? [Contact us](https://spreecommerce.org/contact/) for expert guidance and advice on your Spree project.
+
 ## Getting Started
 
 Copy and paste the following command to your terminal to set up Spree in 5 minutes:
@@ -77,7 +79,7 @@ Spree Commerce supports complex commerce scenarios natively and lets you combine
 
 ## Enterprise Support
 
-Your success is backed by the team that builds Spree. [Contact us](https://spreecommerce.org/get-started/) to get access to:
+Your success is backed by the team that builds Spree. [Contact us](https://spreecommerce.org/contact/) to get access to:
 
 * **Dedicated Success Manager** -- your single point of contact who understands your business and coordinates resources
 * **SLA-Backed Response Times** -- guaranteed response windows for issue resolution depending on severity
@@ -106,7 +108,7 @@ Spree Commerce [Enterprise Edition](https://spreecommerce.org/enterprise/) adds 
 * **B2B eCommerce** -- customer-specific price lists, buyer organizations with roles and approval workflows, gated storefronts, and ERP/procurement integrations
 * **Multi-tenant eCommerce** -- host hundreds of independent stores as a white-label SaaS, franchise network, or multi-brand platform with central control over billing, fulfillment, and operations
 
-[Contact our Sales team](https://spreecommerce.org/get-started/) to get access to the Enterprise Edition.
+[Contact our Sales team](https://spreecommerce.org/contact/) to get access to the Enterprise Edition.
 
 ## What you can build with Spree
 
@@ -175,7 +177,7 @@ Follow our [Contributing Guide](https://spreecommerce.org/docs/developer/contrib
 
 ## Contact
 
-[Contact us](https://spreecommerce.org/get-started/) and let's go!
+[Contact us](https://spreecommerce.org/contact/) and let's go!
 
 ## License
 
