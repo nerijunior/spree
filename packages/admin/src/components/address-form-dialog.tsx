@@ -36,6 +36,9 @@ export interface AddressParams {
   country_iso: string
   state_abbr: string
   phone: string
+  label?: string
+  is_default_billing?: boolean
+  is_default_shipping?: boolean
 }
 
 type CountryOption = { iso: string; name: string }
@@ -48,6 +51,8 @@ export function AddressFormDialog({
   onSave,
   title = 'Edit Address',
   isPending = false,
+  showLabel = false,
+  showDefaultFlags = false,
 }: {
   address: Address | null | undefined
   open: boolean
@@ -55,6 +60,8 @@ export function AddressFormDialog({
   onSave: (address: AddressParams) => void
   title?: string
   isPending?: boolean
+  showLabel?: boolean
+  showDefaultFlags?: boolean
 }) {
   const { countries } = useCountries()
 
@@ -63,12 +70,11 @@ export function AddressFormDialog({
     [countries],
   )
 
-  const initialCountry = useMemo(
+  // Lazy initializer runs once on mount; the parent keys the dialog on the
+  // address id so a fresh instance mounts for each open.
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(
     () => countryItems.find((c) => c.iso === address?.country_iso) ?? null,
-    [countryItems, address?.country_iso],
   )
-
-  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(initialCountry)
 
   const countryData = useMemo(
     () => countries.find((c) => c.iso === selectedCountry?.iso),
@@ -81,12 +87,9 @@ export function AddressFormDialog({
     [countryData],
   )
 
-  const initialState = useMemo(
+  const [selectedState, setSelectedState] = useState<StateOption | null>(
     () => stateItems.find((s) => s.abbr === address?.state_abbr) ?? null,
-    [stateItems, address?.state_abbr],
   )
-
-  const [selectedState, setSelectedState] = useState<StateOption | null>(initialState)
 
   const handleCountryChange = useCallback((country: CountryOption | null) => {
     setSelectedCountry(country)
@@ -106,6 +109,11 @@ export function AddressFormDialog({
       country_iso: selectedCountry?.iso ?? '',
       state_abbr: statesRequired ? (selectedState?.abbr ?? '') : (fd.get('state_abbr') as string),
       phone: fd.get('phone') as string,
+      ...(showLabel && { label: (fd.get('label') as string) || undefined }),
+      ...(showDefaultFlags && {
+        is_default_billing: fd.get('is_default_billing') === 'on',
+        is_default_shipping: fd.get('is_default_shipping') === 'on',
+      }),
     })
   }
 
@@ -127,6 +135,12 @@ export function AddressFormDialog({
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4">
             <FieldGroup>
+              {showLabel && (
+                <Field>
+                  <FieldLabel htmlFor="addr-label">Label</FieldLabel>
+                  <Input id="addr-label" name="label" placeholder="e.g. Home, Office" defaultValue={address?.label ?? ''} />
+                </Field>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 <Field>
                   <FieldLabel htmlFor="addr-fn">First name</FieldLabel>
@@ -216,6 +230,22 @@ export function AddressFormDialog({
                 <FieldLabel htmlFor="addr-phone">Phone</FieldLabel>
                 <Input id="addr-phone" name="phone" defaultValue={address?.phone ?? ''} />
               </Field>
+              {showDefaultFlags && (
+                <>
+                  <Field>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" name="is_default_billing" defaultChecked={address?.is_default_billing} />
+                      Default billing address
+                    </label>
+                  </Field>
+                  <Field>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" name="is_default_shipping" defaultChecked={address?.is_default_shipping} />
+                      Default shipping address
+                    </label>
+                  </Field>
+                </>
+              )}
             </FieldGroup>
           </div>
           <SheetFooter>

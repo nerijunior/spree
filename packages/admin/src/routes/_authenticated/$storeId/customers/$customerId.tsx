@@ -13,9 +13,11 @@ import {
 import { type FormEvent, useState } from 'react'
 import { adminClient } from '@/client'
 import { useAuth } from '@/hooks/use-auth'
+import { AddressFormDialog, type AddressParams } from '@/components/address-form-dialog'
 import { BackButton } from '@/components/back-button'
 import { useConfirm } from '@/components/confirm-dialog'
 import { TagCombobox } from '@/components/tag-combobox'
+import { useCountries } from '@/hooks/use-countries'
 import { Badge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -585,138 +587,68 @@ function AddressesCard({ customer }: { customer: Customer }) {
         )}
       </Card>
 
-      <AddressDialog
-        customerId={customer.id}
-        address={null}
-        open={addOpen}
-        onOpenChange={setAddOpen}
-      />
-      <AddressDialog
-        customerId={customer.id}
-        address={editing}
-        open={editing !== null}
-        onOpenChange={(o) => { if (!o) setEditing(null) }}
-      />
+      {addOpen && (
+        <CustomerAddressDialog
+          customer={customer}
+          address={newAddressTemplate(customer)}
+          onOpenChange={setAddOpen}
+          title="Add Address"
+        />
+      )}
+      {editing && (
+        <CustomerAddressDialog
+          customer={customer}
+          address={editing}
+          onOpenChange={(o) => { if (!o) setEditing(null) }}
+          title="Edit Address"
+        />
+      )}
     </>
   )
 }
 
-function AddressDialog({
-  customerId,
+function newAddressTemplate(customer: Customer): Address {
+  return {
+    first_name: customer.first_name ?? '',
+    last_name: customer.last_name ?? '',
+    phone: customer.phone ?? '',
+  } as Address
+}
+
+function CustomerAddressDialog({
+  customer,
   address,
-  open,
   onOpenChange,
+  title,
 }: {
-  customerId: string
-  address: Address | null
-  open: boolean
+  customer: Customer
+  address: Address
   onOpenChange: (open: boolean) => void
+  title: string
 }) {
-  const isEdit = address !== null
-  const mutation = useCustomerMutation(customerId, (params: Record<string, unknown>) =>
+  const { isLoading: countriesLoading } = useCountries()
+  const isEdit = Boolean(address.id)
+  const mutation = useCustomerMutation(customer.id, (params: AddressParams) =>
     isEdit
-      ? adminClient.customers.addresses.update(customerId, address!.id, params as Parameters<typeof adminClient.customers.addresses.update>[2])
-      : adminClient.customers.addresses.create(customerId, params as Parameters<typeof adminClient.customers.addresses.create>[1]),
+      ? adminClient.customers.addresses.update(customer.id, address.id, params)
+      : adminClient.customers.addresses.create(customer.id, params),
   )
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const fd = new FormData(e.currentTarget)
-    const payload: Record<string, unknown> = {
-      first_name: fd.get('first_name'),
-      last_name: fd.get('last_name'),
-      address1: fd.get('address1'),
-      address2: fd.get('address2'),
-      city: fd.get('city'),
-      postal_code: fd.get('postal_code'),
-      country_iso: fd.get('country_iso'),
-      state_abbr: fd.get('state_abbr'),
-      phone: fd.get('phone'),
-      label: fd.get('label'),
-      is_default_billing: fd.get('is_default_billing') === 'on',
-      is_default_shipping: fd.get('is_default_shipping') === 'on',
-    }
-    mutation.mutate(payload, { onSuccess: () => onOpenChange(false) })
-  }
+  // Wait for countries before mounting so the country/state lazy initializer
+  // can resolve the address's country_iso/state_abbr to a real option.
+  if (countriesLoading) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Address' : 'Add Address'}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <DialogBody>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="addr-label">Label</FieldLabel>
-                <Input id="addr-label" name="label" placeholder="e.g. Home, Office" defaultValue={address?.label ?? ''} />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor="addr-first">First name</FieldLabel>
-                  <Input id="addr-first" name="first_name" defaultValue={address?.first_name ?? ''} />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="addr-last">Last name</FieldLabel>
-                  <Input id="addr-last" name="last_name" defaultValue={address?.last_name ?? ''} />
-                </Field>
-              </div>
-              <Field>
-                <FieldLabel htmlFor="addr-1">Address line 1</FieldLabel>
-                <Input id="addr-1" name="address1" defaultValue={address?.address1 ?? ''} required />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="addr-2">Address line 2</FieldLabel>
-                <Input id="addr-2" name="address2" defaultValue={address?.address2 ?? ''} />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor="addr-city">City</FieldLabel>
-                  <Input id="addr-city" name="city" defaultValue={address?.city ?? ''} required />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="addr-zip">Postal code</FieldLabel>
-                  <Input id="addr-zip" name="postal_code" defaultValue={address?.postal_code ?? ''} required />
-                </Field>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel htmlFor="addr-country">Country (ISO)</FieldLabel>
-                  <Input id="addr-country" name="country_iso" defaultValue={address?.country_iso ?? ''} placeholder="US" required />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="addr-state">State / Province</FieldLabel>
-                  <Input id="addr-state" name="state_abbr" defaultValue={address?.state_abbr ?? ''} placeholder="NY" />
-                </Field>
-              </div>
-              <Field>
-                <FieldLabel htmlFor="addr-phone">Phone</FieldLabel>
-                <Input id="addr-phone" name="phone" defaultValue={address?.phone ?? ''} />
-              </Field>
-              <Field>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="is_default_billing" defaultChecked={address?.is_default_billing} />
-                  Default billing address
-                </label>
-              </Field>
-              <Field>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="is_default_shipping" defaultChecked={address?.is_default_shipping} />
-                  Default shipping address
-                </label>
-              </Field>
-            </FieldGroup>
-          </DialogBody>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? 'Saving…' : isEdit ? 'Save' : 'Add Address'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <AddressFormDialog
+      address={address}
+      open
+      onOpenChange={onOpenChange}
+      onSave={(params) => mutation.mutate(params, { onSuccess: () => onOpenChange(false) })}
+      title={title}
+      isPending={mutation.isPending}
+      showLabel
+      showDefaultFlags
+    />
   )
 }
 
