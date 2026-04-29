@@ -5,19 +5,26 @@ FactoryBot.define do
     company           { 'Company' }
     sequence(:address1) { |n| "#{n} Lovely Street" }
     address2          { 'Northwest' }
-    city              { 'Herndon' }
-    zipcode           { '35005' }
+    city              { 'New York' }
+    zipcode           { '10118' }
     phone             { '555-555-0199' }
     alternative_phone { '555-555-0199' }
 
-    state { |address| address.association(:state) || Spree::State.last }
-
-    country do |address|
-      if address.state
-        address.state.country
-      else
-        address.association(:country)
+    # Default to a real US/NY pair (cached via find_or_create_by) so generated
+    # OpenAPI examples carry plausible country/state fields. Tests that need a
+    # different state/country pass them explicitly.
+    country do
+      Spree::Country.find_or_create_by!(iso: 'US') do |c|
+        c.iso3 = 'USA'
+        c.name = 'United States of America'
+        c.iso_name = 'UNITED STATES'
+        c.numcode = 840
+        c.states_required = true
       end
+    end
+
+    state do |address|
+      (address.country || Spree::Country.find_by(iso: 'US'))&.states&.find_or_create_by!(abbr: 'NY') { |s| s.name = 'New York' }
     end
   end
 end

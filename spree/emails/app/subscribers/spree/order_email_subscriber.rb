@@ -14,6 +14,7 @@ module Spree
       order = find_order(event)
       return unless order
       return if order.confirmation_delivered?
+      return if event.payload['notify_customer'] == false
 
       store = order.store
       return unless store.prefers_send_consumer_transactional_emails?
@@ -38,6 +39,7 @@ module Spree
     def send_cancel_email(event)
       order = find_order(event)
       return unless order
+      return if event.payload['notify_customer'] == false
 
       OrderMailer.cancel_email(order.id).deliver_later
     end

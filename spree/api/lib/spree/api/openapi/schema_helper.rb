@@ -86,6 +86,26 @@ module Spree
               },
               required: %w[token refresh_token user]
             },
+            PermissionRule: {
+              type: :object,
+              description: 'A single permission rule (CanCanCan rule). Rules are applied in order, last-matching-wins.',
+              properties: {
+                allow: { type: :boolean, description: 'true for `can`, false for `cannot`' },
+                actions: { type: :array, items: { type: :string }, description: 'Action names, e.g. ["read", "update"] or ["manage"]' },
+                subjects: { type: :array, items: { type: :string }, description: 'Subject class names, e.g. ["Spree::Product"] or ["all"]' },
+                has_conditions: { type: :boolean, description: 'True if the server-side rule has per-record conditions. The SPA shows the action optimistically and handles 403 from the API.' }
+              },
+              required: %w[allow actions subjects has_conditions]
+            },
+            MeResponse: {
+              type: :object,
+              description: 'Current admin user profile and serialized permissions',
+              properties: {
+                user: { '$ref' => '#/components/schemas/AdminUser' },
+                permissions: { type: :array, items: { '$ref' => '#/components/schemas/PermissionRule' } }
+              },
+              required: %w[user permissions]
+            },
             CheckoutRequirement: {
               type: :object,
               properties: {
@@ -110,8 +130,8 @@ module Spree
               type: :object,
               description: 'An item within a fulfillment — which line item and how many units are in this fulfillment',
               properties: {
-                item_id: { type: :string, description: 'Line item prefixed ID', example: 'li_abc123' },
-                variant_id: { type: :string, description: 'Variant prefixed ID', example: 'variant_abc123' },
+                item_id: { type: :string, description: 'Line item ID', example: 'li_abc123' },
+                variant_id: { type: :string, description: 'Variant ID', example: 'variant_abc123' },
                 quantity: { type: :integer, description: 'Quantity in this fulfillment', example: 2 }
               },
               required: %w[item_id variant_id quantity]
@@ -119,12 +139,12 @@ module Spree
           }
         end
 
-        # Get all schemas (Typelizer + common)
+        # Get all store schemas (Typelizer + common)
         def all_schemas
           schemas = common_schemas
 
           begin
-            schemas.merge!(typelizer_schemas)
+            schemas.merge!(typelizer_schemas(:store))
           rescue StandardError => e
             Rails.logger.warn "Failed to load Typelizer schemas: #{e.message}"
           end
@@ -132,11 +152,27 @@ module Spree
           schemas
         end
 
+        # Get all admin schemas (Typelizer + common)
+        def admin_schemas
+          schemas = common_schemas
+
+          # Override AuthResponse to reference AdminUser instead of Customer
+          schemas[:AuthResponse][:properties][:user] = { '$ref' => '#/components/schemas/AdminUser' }
+
+          begin
+            schemas.merge!(typelizer_schemas(:admin))
+          rescue StandardError => e
+            Rails.logger.warn "Failed to load Typelizer admin schemas: #{e.message}"
+          end
+
+          schemas
+        end
+
         private
 
-        def typelizer_schemas
+        def typelizer_schemas(writer_name)
           with_typelizer_enabled do
-            schemas = Typelizer.openapi_schemas(writer_name: :store)
+            schemas = Typelizer.openapi_schemas(writer_name: writer_name)
             schemas.each_value do |s|
               s[:'x-typelizer'] = true
               strip_null_from_enums(s)

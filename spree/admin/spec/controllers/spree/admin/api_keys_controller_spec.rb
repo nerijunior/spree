@@ -101,7 +101,8 @@ RSpec.describe Spree::Admin::ApiKeysController, type: :controller do
       let(:key_params) do
         {
           name: 'Secret Key',
-          key_type: 'secret'
+          key_type: 'secret',
+          scopes: ['write_all']
         }
       end
 

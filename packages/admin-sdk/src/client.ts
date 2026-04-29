@@ -1,4 +1,4 @@
-import { createRequestFn, resolveRetryConfig } from '@spree/sdk-core';
+import { createRequestFn, resolveRetryConfig, SpreeError } from '@spree/sdk-core';
 import type { RetryConfig, RequestConfig, RequestFn, InternalRequestOptions } from '@spree/sdk-core';
 import { AdminClient } from './admin-client';
 
@@ -22,32 +22,16 @@ export interface Client extends AdminClient {
   setStore(storeId: string): void;
   /** Set JWT token for authenticated admin sessions */
   setToken(token: string): void;
+  /**
+   * Register a callback that fires on 401 responses.
+   * Return `true` to retry the original request (after refreshing the token via setToken).
+   * Return `false` to let the error propagate.
+   */
+  onUnauthorized(handler: () => Promise<boolean>): void;
 }
 
-/**
- * Create a new Spree Admin SDK client.
- *
- * Supports two authentication modes:
- * - **Secret key**: For server-to-server integrations (e.g., backend scripts, CI/CD)
- * - **JWT token**: For admin SPA sessions (e.g., custom admin dashboards)
- *
- * ```ts
- * // Server integration with secret key
- * const admin = createAdminClient({
- *   baseUrl: 'https://api.mystore.com',
- *   secretKey: 'spree_sk_xxx',
- * })
- *
- * // Admin SPA with JWT
- * const admin = createAdminClient({
- *   baseUrl: 'https://api.mystore.com',
- *   jwtToken: 'eyJ...',
- *   storeId: 'store_k5nR8xLq',
- * })
- * ```
- */
 export function createAdminClient(config: AdminClientConfig): Client {
-  if (!config.secretKey && !config.jwtToken) {
+  if (!config.secretKey && config.jwtToken === undefined) {
     throw new Error('Admin client requires either secretKey or jwtToken');
   }
 
@@ -56,24 +40,17 @@ export function createAdminClient(config: AdminClientConfig): Client {
   const retryConfig = resolveRetryConfig(config.retry);
   const requestConfig: RequestConfig = { baseUrl, fetchFn, retryConfig };
 
-  // Mutable state for token and store switching
   let currentToken = config.jwtToken;
   let currentStoreId = config.storeId;
+  let unauthorizedHandler: (() => Promise<boolean>) | null = null;
 
   const basePath = '/api/v3/admin';
 
-  // Dynamic request function that reads current token/storeId on each call
   const dynamicRequestFn: RequestFn = async <T>(
     method: string,
     path: string,
     options: InternalRequestOptions = {}
   ): Promise<T> => {
-    const authValue = config.secretKey
-      ? `Bearer ${config.secretKey}`
-      : currentToken
-        ? `Bearer ${currentToken}`
-        : '';
-
     const extraHeaders: Record<string, string> = {};
     if (currentStoreId) {
       extraHeaders['X-Spree-Store-Id'] = currentStoreId;
@@ -87,13 +64,33 @@ export function createAdminClient(config: AdminClientConfig): Client {
       },
     };
 
-    const requestFn = createRequestFn(
-      requestConfig,
-      basePath,
-      { headerName: 'Authorization', headerValue: authValue },
-    );
+    const makeRequest = () => {
+      // Secret keys go in `X-Spree-Api-Key` (server-to-server integrations).
+      // JWT tokens go in `Authorization: Bearer` (admin SPA sessions).
+      const auth = config.secretKey
+        ? { headerName: 'X-Spree-Api-Key', headerValue: config.secretKey }
+        : { headerName: 'Authorization', headerValue: currentToken ? `Bearer ${currentToken}` : '' };
+      const requestFn = createRequestFn(requestConfig, basePath, auth);
+      return requestFn<T>(method, path, mergedOptions);
+    };
 
-    return requestFn<T>(method, path, mergedOptions);
+    try {
+      return await makeRequest();
+    } catch (error) {
+      // On 401, try the unauthorized handler (token refresh) and retry once
+      if (
+        error instanceof SpreeError &&
+        error.status === 401 &&
+        unauthorizedHandler &&
+        !path.includes('/auth/') // Don't retry auth endpoints
+      ) {
+        const shouldRetry = await unauthorizedHandler();
+        if (shouldRetry) {
+          return makeRequest();
+        }
+      }
+      throw error;
+    }
   };
 
   const adminClient = new AdminClient(dynamicRequestFn);
@@ -105,6 +102,10 @@ export function createAdminClient(config: AdminClientConfig): Client {
 
   client.setToken = (token: string) => {
     currentToken = token;
+  };
+
+  client.onUnauthorized = (handler: () => Promise<boolean>) => {
+    unauthorizedHandler = handler;
   };
 
   return client;

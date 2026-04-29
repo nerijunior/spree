@@ -6,6 +6,29 @@ module Spree
     PREFIXES = { 'publishable' => 'pk_', 'secret' => 'sk_' }.freeze
     TOKEN_LENGTH = 24
 
+    # Admin API authorization scopes. Granted to secret keys at creation; checked
+    # by ScopedAuthorization on every admin request. See
+    # docs/plans/5.5-admin-api-key-scopes.md for the full design.
+    SCOPES = %w[
+      read_orders write_orders
+      read_products write_products
+      read_customers write_customers
+      read_payments write_payments
+      read_fulfillments write_fulfillments
+      read_refunds write_refunds
+      read_gift_cards write_gift_cards
+      read_store_credits write_store_credits
+      read_categories write_categories
+      read_settings write_settings
+      read_webhooks write_webhooks
+      read_dashboard
+      read_all write_all
+    ].freeze
+
+    # Scopes are stored in a JSON column (jsonb on PostgreSQL, json elsewhere).
+    # The DB driver handles array <-> JSON conversion; no `serialize` needed.
+    attribute :scopes, default: []
+
     # Returns the raw token value. For publishable keys this is the persisted
     # +token+ column. For secret keys it is only available in memory immediately
     # after creation (not persisted).
@@ -25,6 +48,8 @@ module Spree
     validates :token_digest, presence: true, uniqueness: true, if: :secret?
     validates :token_prefix, presence: true, if: :secret?
     validates :store, presence: true
+    validates :scopes, presence: true, if: :secret?
+    validate :validate_known_scopes, if: :secret?
 
     before_validation :generate_token, on: :create
 
@@ -83,7 +108,28 @@ module Spree
       update!(revoked_at: Time.current, revoked_by: user)
     end
 
+    # Whether this key carries the given scope. `write_*` implies the matching
+    # `read_*`; `read_all` / `write_all` aliases expand to every read / read+write
+    # scope respectively.
+    #
+    # @param scope [String]
+    # @return [Boolean]
+    def has_scope?(scope)
+      scope = scope.to_s
+      return true if scopes.include?(scope)
+      return true if scope.start_with?('read_') && scopes.include?("write_#{scope.delete_prefix('read_')}")
+      return true if scopes.include?('write_all')
+      return true if scope.start_with?('read_') && scopes.include?('read_all')
+
+      false
+    end
+
     private
+
+    def validate_known_scopes
+      invalid = scopes - SCOPES
+      errors.add(:scopes, "contains unknown scopes: #{invalid.join(', ')}") if invalid.any?
+    end
 
     # Generates the token on creation. For publishable keys, stores the raw token
     # in the +token+ column. For secret keys, computes an HMAC-SHA256 digest stored

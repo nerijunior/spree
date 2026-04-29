@@ -41,9 +41,16 @@ module Spree
         gift_card_remove_service: 'Spree::GiftCards::Remove',
         gift_card_redeem_service: 'Spree::GiftCards::Redeem',
 
+        # option types
+        option_type_create_service: 'Spree::OptionTypes::Create',
+        option_type_update_service: 'Spree::OptionTypes::Update',
+
         # order
         order_approve_service: 'Spree::Orders::Approve',
         order_cancel_service: 'Spree::Orders::Cancel',
+        order_complete_service: 'Spree::Orders::Complete',
+        order_create_service: 'Spree::Orders::Create',
+        order_update_service: 'Spree::Orders::Update',
         order_updater: 'Spree::OrderUpdater',
 
         # shipment

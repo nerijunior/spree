@@ -24,3 +24,21 @@
     <% end %>
   </div>
 </div>
+
+<div class="card mb-6" id="api-key-scopes" data-secret-only data-show-when-key-type="secret">
+  <div class="card-header">
+    <h5 class="card-title"><%= Spree.t('admin.api_keys.scopes', default: 'Scopes') %></h5>
+    <p class="text-sm text-gray-500 mt-1">
+      <%= Spree.t('admin.api_keys.scopes_description', default: 'Required for secret keys. Pick the narrowest set of scopes your integration needs.') %>
+    </p>
+  </div>
+  <div class="card-body">
+    <% Spree::ApiKey::SCOPES.each do |scope| %>
+      <div class="custom-control custom-checkbox mb-1">
+        <%= f.check_box :scopes, { multiple: true, class: 'custom-control-input', id: "api_key_scopes_#{scope}" }, scope, nil %>
+        <%= f.label "scopes_#{scope}", scope, class: 'custom-control-label font-mono text-sm' %>
+      </div>
+    <% end %>
+    <%= f.hidden_field :scopes, value: '', multiple: true %>
+  </div>
+</div>

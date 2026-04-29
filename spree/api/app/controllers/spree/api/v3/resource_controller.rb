@@ -2,6 +2,8 @@ module Spree
   module Api
     module V3
       class ResourceController < BaseController
+        include Spree::Api::V3::ParamsNormalizer
+
         before_action :set_parent
         before_action :set_resource, only: [:show, :update, :destroy]
 
@@ -48,9 +50,18 @@ module Spree
         end
 
         # DELETE /api/v3/resource/:id
+        # Honors `can_be_deleted?` if the model defines it — domain rules like
+        # "completed orders cannot be deleted" live on the model, not on
+        # CanCanCan abilities, so they apply to all callers (JWT and API key).
         def destroy
-          @resource.destroy
+          if @resource.respond_to?(:can_be_deleted?) && !@resource.can_be_deleted?
+            raise CanCan::AccessDenied.new("#{@resource.class.model_name.human} cannot be deleted")
+          end
+
+          @resource.destroy!
           head :no_content
+        rescue ActiveRecord::RecordNotDestroyed => e
+          render_validation_error(e.record.errors.presence || e.message)
         end
 
         protected
@@ -80,11 +91,15 @@ module Spree
 
         # Builds a new resource, using parent association when @parent is set
         def build_resource
-          if @parent.present?
-            @parent.send(parent_association).build(permitted_params)
-          else
-            model_class.new(permitted_params)
-          end
+          resource = if @parent.present?
+                       @parent.send(parent_association).build(permitted_params)
+                     else
+                       model_class.new(permitted_params)
+                     end
+          resource.store = current_store if resource.respond_to?(:store_id) && resource.store_id.blank?
+          resource.store_ids = [current_store.id] if resource.respond_to?(:store_ids) && resource.store_ids.blank?
+          resource.created_by = try_spree_current_user if resource.respond_to?(:created_by_id)
+          resource
         end
 
         # Finds a single resource within scope using prefixed ID
@@ -133,8 +148,11 @@ module Spree
         # Ransack query parameters with sort translation.
         # Translates `-field` notation (JSON:API standard) to Ransack `s` format.
         # e.g., sort=-price,name → s=price desc,name asc
+        # Also decodes Stripe-style prefixed IDs found in keys like `*_id_eq`,
+        # `*_id_in`, `*_id_not_eq`, etc. so SPA filters can pass prefixed IDs.
         def ransack_params
           rp = params[:q]&.to_unsafe_h || params[:q] || {}
+          rp = decode_prefixed_id_predicates(rp)
           sort_value = sort_param
 
           if sort_value.present?
@@ -149,6 +167,27 @@ module Spree
           end
 
           rp
+        end
+
+        def decode_prefixed_id_predicates(hash)
+          return hash unless hash.is_a?(Hash)
+
+          hash.each_with_object({}) do |(key, value), result|
+            result[key] = if ransack_id_predicate?(key)
+                            Array(value).map { |v| Spree::PrefixedId.prefixed_id?(v) ? Spree::PrefixedId.decode_prefixed_id(v) || v : v }.then { |arr|
+                              value.is_a?(Array) ? arr : arr.first
+                            }
+                          elsif value.is_a?(Hash)
+                            decode_prefixed_id_predicates(value)
+                          else
+                            value
+                          end
+          end
+        end
+
+        RANSACK_ID_PREDICATE_RE = /_id(?:s)?(?:_(?:eq|not_eq|in|not_in|lt|lteq|gt|gteq))?\z/.freeze
+        def ransack_id_predicate?(key)
+          RANSACK_ID_PREDICATE_RE.match?(key.to_s)
         end
 
         # Sort parameter from the request
@@ -228,7 +267,7 @@ module Spree
         #
         # Override in subclass for custom parameter handling
         def permitted_params
-          params.permit(permitted_attributes)
+          normalize_params(params.permit(permitted_attributes))
         end
 
         # Returns the permitted attributes list for the model

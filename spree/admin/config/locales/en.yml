@@ -26,6 +26,8 @@ en:
         revoked: API key has been revoked
         revoked_at: Revoked at
         revoked_by: Revoked by
+        scopes: Scopes
+        scopes_description: Required for secret keys. Pick the narrowest set of scopes your integration needs.
         secret_key_hidden: This secret key cannot be revealed. If you've lost it, revoke this key and create a new one.
         statuses:
           active: Active

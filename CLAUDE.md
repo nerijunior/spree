@@ -13,7 +13,8 @@ Use `/project:create-plan` and `/project:update-plan` for plan management.
 
 Current plans:
 - `6.0-cart-order-split.md` — Cart/Order model separation, polymorphic LineItem
-- `6.0-admin-spa.md` — React admin architecture, plugin system
+- `6.0-admin-api.md` — Admin REST API conventions, auth, endpoint list (~300 endpoints)
+- `6.0-admin-spa.md` — React admin architecture, extension points, table registry
 - `6.0-product-types.md` — Prototype → ProductType rename, MetafieldDefinition schema enforcement
 - `6.0-remove-master-variant.md` — Eliminate is_master, add default_variant_id FK on Product
 - `6.0-split-adjustments.md` — Replace polymorphic Adjustment with TaxLine, Discount, Fee
@@ -32,6 +33,8 @@ Current plans:
 - `5.4-6.0-eu-legal-compliance.md` — GDPR (data export/anonymization, consent timestamps), Omnibus (PriceHistory, lowest-in-30-days), Consumer Rights (withdrawal period). Core primitives + enterprise hooks.
 
 
+- `5.5-6.0-order-cancellation-and-approval.md` — First-class `OrderCancellation` + `OrderApproval` models, capture reasons/restock/refund decisions, polymorphic actor; 6.0 drops denormalized columns
+- `5.5-admin-api-key-scopes.md` — Shopify-style `read_*`/`write_*` scopes on `Spree::ApiKey` for Admin API authorization (apps), independent of CanCanCan (which stays for JWT users)
 - `5.4-disjunctive-option-faceting.md` — Per-option-type filter params with disjunctive facet counts (OR within option type, AND across)
 - `5.4-option-type-enhancements.md` — Add `kind` (dropdown/color_swatch/buttons) to OptionType, `color_code` + `image` to OptionValue for swatch support
 - `5.4-6.0-custom-fields-rename.md` — Rename Metafields → Custom Fields (5.4 API bridge + 6.0 model rename)
@@ -119,6 +122,16 @@ end
 - One migration per feature when possible
 - Data transformations go in rake tasks, never in migrations
 - Soft delete: use `paranoia` gem, add `deleted_at` column yourself
+- JSON columns must work across PostgreSQL, MySQL, and SQLite. PostgreSQL supports `t.jsonb` (binary, indexable); MySQL and SQLite do not — only `t.json`. Guard with `respond_to?`:
+
+```ruby
+# JSON column — works on PostgreSQL, MySQL, SQLite
+if t.respond_to?(:jsonb)
+  t.jsonb :metadata
+else
+  t.json :metadata
+end
+```
 
 ```ruby
 class CreateSpreeMetafields < ActiveRecord::Migration[7.2]

@@ -13,8 +13,9 @@ describe Spree::Order, type: :model do
     end
 
     it 'publishes order.completed event when finalizing', events: true do
-      expect(order).to receive(:publish_event).with('order.completed')
+      expect(order).to receive(:publish_event).with('order.completed', hash_including(:notify_customer))
       allow(order).to receive(:publish_event).with(anything)
+      allow(order).to receive(:publish_event).with(anything, anything)
 
       order.finalize!
     end

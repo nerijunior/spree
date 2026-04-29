@@ -90,10 +90,9 @@ module Spree
 
     @@allowed_origin_attributes = [:origin]
 
-    @@api_key_attributes = [:name, :key_type]
+    @@api_key_attributes = [:name, :key_type, { scopes: [] }]
 
-    @@asset_attributes = [:type, :viewable_id, :viewable_type, :attachment, :alt, :position,
-                          :media_type, :focal_point_x, :focal_point_y, :external_video_url]
+    @@asset_attributes = [:type, :viewable_id, :viewable_type, :attachment, :alt, :position, :url, :signed_id]
 
     @@checkout_attributes = [
       :coupon_code, :email, :shipping_method_id, :special_instructions, :use_billing, :use_shipping,

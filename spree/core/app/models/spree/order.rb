@@ -106,20 +106,39 @@ module Spree
 
     self.whitelisted_ransackable_associations = %w[shipments user created_by approver canceler promotions bill_address ship_address line_items store]
     self.whitelisted_ransackable_attributes = %w[
-      completed_at email number state payment_state shipment_state
+      completed_at email number state status payment_state shipment_state
       total item_total item_count considered_risky channel
     ]
-    self.whitelisted_ransackable_scopes = %w[refunded partially_refunded search multi_search]
+    self.whitelisted_ransackable_scopes = %w[complete incomplete refunded partially_refunded multi_search]
 
     attr_reader :coupon_code
     attr_accessor :temporary_address
 
+    # Set to false on admin-initiated flows to suppress customer-facing emails.
+    attr_accessor :notify_customer
+
     attribute :state_machine_resumed, :boolean
+
+    STATUSES = %w[draft placed canceled].freeze
+
+    attribute :status, :string, default: 'draft'
+    validates :status, inclusion: { in: STATUSES }
+
+    scope :drafts,         -> { where(status: 'draft') }
+    scope :placed_orders,  -> { where(status: 'placed') }
+    scope :canceled_orders, -> { where(status: 'canceled') }
 
     acts_as_taggable_on :tags
     acts_as_taggable_tenant :store_id
 
+    def tags=(tags)
+      self.tag_list = tags
+    end
+
     ASSOCIATED_USER_ATTRIBUTES = [:user_id, :email, :bill_address_id, :ship_address_id]
+
+    # 6.0 forward-compat: User→Customer rename. Column stays user_id in 5.x.
+    alias_attribute :customer_id, :user_id
 
     belongs_to :user, class_name: "::#{Spree.user_class}", optional: true, autosave: true
     belongs_to :created_by, class_name: "::#{Spree.admin_user_class}", optional: true
@@ -148,6 +167,8 @@ module Spree
       has_many :payment_sessions, inverse_of: :order, class_name: 'Spree::PaymentSession'
       has_many :return_authorizations, inverse_of: :order, class_name: 'Spree::ReturnAuthorization'
       has_many :adjustments, -> { order(:created_at) }, as: :adjustable, class_name: 'Spree::Adjustment'
+      has_many :cancellations, -> { order(:created_at) }, inverse_of: :order, class_name: 'Spree::OrderCancellation'
+      has_many :approvals, -> { order(:created_at) }, inverse_of: :order, class_name: 'Spree::OrderApproval'
     end
     has_many :reimbursements, inverse_of: :order, class_name: 'Spree::Reimbursement'
     has_many :customer_returns, class_name: 'Spree::CustomerReturn', through: :return_authorizations
@@ -346,6 +367,14 @@ module Spree
 
     def completed?
       completed_at.present?
+    end
+
+    def draft?
+      status == 'draft'
+    end
+
+    def placed?
+      status == 'placed'
     end
 
     # Checks if the order is fully refunded
@@ -591,6 +620,7 @@ module Spree
       end
 
       updater.update_shipment_state
+      self.status = 'placed'
       save!
       updater.run_hooks
 
@@ -1089,7 +1119,7 @@ module Spree
     end
 
     def publish_order_completed_event
-      publish_event('order.completed')
+      publish_event('order.completed', event_payload.merge(notify_customer: notify_customer))
     end
 
     def publish_order_resumed_event

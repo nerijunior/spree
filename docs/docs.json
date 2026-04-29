@@ -501,6 +501,29 @@
             ]
           },
           {
+            "item": "Admin API",
+            "icon": "shield",
+            "description": "REST API for pragmatically managing stores",
+            "groups": [
+              {
+                "group": "API basics",
+                "pages": [
+                  "api-reference/admin-api/introduction",
+                  "api-reference/admin-api/authentication",
+                  "api-reference/admin-api/errors",
+                  "api-reference/admin-api/querying"
+                ]
+              },
+              {
+                "group": "Endpoints",
+                "openapi": {
+                  "source": "api-reference/admin.yaml",
+                  "directory": "api-reference/admin-api"
+                }
+              }
+            ]
+          },
+          {
             "item": "Webhooks",
             "icon": "webhook",
             "description": "Event payloads and delivery reference",

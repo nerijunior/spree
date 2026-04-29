@@ -36,7 +36,7 @@ module Spree
     with_options inverse_of: :variant do
       has_many :inventory_units
       has_many :line_items
-      has_many :stock_items, dependent: :destroy
+      has_many :stock_items, dependent: :destroy, autosave: true
     end
 
     has_many :orders, through: :line_items
@@ -54,13 +54,15 @@ module Spree
     has_many :prices,
              class_name: 'Spree::Price',
              dependent: :destroy,
-             inverse_of: :variant
+             inverse_of: :variant,
+             autosave: true
 
     has_many :wished_items, dependent: :destroy
 
     has_many :digitals
 
     before_validation :set_cost_currency
+    before_validation :apply_pending_options, if: :pending_options?
 
     validate :check_price, if: -> { Spree::Config.enable_legacy_default_price }
 
@@ -167,7 +169,7 @@ module Spree
     self.whitelisted_ransackable_associations = %w[option_values product tax_category prices default_price]
     self.whitelisted_ransackable_attributes = %w[weight depth width height sku discontinue_on is_master cost_price cost_currency track_inventory
                                                  deleted_at]
-    self.whitelisted_ransackable_scopes = %i(product_name_or_sku_cont search_by_product_name_or_sku)
+    self.whitelisted_ransackable_scopes = %i(product_name_or_sku_cont search_by_product_name_or_sku search)
 
     def self.product_name_or_sku_cont(query)
       sanitized_query = ActiveRecord::Base.sanitize_sql_like(query.to_s.downcase.strip)
@@ -330,6 +332,11 @@ module Spree
     # @param options [Array<Hash>] the options to set
     # @return [void]
     def options=(options = {})
+      if product.nil?
+        @pending_options = options
+        return
+      end
+
       options.each do |option|
         next if option[:name].blank? || option[:value].blank?
 
@@ -438,6 +445,48 @@ module Spree
       price_in(currency).try(:compare_at_amount)
     end
 
+    # Syncs base prices from an array of hashes.
+    # Upserts prices for listed currencies, removes base prices for unlisted currencies.
+    # On new records, builds prices in memory (saved when variant is saved).
+    # On persisted records, saves prices immediately and removes unlisted currencies.
+    # @param prices_params [Array<Hash>] array of { currency:, amount:, compare_at_amount: }
+    # @return [void]
+    def prices=(prices_params)
+      return super if prices_params.blank? || prices_params.first.is_a?(Spree::Price)
+
+      currencies_in_payload = []
+
+      prices_params.each do |price_data|
+        price_data = price_data.to_h.with_indifferent_access
+        currencies_in_payload << price_data[:currency]
+        set_price(price_data[:currency], price_data[:amount], price_data[:compare_at_amount])
+      end
+
+      # Remove base prices for currencies not in the payload
+      prices.base_prices.where.not(currency: currencies_in_payload).destroy_all if persisted?
+    end
+
+    # Syncs stock items from an array of hashes.
+    # Upserts stock for listed locations, soft-deletes stock items for unlisted locations.
+    # On new records, defers to after_create callback.
+    # @param stock_items_params [Array<Hash>] array of { stock_location_id:, count_on_hand:, backorderable: }
+    # @return [void]
+    def stock_items=(stock_items_params)
+      return super if stock_items_params.blank? || stock_items_params.first.is_a?(Spree::StockItem)
+
+      location_ids_in_payload = []
+
+      stock_items_params.each do |stock_data|
+        stock_data = stock_data.to_h.with_indifferent_access
+        location = Spree::StockLocation.find_by_param(stock_data[:stock_location_id])
+        location_ids_in_payload << location.id
+        set_stock(stock_data[:count_on_hand], stock_data[:backorderable], location)
+      end
+
+      # Soft-delete stock items for locations not in the payload
+      stock_items.where.not(stock_location_id: location_ids_in_payload).destroy_all if persisted?
+    end
+
     # Sets the base price (global price, not for a price list) for the given currency.
     # @param currency [String] the currency to set the price for
     # @param amount [BigDecimal] the amount to set
@@ -465,16 +514,18 @@ module Spree
       Spree::Pricing::Resolver.new(context).resolve
     end
 
-    # Sets the stock for the variant
+    # Sets the stock for the variant at a given location.
+    # Mirrors set_price: find-or-initialize, set attrs, save only if persisted.
     # @param count_on_hand [Integer] the count on hand
     # @param backorderable [Boolean] the backorderable flag
-    # @param stock_location [Spree::StockLocation] the stock location to set the stock for
+    # @param stock_location [Spree::StockLocation] the stock location (defaults to store default)
     # @return [void]
-    def set_stock(count_on_hand, backorderable = nil)
-      stock_item = stock_items.find_or_initialize_by(stock_location: default_stock_location)
+    def set_stock(count_on_hand, backorderable = nil, stock_location = nil)
+      stock_location ||= default_stock_location
+      stock_item = stock_items.find_or_initialize_by(stock_location: stock_location)
       stock_item.count_on_hand = count_on_hand
       stock_item.backorderable = backorderable if backorderable.present?
-      stock_item.save!
+      stock_item.save! if persisted?
     end
 
     def default_stock_location
@@ -584,6 +635,23 @@ module Spree
     end
 
     private
+
+    def pending_options?
+      @pending_options.present?
+    end
+
+    def apply_pending_options
+      return unless @pending_options
+
+      options_to_apply = @pending_options
+      @pending_options = nil
+
+      options_to_apply.each do |option|
+        next if option[:name].blank? || option[:value].blank?
+
+        set_option_value(option[:name], option[:value], option[:position])
+      end
+    end
 
     def ensure_not_in_complete_orders
       if orders.complete.any?

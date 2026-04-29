@@ -7,7 +7,7 @@ module Spree
 
           many :states,
                resource: Spree.api.admin_state_serializer,
-               if: proc { expand?(:states) }
+               if: proc { params[:expand]&.include?('states') }
         end
       end
     end

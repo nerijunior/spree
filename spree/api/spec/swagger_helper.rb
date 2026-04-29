@@ -106,6 +106,94 @@ RSpec.configure do |config|
         },
         schemas: Spree::Api::OpenAPI::SchemaHelper.all_schemas
       }
+    },
+
+    # Admin API v3 - Administrative API for managing store resources
+    'api-reference/admin.yaml' => {
+      openapi: '3.0.3',
+      info: {
+        title: 'Admin API',
+        contact: {
+          name: 'Spree Commerce',
+          url: 'https://spreecommerce.org',
+          email: 'hello@spreecommerce.org',
+        },
+        description: <<~DESC,
+          Spree Admin API v3 - Administrative API for managing products, orders, and store settings.
+
+          ## Authentication
+
+          The Admin API requires a secret API key passed in the `x-spree-api-key` header.
+          Secret API keys can be generated in the Spree admin dashboard.
+
+          ## Response Format
+
+          All responses are JSON. List endpoints return paginated responses with `data` and `meta` keys.
+          Single resource endpoints return a flat JSON object.
+
+          ## Resource IDs
+
+          Every resource is identified by an opaque string ID (e.g. `prod_86Rf07xd4z`,
+          `variant_k5nR8xLq`, `or_UkLWZg9DAJ`). Use these IDs everywhere — URL paths,
+          request bodies, and Ransack filters all accept them directly.
+
+          ## Error Handling
+
+          Errors return a consistent format:
+          ```json
+          {
+            "error": {
+              "code": "validation_error",
+              "message": "Validation failed",
+              "details": { "name": ["can't be blank"] }
+            }
+          }
+          ```
+        DESC
+        version: 'v3'
+      },
+      paths: {},
+      servers: [
+        {
+          url: 'http://{defaultHost}',
+          variables: {
+            defaultHost: {
+              default: 'localhost:3000'
+            }
+          }
+        }
+      ],
+      tags: [
+        { name: 'Authentication', description: 'Admin user authentication' },
+        { name: 'Product Catalog', description: 'Products, variants, and option types' },
+        { name: 'Orders', description: 'Order management — orders, items, payments, fulfillments, refunds, gift cards, store credits' },
+        { name: 'Customers', description: 'Customer management — profiles, addresses, store credits, credit cards' },
+        { name: 'Configuration', description: 'Store configuration — payment methods, tag autocomplete' }
+      ],
+      'x-tagGroups': [
+        { name: 'Authentication', tags: ['Authentication'] },
+        { name: 'Product Catalog', tags: ['Product Catalog'] },
+        { name: 'Orders', tags: ['Orders'] },
+        { name: 'Customers', tags: ['Customers'] },
+        { name: 'Configuration', tags: ['Configuration'] }
+      ],
+      components: {
+        securitySchemes: {
+          api_key: {
+            type: :apiKey,
+            name: 'x-spree-api-key',
+            in: :header,
+            description: 'Secret API key for admin access'
+          },
+          bearer_auth: {
+            type: :http,
+            scheme: :bearer,
+            bearerFormat: 'JWT',
+            description: 'JWT token for admin user authentication'
+          }
+        },
+        schemas: Spree::Api::OpenAPI::SchemaHelper.admin_schemas
+      }
     }
   }
 

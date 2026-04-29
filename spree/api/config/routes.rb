@@ -90,6 +90,96 @@ Spree::Core::Engine.add_routes do
         resources :feeds, only: [:show], controller: 'data_feeds', param: :slug
       end
 
+      namespace :admin do
+        # Authentication
+        post 'auth/login', to: 'auth#create'
+        post 'auth/refresh', to: 'auth#refresh'
+
+        # Dashboard
+        namespace :dashboard do
+          get :analytics
+        end
+
+        # Current admin user + permissions (for UI permission checks)
+        get 'me', to: 'me#show'
+
+        # Store Settings
+        resource :store, only: [:show, :update], controller: 'store'
+
+        # Direct Uploads (Active Storage)
+        resources :direct_uploads, only: [:create]
+
+        # Products
+        resources :products do
+          member do
+            post :clone
+          end
+          resources :variants, controller: 'products/variants' do
+            resources :media, controller: 'media', only: [:index, :create, :update, :destroy]
+          end
+          resources :media, controller: 'media', only: [:index, :create, :update, :destroy]
+        end
+
+        # Categories
+        resources :categories, only: [:index, :show]
+
+        # Option Types (with nested option_values in payload)
+        resources :option_types
+
+        # Tax Categories
+        resources :tax_categories, only: [:index, :show]
+
+        # Payment Methods
+        resources :payment_methods, only: [:index, :show]
+
+        # Tags (autocomplete for product/order/user tag inputs)
+        resources :tags, only: [:index]
+
+        # Customers
+        resources :customers do
+          resources :addresses, controller: 'customers/addresses'
+          resources :credit_cards, controller: 'customers/credit_cards', only: [:index, :show, :destroy]
+          resources :store_credits, controller: 'customers/store_credits'
+        end
+
+        # Variants (top-level, for search/autocomplete across all products)
+        resources :variants, only: [:index, :show]
+
+        # Countries (with ?expand=states for state/province dropdown)
+        resources :countries, only: [:index, :show]
+
+        # Orders
+        resources :orders do
+          member do
+            patch :complete
+            patch :cancel
+            patch :approve
+            patch :resume
+            post :resend_confirmation
+          end
+
+          resources :items, only: [:index, :show, :create, :update, :destroy], controller: 'orders/items'
+          resources :fulfillments, controller: 'orders/fulfillments', only: [:index, :show, :update] do
+            member do
+              patch :fulfill
+              patch :cancel
+              patch :resume
+              patch :split
+            end
+          end
+          resources :payments, controller: 'orders/payments', only: [:index, :show, :create] do
+            member do
+              patch :capture
+              patch :void
+            end
+          end
+          resources :refunds, controller: 'orders/refunds', only: [:index, :create]
+          resources :adjustments, controller: 'orders/adjustments', only: [:index, :show]
+          resources :gift_cards, controller: 'orders/gift_cards', only: [:create, :destroy]
+          resource :store_credits, controller: 'orders/store_credits', only: [:create, :destroy]
+        end
+      end
+
       # Webhooks (outside of store namespace — no API key authentication)
       namespace :webhooks do
         post 'payments/:payment_method_id', to: 'payments#create', as: :payment_webhook

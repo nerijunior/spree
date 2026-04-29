@@ -1,0 +1,70 @@
+---
+title: "Admin API"
+sidebarTitle: "Introduction"
+---
+
+<Warning>
+**Developer Preview.** The Admin API is in active development and may change between major versions.
+</Warning>
+
+The Admin API is a REST API for managing a Spree stores programmatically — products, orders, customers, fulfillments, payments, and more. It is intended for backend integrations, custom admin tooling, and automation.
+
+All routes are prefixed with `/api/v3/admin`. During development the API is available under `http://localhost:3000/api/v3/admin`. For production, replace `http://localhost:3000` with your Spree application URL.
+
+## Admin API vs Store API
+
+| | Admin API | Store API |
+|---|---|---|
+| **Purpose** | Manage store data | Power storefronts |
+| **Audience** | Staff users, backend integrations | Customers, storefronts |
+| **Authentication** | Secret API key (`sk_…`) or admin JWT | Publishable API key (`pk_…`), customer JWT, order token |
+| **Permissions** | API key scopes (API key authentication) or Admin Staff permission sets | Customer can only read/modify their own data |
+| **Write operations** | Full CRUD on most resources | Limited to the current customer's cart, addresses, profile |
+
+If you're building a storefront, use the [Store API](/api-reference/store-api/introduction). The Admin API exposes administrative operations that should never be invoked from a browser.
+
+## Using the SDK
+
+We recommend using `@spree/admin-sdk` to interact with the Admin API. It provides typed clients, automatic retries, and idempotency support.
+
+### Installation
+
+```bash
+npm install @spree/admin-sdk
+# or
+yarn add @spree/admin-sdk
+# or
+pnpm add @spree/admin-sdk
+```
+
+### Quick start
+
+```typescript
+import { createAdminClient } from '@spree/admin-sdk'
+
+const client = createAdminClient({
+  baseUrl: 'http://localhost:3000',
+  secretKey: 'sk_xxx',
+})
+
+const { data: orders } = await client.orders.list({
+  status_eq: 'complete',
+  limit: 25,
+})
+```
+
+## What's covered
+
+The Admin API today (in Spree 5.5) covers:
+
+- **Catalog** — products, variants, prices
+- **Orders** — list, create, update, items, complete, cancel, approve, resume; nested fulfillments, payments, refunds, gift cards, store credits
+- **Customers** — full CRUD, addresses, store credits, credit cards
+
+See the **Endpoints** section in the sidebar for the complete reference, generated from the OpenAPI spec.
+
+Before integrating, read:
+
+- [Authentication](/api-reference/admin-api/authentication) — secret API keys, scopes, and JWT tokens
+- [Errors](/api-reference/admin-api/errors) — error format and admin-specific codes
+- [Querying](/api-reference/admin-api/querying) — filtering, sorting, pagination, and `expand`

@@ -34,7 +34,10 @@ module Spree
         end
 
         def assign_address(user)
-          address = user.bill_address || user.build_bill_address
+          # Save user first so the address can FK to it via user_id (has_many :addresses).
+          user.save! if user.new_record?
+
+          address = user.bill_address || user.addresses.build
           address.firstname = attributes['first_name'].presence || user.first_name
           address.lastname = attributes['last_name'].presence || user.last_name
           address.company = attributes['company'].strip if attributes['company'].present?

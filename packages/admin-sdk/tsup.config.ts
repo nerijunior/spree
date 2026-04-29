@@ -7,13 +7,14 @@ export default defineConfig({
     'types/index': 'src/types/index.ts',
   },
   format: ['cjs', 'esm'],
-  dts: true,
+  dts: { resolve: ['@spree/sdk-core'] },
   splitting: false,
   sourcemap: true,
   clean: true,
   treeshake: true,
   minify: false,
-  external: ['@spree/sdk-core'],
+  // sdk-core is workspace-private; inline it into the published bundle.
+  noExternal: ['@spree/sdk-core'],
   esbuildOptions(options) {
     options.alias = {
       '@/types': path.resolve(import.meta.dirname, 'src/types/generated/index.ts'),

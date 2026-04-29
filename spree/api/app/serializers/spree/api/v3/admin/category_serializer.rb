@@ -5,10 +5,10 @@ module Spree
         # Admin API Category Serializer
         # Full category data including admin-only fields
         class CategorySerializer < V3::CategorySerializer
-          typelize lft: :number, rgt: :number
+          typelize pretty_name: :string, lft: :number, rgt: :number, sort_order: :string
 
-          # Nested set columns for tree operations
-          attributes :lft, :rgt, created_at: :iso8601, updated_at: :iso8601
+          # Admin-only attributes
+          attributes :pretty_name, :lft, :rgt, created_at: :iso8601, updated_at: :iso8601
 
           # Override inherited associations to use admin serializers
           one :parent,

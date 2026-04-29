@@ -6,7 +6,8 @@ module Spree
         # Full order data including admin-only fields
         class OrderSerializer < V3::OrderSerializer
 
-          typelize last_ip_address: [:string, nullable: true],
+          typelize status: :string,
+                   last_ip_address: [:string, nullable: true],
                    considered_risky: :boolean, confirmation_delivered: :boolean,
                    store_owner_notification_delivered: :boolean,
                    internal_note: [:string, nullable: true], approver_id: [:string, nullable: true],
@@ -14,14 +15,23 @@ module Spree
                    customer_id: [:string, nullable: true],
                    canceled_at: [:string, nullable: true], approved_at: [:string, nullable: true],
                    payment_total: :string, display_payment_total: :string,
+                   tags: [:string, multi: true],
                    metadata: 'Record<string, unknown> | null'
 
           # Admin-only attributes
-          attributes :last_ip_address, :considered_risky,
+          attributes :status, :last_ip_address, :considered_risky,
                      :confirmation_delivered, :store_owner_notification_delivered,
-                     :internal_note, :payment_total, :display_payment_total,
+                     :payment_total, :display_payment_total,
                      canceled_at: :iso8601, approved_at: :iso8601,
                      created_at: :iso8601, updated_at: :iso8601
+
+          attribute :tags do |order|
+            order.tag_list.to_a
+          end
+
+          attribute :internal_note do |order|
+            order.internal_note&.to_plain_text.presence
+          end
 
           attribute :metadata do |order|
             order.metadata.presence
