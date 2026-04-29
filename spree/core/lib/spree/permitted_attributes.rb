@@ -90,7 +90,7 @@ module Spree
 
     @@allowed_origin_attributes = [:origin]
 
-    @@api_key_attributes = [:name, :key_type]
+    @@api_key_attributes = [:name, :key_type, { scopes: [] }]
 
     @@asset_attributes = [:type, :viewable_id, :viewable_type, :attachment, :alt, :position, :url, :signed_id]
 
