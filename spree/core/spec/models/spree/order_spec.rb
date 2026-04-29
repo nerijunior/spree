@@ -353,7 +353,7 @@ describe Spree::Order, type: :model do
       let(:order) { create(:completed_order_with_totals) }
 
       it 'publishes order.canceled event' do
-        expect(order).to receive(:publish_event).with('order.canceled')
+        expect(order).to receive(:publish_event).with('order.canceled', hash_including(:notify_customer))
         order.canceled_by(admin_user)
       end
     end
@@ -466,8 +466,9 @@ describe Spree::Order, type: :model do
       before { order.update_column(:state, 'complete') }
 
       it 'publishes order.completed event' do
-        expect(order).to receive(:publish_event).with('order.completed').at_least(:once)
+        expect(order).to receive(:publish_event).with('order.completed', hash_including(:notify_customer)).at_least(:once)
         allow(order).to receive(:publish_event).with(anything)
+        allow(order).to receive(:publish_event).with(anything, anything)
         order.finalize!
       end
 

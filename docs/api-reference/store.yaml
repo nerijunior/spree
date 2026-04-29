@@ -40,6 +40,624 @@ info:
     ```
   version: v3
 paths:
+  "/api/v3/admin/orders/{order_id}/adjustments":
+    get:
+      summary: List adjustments
+      tags:
+      - Adjustments
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Returns all adjustments for an order. Read-only — adjustments are
+        computed from promotions, taxes, and fees.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: order_id
+        in: path
+        required: true
+        description: Order prefixed ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: adjustments found
+          content:
+            application/json:
+              example:
+                data:
+                - id: adj_UkLWZg9DAJ
+                  label: Admin discount
+                  display_amount: "$0.00"
+                  included: false
+                  created_at: '2026-04-29T10:49:45.205Z'
+                  updated_at: '2026-04-29T10:49:45.212Z'
+                  amount: '0.0'
+                  order_id: or_UkLWZg9DAJ
+                meta:
+                  page: 1
+                  limit: 25
+                  count: 1
+                  pages: 1
+                  from: 1
+                  to: 1
+                  in: 1
+                  previous:
+                  next:
+  "/api/v3/admin/orders/{order_id}/adjustments/{id}":
+    get:
+      summary: Show an adjustment
+      tags:
+      - Adjustments
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Returns details of a specific adjustment.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: order_id
+        in: path
+        required: true
+        description: Order prefixed ID
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        description: Adjustment prefixed ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: adjustment found
+          content:
+            application/json:
+              example:
+                id: adj_UkLWZg9DAJ
+                label: Admin discount
+                display_amount: "$0.00"
+                included: false
+                created_at: '2026-04-29T10:49:45.775Z'
+                updated_at: '2026-04-29T10:49:45.779Z'
+                amount: '0.0'
+                order_id: or_UkLWZg9DAJ
+  "/api/v3/admin/products/{product_id}/media":
+    get:
+      summary: List product media
+      tags:
+      - Product Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Returns a paginated list of media (images, video) for a product.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Page number
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: media found
+          content:
+            application/json:
+              example:
+                data:
+                - id: media_UkLWZg9DAJ
+                  product_id: prod_UkLWZg9DAJ
+                  variant_ids:
+                  - variant_UkLWZg9DAJ
+                  position: 1
+                  alt:
+                  media_type: image
+                  focal_point_x:
+                  focal_point_y:
+                  external_video_url:
+                  original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
+                  mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
+                  small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
+                  medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
+                  large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
+                  xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
+                  og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
+                  created_at: '2026-04-29T10:50:08.202Z'
+                  updated_at: '2026-04-29T10:50:08.204Z'
+                  viewable_id: variant_UkLWZg9DAJ
+                  viewable_type: Spree::Variant
+                meta:
+                  page: 1
+                  limit: 25
+                  count: 1
+                  pages: 1
+                  from: 1
+                  to: 1
+                  in: 1
+                  previous:
+                  next:
+    post:
+      summary: Create a product media item
+      tags:
+      - Product Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Creates a new media item (image, video) for a product.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      responses:
+        '202':
+          description: media import from URL enqueued
+        '422':
+          description: validation error (attachment required)
+          content:
+            application/json:
+              example:
+                error:
+                  code: validation_error
+                  message: Attachment can't be blank
+                  details:
+                    attachment:
+                    - can't be blank
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alt:
+                  type: string
+                  example: Product front view
+                position:
+                  type: integer
+                  example: 1
+                type:
+                  type: string
+                  example: Spree::Image
+                  description: Media type (defaults to Spree::Image)
+                url:
+                  type: string
+                  example: https://example.com/image.jpg
+                  description: External URL to import image from (async). Returns
+                    202 Accepted.
+  "/api/v3/admin/products/{product_id}/media/{id}":
+    patch:
+      summary: Update a product media item
+      tags:
+      - Product Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Updates a product media item. Only provided fields are updated.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        description: Media prefixed ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: media updated
+          content:
+            application/json:
+              example:
+                id: media_UkLWZg9DAJ
+                product_id: prod_UkLWZg9DAJ
+                variant_ids:
+                - variant_UkLWZg9DAJ
+                position: 1
+                alt: Updated alt text
+                media_type: image
+                focal_point_x:
+                focal_point_y:
+                external_video_url:
+                original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
+                mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
+                small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
+                medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
+                large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
+                xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
+                og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
+                created_at: '2026-04-29T10:50:09.172Z'
+                updated_at: '2026-04-29T10:50:09.464Z'
+                viewable_id: variant_UkLWZg9DAJ
+                viewable_type: Spree::Variant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alt:
+                  type: string
+                  example: Updated alt text
+                position:
+                  type: integer
+                  example: 2
+    delete:
+      summary: Delete a product media item
+      tags:
+      - Product Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Deletes a media item from a product.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        description: Media prefixed ID
+        schema:
+          type: string
+      responses:
+        '204':
+          description: media deleted
+  "/api/v3/admin/products/{product_id}/variants/{variant_id}/media":
+    get:
+      summary: List variant media
+      tags:
+      - Variant Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Returns a paginated list of media (images, video) for a variant.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: variant_id
+        in: path
+        required: true
+        description: Variant prefixed ID
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: Page number
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: Number of records per page
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: variant media found
+          content:
+            application/json:
+              example:
+                data:
+                - id: media_UkLWZg9DAJ
+                  product_id: prod_UkLWZg9DAJ
+                  variant_ids:
+                  - variant_gbHJdmfrXB
+                  position: 1
+                  alt:
+                  media_type: image
+                  focal_point_x:
+                  focal_point_y:
+                  external_video_url:
+                  original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
+                  mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
+                  small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
+                  medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
+                  large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
+                  xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
+                  og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
+                  created_at: '2026-04-29T10:50:12.463Z'
+                  updated_at: '2026-04-29T10:50:12.465Z'
+                  viewable_id: variant_gbHJdmfrXB
+                  viewable_type: Spree::Variant
+                meta:
+                  page: 1
+                  limit: 25
+                  count: 1
+                  pages: 1
+                  from: 1
+                  to: 1
+                  in: 1
+                  previous:
+                  next:
+    post:
+      summary: Create a variant media item
+      tags:
+      - Variant Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Creates a new media item (image, video) for a variant.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: variant_id
+        in: path
+        required: true
+        description: Variant prefixed ID
+        schema:
+          type: string
+      responses:
+        '202':
+          description: variant media import from URL enqueued
+        '422':
+          description: validation error (attachment required)
+          content:
+            application/json:
+              example:
+                error:
+                  code: validation_error
+                  message: Attachment can't be blank
+                  details:
+                    attachment:
+                    - can't be blank
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alt:
+                  type: string
+                  example: Variant image
+                position:
+                  type: integer
+                  example: 1
+                type:
+                  type: string
+                  example: Spree::Image
+                  description: Media type (defaults to Spree::Image)
+                url:
+                  type: string
+                  example: https://example.com/image.jpg
+                  description: External URL to import image from (async). Returns
+                    202 Accepted.
+  "/api/v3/admin/products/{product_id}/variants/{variant_id}/media/{id}":
+    patch:
+      summary: Update a variant media item
+      tags:
+      - Variant Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Updates a variant media item. Only provided fields are updated.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: variant_id
+        in: path
+        required: true
+        description: Variant prefixed ID
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        description: Media prefixed ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: variant media updated
+          content:
+            application/json:
+              example:
+                id: media_UkLWZg9DAJ
+                product_id: prod_UkLWZg9DAJ
+                variant_ids:
+                - variant_gbHJdmfrXB
+                position: 1
+                alt: Updated variant image
+                media_type: image
+                focal_point_x:
+                focal_point_y:
+                external_video_url:
+                original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
+                mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
+                small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
+                medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
+                large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
+                xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
+                og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
+                created_at: '2026-04-29T10:50:13.491Z'
+                updated_at: '2026-04-29T10:50:13.774Z'
+                viewable_id: variant_gbHJdmfrXB
+                viewable_type: Spree::Variant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                alt:
+                  type: string
+                  example: Updated variant image
+                position:
+                  type: integer
+                  example: 2
+    delete:
+      summary: Delete a variant media item
+      tags:
+      - Variant Media
+      security:
+      - api_key: []
+        bearer_auth: []
+      description: Deletes a media item from a variant.
+      parameters:
+      - name: x-spree-api-key
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer token for admin authentication
+        schema:
+          type: string
+      - name: product_id
+        in: path
+        required: true
+        description: Product prefixed ID
+        schema:
+          type: string
+      - name: variant_id
+        in: path
+        required: true
+        description: Variant prefixed ID
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        description: Media prefixed ID
+        schema:
+          type: string
+      responses:
+        '204':
+          description: variant media deleted
   "/api/v3/store/customers/me/addresses":
     get:
       summary: List customer addresses
@@ -102,25 +720,25 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 3 Lovely Street
+                  address1: 63 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
                   phone: 555-555-0199
                   company: Company
-                  country_name: NAME_1
-                  country_iso: I1
-                  state_text: STATE_ABBR_1
-                  state_abbr: STATE_ABBR_1
+                  country_name: NAME_23
+                  country_iso: I23
+                  state_text: STATE_ABBR_92
+                  state_abbr: STATE_ABBR_92
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_1
+                  state_name: STATE_NAME_92
                 - id: addr_gbHJdmfrXB
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 2 Lovely Street
+                  address1: 62 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -128,17 +746,17 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_3
-                  state_abbr: STATE_ABBR_3
+                  state_text: STATE_ABBR_94
+                  state_abbr: STATE_ABBR_94
                   quick_checkout: false
                   is_default_billing: true
                   is_default_shipping: false
-                  state_name: STATE_NAME_3
+                  state_name: STATE_NAME_94
                 - id: addr_UkLWZg9DAJ
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 1 Lovely Street
+                  address1: 61 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -146,12 +764,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_2
-                  state_abbr: STATE_ABBR_2
+                  state_text: STATE_ABBR_93
+                  state_abbr: STATE_ABBR_93
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: true
-                  state_name: STATE_NAME_2
+                  state_name: STATE_NAME_93
                 meta:
                   page: 1
                   limit: 25
@@ -239,14 +857,14 @@ paths:
                 city: New York
                 phone: "+1 555 123 4567"
                 company:
-                country_name: NAME_3
-                country_iso: I3
-                state_text: STATE_ABBR_7
-                state_abbr: STATE_ABBR_7
+                country_name: NAME_25
+                country_iso: I25
+                state_text: STATE_ABBR_98
+                state_abbr: STATE_ABBR_98
                 quick_checkout: false
                 is_default_billing: false
                 is_default_shipping: false
-                state_name: STATE_NAME_7
+                state_name: STATE_NAME_98
               schema:
                 "$ref": "#/components/schemas/Address"
         '422':
@@ -387,20 +1005,20 @@ paths:
                 first_name: John
                 last_name: Doe
                 full_name: John Doe
-                address1: 15 Lovely Street
+                address1: 75 Lovely Street
                 address2: Northwest
                 postal_code: '35005'
                 city: Herndon
                 phone: 555-555-0199
                 company: Company
-                country_name: NAME_5
-                country_iso: I5
-                state_text: STATE_ABBR_13
-                state_abbr: STATE_ABBR_13
+                country_name: NAME_27
+                country_iso: I27
+                state_text: STATE_ABBR_104
+                state_abbr: STATE_ABBR_104
                 quick_checkout: false
                 is_default_billing: false
                 is_default_shipping: false
-                state_name: STATE_NAME_13
+                state_name: STATE_NAME_104
               schema:
                 "$ref": "#/components/schemas/Address"
         '404':
@@ -462,20 +1080,20 @@ paths:
                 first_name: John
                 last_name: Doe
                 full_name: John Doe
-                address1: 21 Lovely Street
+                address1: 81 Lovely Street
                 address2: Northwest
                 postal_code: '35005'
                 city: Los Angeles
                 phone: 555-555-0199
                 company: Company
-                country_name: NAME_7
-                country_iso: I7
-                state_text: STATE_ABBR_19
-                state_abbr: STATE_ABBR_19
+                country_name: NAME_29
+                country_iso: I29
+                state_text: STATE_ABBR_110
+                state_abbr: STATE_ABBR_110
                 quick_checkout: false
                 is_default_billing: false
                 is_default_shipping: false
-                state_name: STATE_NAME_19
+                state_name: STATE_NAME_110
               schema:
                 "$ref": "#/components/schemas/Address"
       requestBody:
@@ -590,13 +1208,13 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImNjYWU3OThjLTIxNTYtNGM5Mi04YzA5LWIxMDViMDZmYTNlNSIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc2MTYxODIyfQ.K9UvQDyZ1Z2-NgFQ--azTRbyk8Syd4gJGR8y8Kv06NE
-                refresh_token: jfUcHe3M3sksXfCJhrbgSTKV
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImIzMjVlY2M0LWQxMDYtNDNlNi05MDc4LWM5ZGI0MDc5YzAyYSIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDYzNDIyfQ.D8X3NHrqCn3i5fgFgdpwa2Sjfc8UG5_yUk3HuiDI-7w
+                refresh_token: JSYM5Q3NLy497JKBnAWDRSey
                 user:
                   id: cus_UkLWZg9DAJ
                   email: test@example.com
-                  first_name: Jodie
-                  last_name: Welch
+                  first_name: Keesha
+                  last_name: Robel
                   phone:
                   accepts_email_marketing: false
                   available_store_credit_total: '0'
@@ -671,13 +1289,13 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6IjY0MWQ5Y2NmLTNhM2EtNDk2OS1hNWUyLWUwNWViZjdmYWIxNyIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc2MTYxODIzfQ.6CIayRaSgbOgiwJyuweu92lgkwboaEufAQDHjrWCR5Y
-                refresh_token: NPstvWaaAHLokJkeKyfY4TzG
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImIwZTYxNDAxLTMyMGMtNDNmOC1hMTg0LThjNzE0NDFlM2Q4MiIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDYzNDIzfQ.RuLvcqp7kj2E28wmG3soWhE4deoWKew0eCPCvriyREc
+                refresh_token: tDvpvuuhRZYPLHCTj9KuE1PT
                 user:
                   id: cus_UkLWZg9DAJ
                   email: test@example.com
-                  first_name: Shiloh
-                  last_name: Robel
+                  first_name: Coralie
+                  last_name: Botsford
                   phone:
                   accepts_email_marketing: false
                   available_store_credit_total: '0'
@@ -843,9 +1461,9 @@ paths:
                 data:
                 - id: cart_gbHJdmfrXB
                   market_id:
-                  number: R232078179
-                  token: zG15ZP7pVhYDcfbgTYU4hiq8aXojPfSy4c3
-                  email: maisha@bruen.com
+                  number: R471470566
+                  token: HafFjQfHw7jCvEUWDaqPy8kvQm9QbvDZpcG
+                  email: bridgett.parker@abernathyquigley.co.uk
                   customer_note:
                   currency: USD
                   locale: en
@@ -887,8 +1505,8 @@ paths:
                     variant_id: variant_gbHJdmfrXB
                     quantity: 1
                     currency: USD
-                    name: Product 27264
-                    slug: product-27264
+                    name: Product 579559
+                    slug: product-579559
                     options_text: ''
                     price: '10.0'
                     display_price: "$10.00"
@@ -913,7 +1531,7 @@ paths:
                     digital_links: []
                   fulfillments:
                   - id: ful_gbHJdmfrXB
-                    number: H29082671412
+                    number: H74595238338
                     tracking: U10000
                     tracking_url:
                     cost: '100.0'
@@ -941,14 +1559,14 @@ paths:
                       code: UPS_GROUND
                     stock_location:
                       id: sloc_UkLWZg9DAJ
-                      state_abbr: STATE_ABBR_32
-                      name: Kandace Kulas
+                      state_abbr: STATE_ABBR_123
+                      name: Joelle Padberg
                       address1: 1600 Pennsylvania Ave NW
                       city: Washington
                       zipcode: '20500'
                       country_iso: US
                       country_name: United States of America
-                      state_text: STATE_ABBR_32
+                      state_text: STATE_ABBR_123
                     delivery_rates:
                     - id: dr_gbHJdmfrXB
                       delivery_method_id: dm_gbHJdmfrXB
@@ -974,7 +1592,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 36 Lovely Street
+                    address1: 96 Lovely Street
                     address2: Northwest
                     postal_code: '35005'
                     city: Herndon
@@ -982,18 +1600,18 @@ paths:
                     company: Company
                     country_name: United States of America
                     country_iso: US
-                    state_text: STATE_ABBR_36
-                    state_abbr: STATE_ABBR_36
+                    state_text: STATE_ABBR_127
+                    state_abbr: STATE_ABBR_127
                     quick_checkout: false
                     is_default_billing: false
                     is_default_shipping: false
-                    state_name: STATE_NAME_36
+                    state_name: STATE_NAME_127
                   shipping_address:
                     id: addr_OIJLhNcSbf
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 37 Lovely Street
+                    address1: 97 Lovely Street
                     address2: Northwest
                     postal_code: '35005'
                     city: Herndon
@@ -1001,20 +1619,20 @@ paths:
                     company: Company
                     country_name: United States of America
                     country_iso: US
-                    state_text: STATE_ABBR_37
-                    state_abbr: STATE_ABBR_37
+                    state_text: STATE_ABBR_128
+                    state_abbr: STATE_ABBR_128
                     quick_checkout: false
                     is_default_billing: false
                     is_default_shipping: false
-                    state_name: STATE_NAME_37
+                    state_name: STATE_NAME_128
                   payment_methods: []
                   gift_card:
                   market:
                 - id: cart_UkLWZg9DAJ
                   market_id:
-                  number: R676619505
-                  token: JoRTMBpiuETzPG5ZjdvhR2oh3on6SLe5Esg
-                  email: maisha@bruen.com
+                  number: R719129789
+                  token: hrbr967gvjnhuuDGo1inkjD3tZtz6tqboAN
+                  email: bridgett.parker@abernathyquigley.co.uk
                   customer_note:
                   currency: USD
                   locale: en
@@ -1056,8 +1674,8 @@ paths:
                     variant_id: variant_UkLWZg9DAJ
                     quantity: 1
                     currency: USD
-                    name: Product 12178
-                    slug: product-12178
+                    name: Product 567610
+                    slug: product-567610
                     options_text: ''
                     price: '10.0'
                     display_price: "$10.00"
@@ -1082,7 +1700,7 @@ paths:
                     digital_links: []
                   fulfillments:
                   - id: ful_UkLWZg9DAJ
-                    number: H94768987826
+                    number: H09180957231
                     tracking: U10000
                     tracking_url:
                     cost: '100.0'
@@ -1110,14 +1728,14 @@ paths:
                       code: UPS_GROUND
                     stock_location:
                       id: sloc_UkLWZg9DAJ
-                      state_abbr: STATE_ABBR_32
-                      name: Kandace Kulas
+                      state_abbr: STATE_ABBR_123
+                      name: Joelle Padberg
                       address1: 1600 Pennsylvania Ave NW
                       city: Washington
                       zipcode: '20500'
                       country_iso: US
                       country_name: United States of America
-                      state_text: STATE_ABBR_32
+                      state_text: STATE_ABBR_123
                     delivery_rates:
                     - id: dr_UkLWZg9DAJ
                       delivery_method_id: dm_UkLWZg9DAJ
@@ -1143,7 +1761,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 34 Lovely Street
+                    address1: 94 Lovely Street
                     address2: Northwest
                     postal_code: '35005'
                     city: Herndon
@@ -1151,18 +1769,18 @@ paths:
                     company: Company
                     country_name: United States of America
                     country_iso: US
-                    state_text: STATE_ABBR_34
-                    state_abbr: STATE_ABBR_34
+                    state_text: STATE_ABBR_125
+                    state_abbr: STATE_ABBR_125
                     quick_checkout: false
                     is_default_billing: false
                     is_default_shipping: false
-                    state_name: STATE_NAME_34
+                    state_name: STATE_NAME_125
                   shipping_address:
                     id: addr_VqXmZF31wY
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 35 Lovely Street
+                    address1: 95 Lovely Street
                     address2: Northwest
                     postal_code: '35005'
                     city: Herndon
@@ -1170,12 +1788,12 @@ paths:
                     company: Company
                     country_name: United States of America
                     country_iso: US
-                    state_text: STATE_ABBR_35
-                    state_abbr: STATE_ABBR_35
+                    state_text: STATE_ABBR_126
+                    state_abbr: STATE_ABBR_126
                     quick_checkout: false
                     is_default_billing: false
                     is_default_shipping: false
-                    state_name: STATE_NAME_35
+                    state_name: STATE_NAME_126
                   payment_methods: []
                   gift_card:
                   market:
@@ -1254,8 +1872,8 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R943663093
-                token: FievmZcr9NHVLz13M8ohRrcBjevgVjbRbVC
+                number: R726052394
+                token: bjgtGTAwFNzmdMghbyNvSSY5Bhmphe3Yypw
                 email:
                 customer_note:
                 currency: USD
@@ -1410,9 +2028,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R938172735
-                token: mq3o1sSWFULnd4nAKvThhRNgaEnAyNZBf5D
-                email: ivonne@schummkunde.ca
+                number: R422904303
+                token: Zj1VTueTADRkkBECLKgUWgjoyY4Bjjf3rp2
+                email: isela_hauck@auer.com
                 customer_note:
                 currency: USD
                 locale: en
@@ -1439,7 +2057,7 @@ paths:
                 display_delivery_total: "$0.00"
                 warnings:
                 - code: line_item_removed
-                  message: Product 62602 was removed because it was sold out
+                  message: Product 611681 was removed because it was sold out
                   line_item_id: li_UkLWZg9DAJ
                   variant_id: variant_UkLWZg9DAJ
                 store_credit_total: '0.0'
@@ -1464,7 +2082,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 44 Lovely Street
+                  address1: 104 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -1472,18 +2090,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_44
-                  state_abbr: STATE_ABBR_44
+                  state_text: STATE_ABBR_135
+                  state_abbr: STATE_ABBR_135
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_44
+                  state_name: STATE_NAME_135
                 shipping_address:
                   id: addr_gbHJdmfrXB
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 45 Lovely Street
+                  address1: 105 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -1491,12 +2109,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_45
-                  state_abbr: STATE_ABBR_45
+                  state_text: STATE_ABBR_136
+                  state_abbr: STATE_ABBR_136
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_45
+                  state_name: STATE_NAME_136
                 payment_methods: []
                 gift_card:
                 market:
@@ -1581,9 +2199,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R252724618
-                token: E4K899xK1ZBq7ruLV2dwq4gxKXekKhFiVKb
-                email: maye@hirthe.ca
+                number: R957103637
+                token: HQxdHjJrkj5DHrLzDsZrCmHh6HAnkckM4nb
+                email: rolland@luettgen.com
                 customer_note: Leave at door
                 currency: USD
                 locale: en
@@ -1627,8 +2245,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 7619
-                  slug: product-7619
+                  name: Product 624104
+                  slug: product-624104
                   options_text: ''
                   price: '19.99'
                   display_price: "$19.99"
@@ -1653,7 +2271,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_gbHJdmfrXB
-                  number: H64092938149
+                  number: H86120439581
                   tracking:
                   tracking_url:
                   cost: '10.0'
@@ -1681,14 +2299,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_46
-                    name: Paige Romaguera
+                    state_abbr: STATE_ABBR_137
+                    name: Sook Cummerata
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_46
+                    state_text: STATE_ABBR_137
                   delivery_rates:
                   - id: dr_gbHJdmfrXB
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -1714,7 +2332,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 48 Lovely Street
+                  address1: 108 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -1722,18 +2340,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_48
-                  state_abbr: STATE_ABBR_48
+                  state_text: STATE_ABBR_139
+                  state_abbr: STATE_ABBR_139
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_48
+                  state_name: STATE_NAME_139
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 49 Lovely Street
+                  address1: 109 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -1741,12 +2359,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_49
-                  state_abbr: STATE_ABBR_49
+                  state_text: STATE_ABBR_140
+                  state_abbr: STATE_ABBR_140
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_49
+                  state_name: STATE_NAME_140
                 payment_methods: []
                 gift_card:
                 market:
@@ -1919,9 +2537,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R028378406
-                token: r69yQYQREesLPoT1Ga4hYFDV4DyiRMwx9mc
-                email: eva@nolan.com
+                number: R786196151
+                token: e5rvddh349aEjUgBen6GeL7QLySXMZVUoD8
+                email: maya_hermann@zieme.us
                 customer_note:
                 currency: USD
                 locale: en
@@ -1963,8 +2581,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 95368
-                  slug: product-95368
+                  name: Product 643839
+                  slug: product-643839
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -1989,7 +2607,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H19674421649
+                  number: H59612746246
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -2017,14 +2635,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_54
-                    name: Kaitlin Gorczany
+                    state_abbr: STATE_ABBR_145
+                    name: Adelaide Jones
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_54
+                    state_text: STATE_ABBR_145
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -2050,7 +2668,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 54 Lovely Street
+                  address1: 114 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -2058,18 +2676,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_54
-                  state_abbr: STATE_ABBR_54
+                  state_text: STATE_ABBR_145
+                  state_abbr: STATE_ABBR_145
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_54
+                  state_name: STATE_NAME_145
                 shipping_address:
                   id: addr_gbHJdmfrXB
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 55 Lovely Street
+                  address1: 115 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -2077,12 +2695,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_55
-                  state_abbr: STATE_ABBR_55
+                  state_text: STATE_ABBR_146
+                  state_abbr: STATE_ABBR_146
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_55
+                  state_name: STATE_NAME_146
                 payment_methods: []
                 gift_card:
                 market:
@@ -2152,8 +2770,8 @@ paths:
               example:
                 id: or_UkLWZg9DAJ
                 market_id:
-                number: R019572861
-                email: lea.wolff@hacketttremblay.info
+                number: R100883351
+                email: charise.hegmann@ruecker.biz
                 customer_note:
                 currency: USD
                 locale: en
@@ -2180,7 +2798,7 @@ paths:
                 display_delivery_total: "$10.00"
                 fulfillment_status: backorder
                 payment_status: paid
-                completed_at: '2026-04-14T09:17:10.133Z'
+                completed_at: '2026-04-29T10:50:29.089Z'
                 store_credit_total: '0.0'
                 display_store_credit_total: "$0.00"
                 covered_by_store_credit: false
@@ -2190,8 +2808,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 116185
-                  slug: product-116185
+                  name: Product 663637
+                  slug: product-663637
                   options_text: ''
                   price: '19.99'
                   display_price: "$19.99"
@@ -2216,7 +2834,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_gbHJdmfrXB
-                  number: H54059075466
+                  number: H88952533523
                   tracking:
                   tracking_url:
                   cost: '10.0'
@@ -2244,14 +2862,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_60
-                    name: Nanci Ruecker
+                    state_abbr: STATE_ABBR_151
+                    name: Aliza Botsford
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_60
+                    state_text: STATE_ABBR_151
                   delivery_rates:
                   - id: dr_gbHJdmfrXB
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -2274,8 +2892,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: '12345'
-                  number: PCJJXDN4
+                  response_code: BGS-ce1c387a56e5
+                  number: PYPRN144
                   amount: '29.99'
                   display_amount: "$29.99"
                   status: completed
@@ -2301,7 +2919,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 62 Lovely Street
+                  address1: 122 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -2309,18 +2927,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_62
-                  state_abbr: STATE_ABBR_62
+                  state_text: STATE_ABBR_153
+                  state_abbr: STATE_ABBR_153
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_62
+                  state_name: STATE_NAME_153
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 63 Lovely Street
+                  address1: 123 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -2328,12 +2946,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_63
-                  state_abbr: STATE_ABBR_63
+                  state_text: STATE_ABBR_154
+                  state_abbr: STATE_ABBR_154
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_63
+                  state_name: STATE_NAME_154
                 gift_card:
                 market:
               schema:
@@ -2622,7 +3240,7 @@ paths:
               example:
                 data:
                 - iso: DE
-                  iso3: IS19
+                  iso3: IS41
                   name: Germany
                   states_required: false
                   zipcode_required: true
@@ -3130,13 +3748,13 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6Ijg2YjI5NGYxLTU4OTItNGY2YS1hOWEzLTY0ZjUwM2I0ODMxMyIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc2MTYxODM2fQ.k2zGOAOvYuPsD5raanWMRO6in3ogqqdMWbPMfSJgQc4
-                refresh_token: qjyCdgmLNW4p3XnUDXGgfVyT
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6Ijc5ZDhhNzJmLTk1MWItNDI3MS1iMTM0LWI4ZmY4YjJiZTlhOSIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDYzNDM1fQ.FRmEBHJOnv0F_FEQCxz1TLg-moXIFvKqvUR6Etg9iMo
+                refresh_token: RoHNyL7rZQNfkzTJm4Bj4Eov
                 user:
                   id: cus_UkLWZg9DAJ
                   email: customer@example.com
-                  first_name: Chelsea
-                  last_name: Bayer
+                  first_name: Darrin
+                  last_name: Langosh
                   phone:
                   accepts_email_marketing: false
                   available_store_credit_total: '0'
@@ -3308,8 +3926,8 @@ paths:
                 data:
                 - id: or_UkLWZg9DAJ
                   market_id:
-                  number: R003163523
-                  email: shin@brakus.biz
+                  number: R199401374
+                  email: bernice@parisian.info
                   customer_note:
                   currency: USD
                   locale: en
@@ -3336,7 +3954,7 @@ paths:
                   display_delivery_total: "$100.00"
                   fulfillment_status:
                   payment_status:
-                  completed_at: '2026-04-14T09:17:17.539Z'
+                  completed_at: '2026-04-29T10:50:36.041Z'
                   store_credit_total: '0.0'
                   display_store_credit_total: "$0.00"
                   covered_by_store_credit: false
@@ -3346,8 +3964,8 @@ paths:
                     variant_id: variant_UkLWZg9DAJ
                     quantity: 1
                     currency: USD
-                    name: Product 205526
-                    slug: product-205526
+                    name: Product 752016
+                    slug: product-752016
                     options_text: ''
                     price: '10.0'
                     display_price: "$10.00"
@@ -3372,7 +3990,7 @@ paths:
                     digital_links: []
                   fulfillments:
                   - id: ful_UkLWZg9DAJ
-                    number: H84142443892
+                    number: H91888025843
                     tracking: U10000
                     tracking_url:
                     cost: '100.0'
@@ -3400,14 +4018,14 @@ paths:
                       code: UPS_GROUND
                     stock_location:
                       id: sloc_UkLWZg9DAJ
-                      state_abbr: STATE_ABBR_87
-                      name: Annita Deckow
+                      state_abbr: STATE_ABBR_178
+                      name: Merrill Lemke
                       address1: 1600 Pennsylvania Ave NW
                       city: Washington
                       zipcode: '20500'
                       country_iso: US
                       country_name: United States of America
-                      state_text: STATE_ABBR_87
+                      state_text: STATE_ABBR_178
                     delivery_rates:
                     - id: dr_gbHJdmfrXB
                       delivery_method_id: dm_UkLWZg9DAJ
@@ -3433,7 +4051,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 82 Lovely Street
+                    address1: 142 Lovely Street
                     address2: Northwest
                     postal_code: '35005'
                     city: Herndon
@@ -3441,18 +4059,18 @@ paths:
                     company: Company
                     country_name: United States of America
                     country_iso: US
-                    state_text: STATE_ABBR_89
-                    state_abbr: STATE_ABBR_89
+                    state_text: STATE_ABBR_180
+                    state_abbr: STATE_ABBR_180
                     quick_checkout: false
                     is_default_billing: false
                     is_default_shipping: false
-                    state_name: STATE_NAME_89
+                    state_name: STATE_NAME_180
                   shipping_address:
                     id: addr_VqXmZF31wY
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 83 Lovely Street
+                    address1: 143 Lovely Street
                     address2: Northwest
                     postal_code: '35005'
                     city: Herndon
@@ -3460,12 +4078,12 @@ paths:
                     company: Company
                     country_name: United States of America
                     country_iso: US
-                    state_text: STATE_ABBR_90
-                    state_abbr: STATE_ABBR_90
+                    state_text: STATE_ABBR_181
+                    state_abbr: STATE_ABBR_181
                     quick_checkout: false
                     is_default_billing: false
                     is_default_shipping: false
-                    state_name: STATE_NAME_90
+                    state_name: STATE_NAME_181
                   gift_card:
                   market:
                 meta:
@@ -3563,8 +4181,8 @@ paths:
               example:
                 id: or_UkLWZg9DAJ
                 market_id:
-                number: R701124602
-                email: damien_sanford@wunschlehner.co.uk
+                number: R192684346
+                email: stephan@kingrohan.biz
                 customer_note:
                 currency: USD
                 locale: en
@@ -3591,7 +4209,7 @@ paths:
                 display_delivery_total: "$100.00"
                 fulfillment_status:
                 payment_status:
-                completed_at: '2026-04-14T09:17:18.250Z'
+                completed_at: '2026-04-29T10:50:36.721Z'
                 store_credit_total: '0.0'
                 display_store_credit_total: "$0.00"
                 covered_by_store_credit: false
@@ -3601,8 +4219,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 222299
-                  slug: product-222299
+                  name: Product 777387
+                  slug: product-777387
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -3627,7 +4245,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H01807094479
+                  number: H03244332837
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -3655,14 +4273,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_93
-                    name: Sonya Smitham
+                    state_abbr: STATE_ABBR_184
+                    name: Ceola Heathcote
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_93
+                    state_text: STATE_ABBR_184
                   delivery_rates:
                   - id: dr_gbHJdmfrXB
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -3688,7 +4306,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 88 Lovely Street
+                  address1: 148 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -3696,18 +4314,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_95
-                  state_abbr: STATE_ABBR_95
+                  state_text: STATE_ABBR_186
+                  state_abbr: STATE_ABBR_186
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_95
+                  state_name: STATE_NAME_186
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 89 Lovely Street
+                  address1: 149 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -3715,12 +4333,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_96
-                  state_abbr: STATE_ABBR_96
+                  state_text: STATE_ABBR_187
+                  state_abbr: STATE_ABBR_187
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_96
+                  state_name: STATE_NAME_187
                 gift_card:
                 market:
               schema:
@@ -3776,8 +4394,8 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImM1NGU5MzRhLWEyYTYtNDNiYi05MzA4LWNlYWY1ODE1YTMxZiIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc2MTYxODM5fQ.2_yHXmEz6hPyIQ4SBR74_XKxhkvtwDEuNQEu5dlOEOE
-                refresh_token: YsK6yzNeTHiYRJXeWGioxm64
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6IjI3YmM5YjBlLTFiZjEtNDU5Ny1iMWYxLTk5N2Q2OGRkZjFjOSIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDYzNDM3fQ.uA9BQYSznjc35ScHblb6KCqvbB9doDnTu2mo5XlA3a8
+                refresh_token: MUk9YT6q227ADbBesnF8VxHD
                 user:
                   id: cus_UkLWZg9DAJ
                   email: newuser@example.com
@@ -3890,9 +4508,9 @@ paths:
             application/json:
               example:
                 id: cus_UkLWZg9DAJ
-                email: talisha_swift@west.ca
-                first_name: Heath
-                last_name: Roberts
+                email: dreama.rempel@simonis.info
+                first_name: Meaghan
+                last_name: Ebert
                 phone: 555-555-0199
                 accepts_email_marketing: false
                 available_store_credit_total: '0'
@@ -3902,7 +4520,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 95 Lovely Street
+                  address1: 155 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -3910,17 +4528,17 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_102
-                  state_abbr: STATE_ABBR_102
+                  state_text: STATE_ABBR_193
+                  state_abbr: STATE_ABBR_193
                   quick_checkout: false
                   is_default_billing: true
                   is_default_shipping: false
-                  state_name: STATE_NAME_102
+                  state_name: STATE_NAME_193
                 - id: addr_UkLWZg9DAJ
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 94 Lovely Street
+                  address1: 154 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -3928,18 +4546,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_101
-                  state_abbr: STATE_ABBR_101
+                  state_text: STATE_ABBR_192
+                  state_abbr: STATE_ABBR_192
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: true
-                  state_name: STATE_NAME_101
+                  state_name: STATE_NAME_192
                 default_billing_address:
                   id: addr_gbHJdmfrXB
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 95 Lovely Street
+                  address1: 155 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -3947,18 +4565,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_102
-                  state_abbr: STATE_ABBR_102
+                  state_text: STATE_ABBR_193
+                  state_abbr: STATE_ABBR_193
                   quick_checkout: false
                   is_default_billing: true
                   is_default_shipping: false
-                  state_name: STATE_NAME_102
+                  state_name: STATE_NAME_193
                 default_shipping_address:
                   id: addr_UkLWZg9DAJ
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 94 Lovely Street
+                  address1: 154 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -3966,12 +4584,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_101
-                  state_abbr: STATE_ABBR_101
+                  state_text: STATE_ABBR_192
+                  state_abbr: STATE_ABBR_192
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: true
-                  state_name: STATE_NAME_101
+                  state_name: STATE_NAME_192
               schema:
                 "$ref": "#/components/schemas/Customer"
         '401':
@@ -4028,7 +4646,7 @@ paths:
             application/json:
               example:
                 id: cus_UkLWZg9DAJ
-                email: carolina@parisian.us
+                email: dori@rodriguez.biz
                 first_name: Updated
                 last_name: Name
                 phone: 555-555-0199
@@ -4040,7 +4658,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 97 Lovely Street
+                  address1: 157 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4048,17 +4666,17 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_104
-                  state_abbr: STATE_ABBR_104
+                  state_text: STATE_ABBR_195
+                  state_abbr: STATE_ABBR_195
                   quick_checkout: false
                   is_default_billing: true
                   is_default_shipping: false
-                  state_name: STATE_NAME_104
+                  state_name: STATE_NAME_195
                 - id: addr_UkLWZg9DAJ
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 96 Lovely Street
+                  address1: 156 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4066,18 +4684,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_103
-                  state_abbr: STATE_ABBR_103
+                  state_text: STATE_ABBR_194
+                  state_abbr: STATE_ABBR_194
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: true
-                  state_name: STATE_NAME_103
+                  state_name: STATE_NAME_194
                 default_billing_address:
                   id: addr_gbHJdmfrXB
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 97 Lovely Street
+                  address1: 157 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4085,18 +4703,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_104
-                  state_abbr: STATE_ABBR_104
+                  state_text: STATE_ABBR_195
+                  state_abbr: STATE_ABBR_195
                   quick_checkout: false
                   is_default_billing: true
                   is_default_shipping: false
-                  state_name: STATE_NAME_104
+                  state_name: STATE_NAME_195
                 default_shipping_address:
                   id: addr_UkLWZg9DAJ
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 96 Lovely Street
+                  address1: 156 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4104,12 +4722,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_103
-                  state_abbr: STATE_ABBR_103
+                  state_text: STATE_ABBR_194
+                  state_abbr: STATE_ABBR_194
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: true
-                  state_name: STATE_NAME_103
+                  state_name: STATE_NAME_194
               schema:
                 "$ref": "#/components/schemas/Customer"
         '422':
@@ -4267,9 +4885,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R081079159
-                token: bccBaE7xBqXGz9538mnxTfsvesKQpsfSc1z
-                email: julia@hodkiewicz.biz
+                number: R379896415
+                token: Pt7j1jUzgy5J9dJuWnrLUMCUZ5DT6TD38oo
+                email: charise.robel@ullrich.us
                 customer_note:
                 currency: USD
                 locale: en
@@ -4318,8 +4936,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 301628
-                  slug: product-301628
+                  name: Product 853932
+                  slug: product-853932
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -4344,7 +4962,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H99376630233
+                  number: H76685276530
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -4372,14 +4990,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_119
-                    name: Jenee Stroman
+                    state_abbr: STATE_ABBR_210
+                    name: Andera Barrows
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_119
+                    state_text: STATE_ABBR_210
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -4405,7 +5023,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 114 Lovely Street
+                  address1: 174 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4413,18 +5031,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_121
-                  state_abbr: STATE_ABBR_121
+                  state_text: STATE_ABBR_212
+                  state_abbr: STATE_ABBR_212
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_121
+                  state_name: STATE_NAME_212
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 115 Lovely Street
+                  address1: 175 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4432,12 +5050,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_122
-                  state_abbr: STATE_ABBR_122
+                  state_text: STATE_ABBR_213
+                  state_abbr: STATE_ABBR_213
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_122
+                  state_name: STATE_NAME_213
                 payment_methods: []
                 gift_card:
                 market:
@@ -4527,9 +5145,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R083155091
-                token: gQqNxRcp1rMrwRE7sPnXsWSqDzXzqRMfaJ3
-                email: vannesa@heidenreich.co.uk
+                number: R743152262
+                token: 4g5Rd89j2tekAsqrBM5rHFiKYJrEhCY1jyv
+                email: lucille@powlowski.biz
                 customer_note:
                 currency: USD
                 locale: en
@@ -4571,8 +5189,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 328702
-                  slug: product-328702
+                  name: Product 872597
+                  slug: product-872597
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -4597,7 +5215,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H74829810268
+                  number: H00373340716
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -4625,14 +5243,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_127
-                    name: Carrol Lindgren
+                    state_abbr: STATE_ABBR_218
+                    name: Bea Schultz
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_127
+                    state_text: STATE_ABBR_218
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -4658,7 +5276,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 122 Lovely Street
+                  address1: 182 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4666,18 +5284,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_129
-                  state_abbr: STATE_ABBR_129
+                  state_text: STATE_ABBR_220
+                  state_abbr: STATE_ABBR_220
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_129
+                  state_name: STATE_NAME_220
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 123 Lovely Street
+                  address1: 183 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4685,12 +5303,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_130
-                  state_abbr: STATE_ABBR_130
+                  state_text: STATE_ABBR_221
+                  state_abbr: STATE_ABBR_221
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_130
+                  state_name: STATE_NAME_221
                 payment_methods: []
                 gift_card:
                 market:
@@ -4769,9 +5387,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R848172025
-                token: CCiBRx13RfPPoNcrsBw9ScuBBCJNx1QXDRv
-                email: vonda@schmidt.ca
+                number: R104959955
+                token: aMgNdSuL7EPtwsCPZG1AoCRQWo2jRkKV5HL
+                email: wyatt@stoltenberg.co.uk
                 customer_note:
                 currency: USD
                 locale: en
@@ -4815,8 +5433,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 34283
-                  slug: product-34283
+                  name: Product 893232
+                  slug: product-893232
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -4841,7 +5459,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H99037479862
+                  number: H32040529041
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -4869,14 +5487,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_135
-                    name: Newton Ferry
+                    state_abbr: STATE_ABBR_226
+                    name: Treasa Kuhn
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_135
+                    state_text: STATE_ABBR_226
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -4902,7 +5520,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 130 Lovely Street
+                  address1: 190 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4910,18 +5528,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_137
-                  state_abbr: STATE_ABBR_137
+                  state_text: STATE_ABBR_228
+                  state_abbr: STATE_ABBR_228
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_137
+                  state_name: STATE_NAME_228
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 131 Lovely Street
+                  address1: 191 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -4929,12 +5547,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_138
-                  state_abbr: STATE_ABBR_138
+                  state_text: STATE_ABBR_229
+                  state_abbr: STATE_ABBR_229
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_138
+                  state_name: STATE_NAME_229
                 payment_methods: []
                 gift_card:
                 market:
@@ -5027,9 +5645,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R534636874
-                token: 4nAvGyaWaG5svaQmWXzEYbw2Cqr5PLHbGrX
-                email: lael_baumbach@huelmayer.biz
+                number: R999279559
+                token: QHzk9caWQYRLB5xisENjfm95gSMvD1df2Lx
+                email: ora@kub.info
                 customer_note:
                 currency: USD
                 locale: en
@@ -5068,8 +5686,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 36180
-                  slug: product-36180
+                  name: Product 911122
+                  slug: product-911122
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -5094,7 +5712,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H46529036013
+                  number: H62216687249
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -5122,14 +5740,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_143
-                    name: Grazyna Bednar
+                    state_abbr: STATE_ABBR_234
+                    name: Heide Hansen
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_143
+                    state_text: STATE_ABBR_234
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -5152,8 +5770,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: 1-SC-20260414091727979773
-                  number: PKI8ZMEE
+                  response_code: 1-SC-20260429105046678898
+                  number: PD180RFA
                   amount: '50.0'
                   display_amount: "$50.00"
                   status: checkout
@@ -5179,7 +5797,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 138 Lovely Street
+                  address1: 198 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -5187,18 +5805,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_145
-                  state_abbr: STATE_ABBR_145
+                  state_text: STATE_ABBR_236
+                  state_abbr: STATE_ABBR_236
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_145
+                  state_name: STATE_NAME_236
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 139 Lovely Street
+                  address1: 199 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -5206,12 +5824,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_146
-                  state_abbr: STATE_ABBR_146
+                  state_text: STATE_ABBR_237
+                  state_abbr: STATE_ABBR_237
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_146
+                  state_name: STATE_NAME_237
                 payment_methods:
                 - id: pm_UkLWZg9DAJ
                   name: Store Credit
@@ -5330,9 +5948,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R219045203
-                token: rrFzEu6kvs9YuBXJpZR7oBq3KXXHEaBacoY
-                email: kiera.kuvalis@townebreitenberg.co.uk
+                number: R659207348
+                token: o3FM6PoYwtZRFdpaprtgnbgUXMbojhaaRmn
+                email: domenica@moenschaefer.co.uk
                 customer_note:
                 currency: USD
                 locale: en
@@ -5374,8 +5992,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 406611
-                  slug: product-406611
+                  name: Product 95217
+                  slug: product-95217
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -5400,7 +6018,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H26467945449
+                  number: H45267185219
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -5428,14 +6046,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_159
-                    name: Hermine Mertz
+                    state_abbr: STATE_ABBR_250
+                    name: Lindsay Bosco
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_159
+                    state_text: STATE_ABBR_250
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -5458,8 +6076,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: 1-SC-20260414091730492369
-                  number: P20ASZJU
+                  response_code: 1-SC-20260429105049202019
+                  number: PPL7OPNI
                   amount: '50.0'
                   display_amount: "$50.00"
                   status: invalid
@@ -5485,7 +6103,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 154 Lovely Street
+                  address1: 214 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -5493,18 +6111,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_161
-                  state_abbr: STATE_ABBR_161
+                  state_text: STATE_ABBR_252
+                  state_abbr: STATE_ABBR_252
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_161
+                  state_name: STATE_NAME_252
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 155 Lovely Street
+                  address1: 215 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -5512,12 +6130,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_162
-                  state_abbr: STATE_ABBR_162
+                  state_text: STATE_ABBR_253
+                  state_abbr: STATE_ABBR_253
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_162
+                  state_name: STATE_NAME_253
                 payment_methods: []
                 gift_card:
                 market:
@@ -5582,7 +6200,7 @@ paths:
               example:
                 data:
                 - id: gc_UkLWZg9DAJ
-                  code: F164794534BBCB57
+                  code: 7130BB409ABC20D8
                   status: active
                   currency: USD
                   amount: '10.0'
@@ -5678,7 +6296,7 @@ paths:
             application/json:
               example:
                 id: gc_UkLWZg9DAJ
-                code: 60BC446DEE5E15E9
+                code: E41BF12E6A00C9BA
                 status: active
                 currency: USD
                 amount: '10.0'
@@ -5769,9 +6387,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R687543473
-                token: 3b8VvuGTnXJzPfb77oxZv1M7r535AjPRkBu
-                email: illa@donnelly.ca
+                number: R738376524
+                token: zoXK6oAmUiuyfM4JqfVfrj1estkPocer8Fi
+                email: mira@cristkrajcik.info
                 customer_note:
                 currency: USD
                 locale: en
@@ -5819,8 +6437,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 438369
-                  slug: product-438369
+                  name: Product 985403
+                  slug: product-985403
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -5847,8 +6465,8 @@ paths:
                   variant_id: variant_gbHJdmfrXB
                   quantity: 1
                   currency: USD
-                  name: Product 441414
-                  slug: product-441414
+                  name: Product 995517
+                  slug: product-995517
                   options_text: ''
                   price: '19.99'
                   display_price: "$19.99"
@@ -5878,7 +6496,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 169 Lovely Street
+                  address1: 229 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -5886,12 +6504,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_176
-                  state_abbr: STATE_ABBR_176
+                  state_text: STATE_ABBR_267
+                  state_abbr: STATE_ABBR_267
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_176
+                  state_name: STATE_NAME_267
                 shipping_address:
                 payment_methods: []
                 gift_card:
@@ -5991,9 +6609,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R771412472
-                token: h7K1rG2JFmAQqoBHJ48gHSANyRC2gPenQj3
-                email: nancey@schulistwalter.co.uk
+                number: R136473536
+                token: Tdvb8Y6Y3ewiJijNpgm4vwNR4si2ry3Curb
+                email: merle.pouros@moen.biz
                 customer_note:
                 currency: USD
                 locale: en
@@ -6038,8 +6656,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 47215
-                  slug: product-47215
+                  name: Product 1023331
+                  slug: product-1023331
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -6069,7 +6687,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 178 Lovely Street
+                  address1: 238 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -6077,12 +6695,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_185
-                  state_abbr: STATE_ABBR_185
+                  state_text: STATE_ABBR_276
+                  state_abbr: STATE_ABBR_276
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_185
+                  state_name: STATE_NAME_276
                 shipping_address:
                 payment_methods: []
                 gift_card:
@@ -6162,9 +6780,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R491965603
-                token: PWpMqwAT7tSwZjLCus2TaUEQ1NhDtaWX8Wq
-                email: bambi@schultzhodkiewicz.us
+                number: R118751837
+                token: A1CvoYBtS1kjJ2HEDgU3MTNjcctFDrmhiDm
+                email: carie@kulas.name
                 customer_note:
                 currency: USD
                 locale: en
@@ -6215,7 +6833,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 181 Lovely Street
+                  address1: 241 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -6223,12 +6841,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_188
-                  state_abbr: STATE_ABBR_188
+                  state_text: STATE_ABBR_279
+                  state_abbr: STATE_ABBR_279
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_188
+                  state_name: STATE_NAME_279
                 shipping_address:
                 payment_methods: []
                 gift_card:
@@ -6376,12 +6994,12 @@ paths:
                   - fr
                   countries:
                   - iso: DE
-                    iso3: IS46
+                    iso3: IS68
                     name: Germany
                     states_required: false
                     zipcode_required: true
                   - iso: FR
-                    iso3: IS47
+                    iso3: IS69
                     name: France
                     states_required: false
                     zipcode_required: true
@@ -6460,12 +7078,12 @@ paths:
                 - fr
                 countries:
                 - iso: DE
-                  iso3: IS50
+                  iso3: IS72
                   name: Germany
                   states_required: false
                   zipcode_required: true
                 - iso: FR
-                  iso3: IS51
+                  iso3: IS73
                   name: France
                   states_required: false
                   zipcode_required: true
@@ -6540,12 +7158,12 @@ paths:
                 - fr
                 countries:
                 - iso: DE
-                  iso3: IS54
+                  iso3: IS76
                   name: Germany
                   states_required: false
                   zipcode_required: true
                 - iso: FR
-                  iso3: IS55
+                  iso3: IS77
                   name: France
                   states_required: false
                   zipcode_required: true
@@ -6609,12 +7227,12 @@ paths:
               example:
                 data:
                 - iso: FR
-                  iso3: IS59
+                  iso3: IS81
                   name: France
                   states_required: false
                   zipcode_required: true
                 - iso: DE
-                  iso3: IS58
+                  iso3: IS80
                   name: Germany
                   states_required: false
                   zipcode_required: true
@@ -6765,7 +7383,7 @@ paths:
               example:
                 id: or_UkLWZg9DAJ
                 market_id:
-                number: R652984046
+                number: R107458949
                 email: guest@example.com
                 customer_note:
                 currency: USD
@@ -6793,7 +7411,7 @@ paths:
                 display_delivery_total: "$100.00"
                 fulfillment_status:
                 payment_status:
-                completed_at: '2026-04-14T09:17:38.381Z'
+                completed_at: '2026-04-29T10:50:57.067Z'
                 store_credit_total: '0.0'
                 display_store_credit_total: "$0.00"
                 covered_by_store_credit: false
@@ -6803,8 +7421,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 513431
-                  slug: product-513431
+                  name: Product 1066551
+                  slug: product-1066551
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -6829,7 +7447,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H55045226861
+                  number: H25115000054
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -6857,14 +7475,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_196
-                    name: Dessie Rau
+                    state_abbr: STATE_ABBR_287
+                    name: Madonna Roob
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_196
+                    state_text: STATE_ABBR_287
                   delivery_rates:
                   - id: dr_gbHJdmfrXB
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -6890,7 +7508,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 189 Lovely Street
+                  address1: 249 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -6898,18 +7516,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_196
-                  state_abbr: STATE_ABBR_196
+                  state_text: STATE_ABBR_287
+                  state_abbr: STATE_ABBR_287
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_196
+                  state_name: STATE_NAME_287
                 shipping_address:
                   id: addr_gbHJdmfrXB
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 190 Lovely Street
+                  address1: 250 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -6917,12 +7535,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_197
-                  state_abbr: STATE_ABBR_197
+                  state_text: STATE_ABBR_288
+                  state_abbr: STATE_ABBR_288
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_197
+                  state_name: STATE_NAME_288
                 gift_card:
                 market:
               schema:
@@ -7003,9 +7621,9 @@ paths:
                 id: ps_gbHJdmfrXB
                 status: pending
                 currency: USD
-                external_id: bogus_7646d7977296a750908aeb2b
+                external_id: bogus_ae7d1a1ff0a0beb194aa3443
                 external_data:
-                  client_secret: bogus_secret_34c9e32090fc0919
+                  client_secret: bogus_secret_7db742b773345c67
                 customer_external_id:
                 expires_at:
                 amount: '110.0'
@@ -7102,7 +7720,7 @@ paths:
                 id: ps_UkLWZg9DAJ
                 status: pending
                 currency: USD
-                external_id: bogus_a9f87fd5747a1a113465fbfe
+                external_id: bogus_7018c5066dfe2f5eb9cb4250
                 external_data:
                   client_secret: secret_123
                 customer_external_id:
@@ -7163,7 +7781,7 @@ paths:
                 id: ps_UkLWZg9DAJ
                 status: pending
                 currency: USD
-                external_id: bogus_0a88d0a1804df8a9597e7706
+                external_id: bogus_3a664db563f40c4715880d9e
                 external_data:
                   client_secret: secret_123
                 customer_external_id:
@@ -7264,7 +7882,7 @@ paths:
                 id: ps_UkLWZg9DAJ
                 status: completed
                 currency: USD
-                external_id: bogus_5c1f2729cc6141351419a0ae
+                external_id: bogus_dcee48f27758a45d58fa7ac7
                 external_data:
                   client_secret: secret_123
                 customer_external_id:
@@ -7348,8 +7966,8 @@ paths:
               example:
                 id: pss_gbHJdmfrXB
                 status: pending
-                external_id: bogus_seti_12499847aa63bb365aa96b1f
-                external_client_secret: bogus_seti_secret_2187772c688095e0
+                external_id: bogus_seti_daa821c21a77241b20325bd9
+                external_client_secret: bogus_seti_secret_ac6eda78228e2b69
                 external_data: {}
                 payment_method_id: pm_UkLWZg9DAJ
                 payment_source_id:
@@ -7447,8 +8065,8 @@ paths:
               example:
                 id: pss_UkLWZg9DAJ
                 status: pending
-                external_id: seti_test_36bc96c3ae7f7ee42898e09b
-                external_client_secret: seti_secret_b06993b3d5ebe39aa50cb8e0
+                external_id: seti_test_5de54867a27e5f854231ff0e
+                external_client_secret: seti_secret_652723a3cd866daacc01d898
                 external_data:
                   client_secret: secret_123
                 payment_method_id: pm_UkLWZg9DAJ
@@ -7523,8 +8141,8 @@ paths:
               example:
                 id: pss_UkLWZg9DAJ
                 status: completed
-                external_id: seti_test_108edeef19b71f5183ee50bd
-                external_client_secret: seti_secret_a9d0807f1b231b12dca14135
+                external_id: seti_test_a790e6fc19873d08e23219b4
+                external_client_secret: seti_secret_303ab6a822fb5afdd4eae7ef
                 external_data:
                   client_secret: secret_123
                 payment_method_id: pm_UkLWZg9DAJ
@@ -7617,7 +8235,7 @@ paths:
                 id: py_UkLWZg9DAJ
                 payment_method_id: pm_UkLWZg9DAJ
                 response_code:
-                number: P2D5OQFR
+                number: P8RVG2ZC
                 amount: '110.0'
                 display_amount: "$110.00"
                 status: checkout
@@ -7712,7 +8330,7 @@ paths:
                   body_html: ''
                 - id: pol_OIJLhNcSbf
                   name: Privacy Policy
-                  slug: privacy-policy-e900c731-47af-4aef-b495-58ca93b269c0
+                  slug: privacy-policy-1de8e153-7a63-406c-a4f6-636435567a59
                   body: We respect your privacy.
                   body_html: |
                     <div class="trix-content">
@@ -7956,12 +8574,12 @@ paths:
               example:
                 data:
                 - id: prod_UkLWZg9DAJ
-                  name: Product 618621
-                  slug: product-618621
+                  name: Product 1165108
+                  slug: product-1165108
                   meta_description:
                   meta_keywords:
                   variant_count: 1
-                  available_on: '2025-04-14T09:17:48.624Z'
+                  available_on: '2025-04-29T10:51:07.777Z'
                   purchasable: true
                   in_stock: false
                   backorderable: true
@@ -7983,24 +8601,26 @@ paths:
                     price_list_id:
                   original_price:
                 - id: prod_gbHJdmfrXB
-                  name: Product 621163
-                  slug: product-621163
+                  name: Product 1178746
+                  slug: product-1178746
                   meta_description:
                   meta_keywords:
                   variant_count: 0
-                  available_on: '2025-04-14T09:17:48.696Z'
+                  available_on: '2025-04-29T10:51:07.830Z'
                   purchasable: true
                   in_stock: false
                   backorderable: true
                   available: true
-                  description: Nihil nisi harum nostrum inventore pariatur exercitationem
-                    animi numquam. Aspernatur atque id provident recusandae nobis
-                    dolorum. Praesentium harum quasi fugiat modi esse tempore rem
-                    omnis.
-                  description_html: Nihil nisi harum nostrum inventore pariatur exercitationem
-                    animi numquam. Aspernatur atque id provident recusandae nobis
-                    dolorum. Praesentium harum quasi fugiat modi esse tempore rem
-                    omnis.
+                  description: Expedita quo laborum molestias cumque ullam culpa molestiae.
+                    Quae temporibus quia unde corporis nisi illum numquam asperiores.
+                    A non soluta voluptatibus excepturi nihil odit. Sapiente impedit
+                    deserunt sit molestiae. Repellat animi nostrum possimus officiis
+                    dolorem dolore placeat. Porro eum sequi sed vel. Hic commodi doloremque
+                    facilis debitis reprehenderit dolorem accusamus. Labore dolorem
+                    quisquam vel iusto maxime.
+                  description_html: |-
+                    Expedita quo laborum molestias cumque ullam culpa molestiae. Quae temporibus quia unde corporis nisi illum numquam asperiores. A non soluta voluptatibus excepturi nihil odit. Sapiente impedit deserunt sit molestiae.
+                    Repellat animi nostrum possimus officiis dolorem dolore placeat. Porro eum sequi sed vel. Hic commodi doloremque facilis debitis reprehenderit dolorem accusamus. Labore dolorem quisquam vel iusto maxime.
                   default_variant_id: variant_EfhxLZ9ck8
                   thumbnail_url:
                   tags: []
@@ -8102,12 +8722,12 @@ paths:
             application/json:
               example:
                 id: prod_UkLWZg9DAJ
-                name: Product 896469
-                slug: product-896469
+                name: Product 1445184
+                slug: product-1445184
                 meta_description:
                 meta_keywords:
                 variant_count: 1
-                available_on: '2025-04-14T09:17:50.257Z'
+                available_on: '2025-04-29T10:51:09.354Z'
                 purchasable: true
                 in_stock: false
                 backorderable: true
@@ -8134,7 +8754,7 @@ paths:
                   amount_in_cents: 999
                   currency: USD
                   display_amount: "$9.99"
-                  recorded_at: '2026-03-30T09:17:50Z'
+                  recorded_at: '2026-04-14T10:51:09Z'
               schema:
                 "$ref": "#/components/schemas/Product"
         '404':
@@ -8509,9 +9129,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R867928889
-                token: hbBeuh8TR96gYoT5qvyJL1gMxP1n6QKWKte
-                email: sylvester_brown@abshirerunolfsdottir.us
+                number: R020356036
+                token: GHnHfacc14zgYkeFCtTp8q6SQMLJUzeDEYH
+                email: vashti@luettgen.com
                 customer_note:
                 currency: USD
                 locale: en
@@ -8550,8 +9170,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 1096667
-                  slug: product-1096667
+                  name: Product 1646644
+                  slug: product-1646644
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -8576,7 +9196,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H50340603568
+                  number: H39848763315
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -8604,14 +9224,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_270
-                    name: Kimi Keebler
+                    state_abbr: STATE_ABBR_361
+                    name: Eliza Johnson
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_270
+                    state_text: STATE_ABBR_361
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -8634,8 +9254,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: 1-SC-20260414091755508264
-                  number: PU2F8H3T
+                  response_code: 1-SC-20260429105114663503
+                  number: PX5MHHHA
                   amount: '10.0'
                   display_amount: "$10.00"
                   status: checkout
@@ -8661,7 +9281,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 253 Lovely Street
+                  address1: 313 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -8669,18 +9289,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_272
-                  state_abbr: STATE_ABBR_272
+                  state_text: STATE_ABBR_363
+                  state_abbr: STATE_ABBR_363
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_272
+                  state_name: STATE_NAME_363
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 254 Lovely Street
+                  address1: 314 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -8688,12 +9308,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_273
-                  state_abbr: STATE_ABBR_273
+                  state_text: STATE_ABBR_364
+                  state_abbr: STATE_ABBR_364
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_273
+                  state_name: STATE_NAME_364
                 payment_methods:
                 - id: pm_UkLWZg9DAJ
                   name: Store Credit
@@ -8776,9 +9396,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R367608340
-                token: F2PVDNgqjZfuZ12mrWwEyxEopJYjVKh56hv
-                email: peggy_baumbach@dach.name
+                number: R169499153
+                token: BiKX4rq41Qyxxq2UcdbhD3mXEKbp8iZsKG3
+                email: dorethea.zieme@kozey.ca
                 customer_note:
                 currency: USD
                 locale: en
@@ -8820,8 +9440,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 1114779
-                  slug: product-1114779
+                  name: Product 1662939
+                  slug: product-1662939
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -8846,7 +9466,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H75926459512
+                  number: H07475797758
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -8874,14 +9494,14 @@ paths:
                     code: UPS_GROUND
                   stock_location:
                     id: sloc_UkLWZg9DAJ
-                    state_abbr: STATE_ABBR_278
-                    name: Lawerence Fritsch
+                    state_abbr: STATE_ABBR_369
+                    name: Hilma Spencer
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
                     country_iso: US
                     country_name: United States of America
-                    state_text: STATE_ABBR_278
+                    state_text: STATE_ABBR_369
                   delivery_rates:
                   - id: dr_UkLWZg9DAJ
                     delivery_method_id: dm_UkLWZg9DAJ
@@ -8907,7 +9527,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 261 Lovely Street
+                  address1: 321 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -8915,18 +9535,18 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_280
-                  state_abbr: STATE_ABBR_280
+                  state_text: STATE_ABBR_371
+                  state_abbr: STATE_ABBR_371
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_280
+                  state_name: STATE_NAME_371
                 shipping_address:
                   id: addr_VqXmZF31wY
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 262 Lovely Street
+                  address1: 322 Lovely Street
                   address2: Northwest
                   postal_code: '35005'
                   city: Herndon
@@ -8934,12 +9554,12 @@ paths:
                   company: Company
                   country_name: United States of America
                   country_iso: US
-                  state_text: STATE_ABBR_281
-                  state_abbr: STATE_ABBR_281
+                  state_text: STATE_ABBR_372
+                  state_abbr: STATE_ABBR_372
                   quick_checkout: false
                   is_default_billing: false
                   is_default_shipping: false
-                  state_name: STATE_NAME_281
+                  state_name: STATE_NAME_372
                 payment_methods: []
                 gift_card:
                 market:
@@ -9005,7 +9625,7 @@ paths:
                 data:
                 - id: wl_UkLWZg9DAJ
                   name: My Wishlist
-                  token: 3z9Ht2V3YetVi5yEUfrhukAA
+                  token: Z7DaDpsmubLfKkyNfx21PsbY
                   is_default: false
                   is_private: true
                 meta:
@@ -9081,7 +9701,7 @@ paths:
               example:
                 id: wl_gbHJdmfrXB
                 name: Birthday Ideas
-                token: cVNoCgEmKvvAXmRskBtVnHeW
+                token: 3hdDht5j3dMfvXahEcDmUKNb
                 is_default: false
                 is_private: true
               schema:
@@ -9177,7 +9797,7 @@ paths:
               example:
                 id: wl_UkLWZg9DAJ
                 name: My Wishlist
-                token: TJtUtkZ4FdnWqRSN2SKhBsZ8
+                token: ubLMnj4paswMWgoZV6TmuPSC
                 is_default: false
                 is_private: true
               schema:
@@ -9239,7 +9859,7 @@ paths:
               example:
                 id: wl_UkLWZg9DAJ
                 name: Updated Name
-                token: N9xNqw4gESzcvUn52WBT9yax
+                token: AdgqhhL8PxMQyeqZrB5ZqVda
                 is_default: false
                 is_private: true
               schema:
@@ -9354,7 +9974,7 @@ paths:
                 variant:
                   id: variant_gbHJdmfrXB
                   product_id: prod_gbHJdmfrXB
-                  sku: SKU-133
+                  sku: SKU-206
                   options_text: ''
                   track_inventory: true
                   media_count: 0
@@ -9611,6 +10231,46 @@ components:
       - token
       - refresh_token
       - user
+    PermissionRule:
+      type: object
+      description: A single permission rule (CanCanCan rule). Rules are applied in
+        order, last-matching-wins.
+      properties:
+        allow:
+          type: boolean
+          description: true for `can`, false for `cannot`
+        actions:
+          type: array
+          items:
+            type: string
+          description: Action names, e.g. ["read", "update"] or ["manage"]
+        subjects:
+          type: array
+          items:
+            type: string
+          description: Subject class names, e.g. ["Spree::Product"] or ["all"]
+        has_conditions:
+          type: boolean
+          description: True if the server-side rule has per-record conditions. The
+            SPA shows the action optimistically and handles 403 from the API.
+      required:
+      - allow
+      - actions
+      - subjects
+      - has_conditions
+    MeResponse:
+      type: object
+      description: Current admin user profile and serialized permissions
+      properties:
+        user:
+          "$ref": "#/components/schemas/AdminUser"
+        permissions:
+          type: array
+          items:
+            "$ref": "#/components/schemas/PermissionRule"
+      required:
+      - user
+      - permissions
     CheckoutRequirement:
       type: object
       properties:

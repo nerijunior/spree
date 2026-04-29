@@ -7,16 +7,20 @@ module Spree
             before_action :set_resource, only: [:show, :capture, :void]
 
             # POST /api/v3/admin/orders/:order_id/payments
+            #
+            # Supports off-session admin charges by passing `source_id` referencing a
+            # saved payment source (e.g. a Spree::CreditCard owned by the order's customer).
+            # The source must belong to the customer assigned to the order.
             def create
               with_order_lock do
-                payment_method = Spree::PaymentMethod.find(params[:payment_method_id])
+                payment_method = Spree::PaymentMethod.find_by_prefix_id!(params[:payment_method_id])
                 @resource = @parent.payments.build(
                   amount: params[:amount] || @parent.order_total_after_store_credit,
                   payment_method: payment_method
                 )
 
                 if params[:source_id].present? && payment_method.source_required?
-                  @resource.source = payment_method.payment_source_class.find_by_prefix_id!(params[:source_id])
+                  @resource.source = find_source!(payment_method, params[:source_id])
                 end
 
                 authorize_resource!(@resource, :create)
@@ -66,6 +70,15 @@ module Spree
 
             def permitted_params
               params.permit(*Spree::PermittedAttributes.payment_attributes, :source_id)
+            end
+
+            # Saved-source charges require an order customer — sources are scoped
+            # to that customer to prevent attaching customer A's card to
+            # customer B's order. Refuse if no customer is assigned.
+            def find_source!(payment_method, source_id)
+              raise ActiveRecord::RecordNotFound unless @parent.user
+
+              @parent.user.credit_cards.find_by_prefix_id!(source_id)
             end
           end
         end

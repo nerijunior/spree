@@ -161,7 +161,7 @@ function OrderHeader({ order }: { order: Order }) {
   const backFallback = order.completed_at ? 'orders' : 'orders/drafts'
 
   const cancelMutation = useOrderMutation(orderId, () =>
-    adminClient.orders.cancel(orderId, {}),
+    adminClient.orders.cancel(orderId),
   )
   const resendMutation = useOrderMutation(orderId, () =>
     adminClient.orders.resendConfirmation(orderId, {}),
@@ -206,7 +206,7 @@ function OrderHeader({ order }: { order: Order }) {
                 <DropdownMenuSeparator />
               </>
             )}
-            {(order as any).state !== 'canceled' && (
+            {order.status !== 'canceled' && (
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={async () => {
@@ -254,7 +254,7 @@ function AddLineItemDialog({
   const variants = variantsData?.data ?? []
 
   const mutation = useOrderMutation(orderId, (params: { variant_id: string; quantity: number }) =>
-    adminClient.orders.lineItems.create(orderId, params),
+    adminClient.orders.items.create(orderId, params),
   )
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -385,7 +385,7 @@ function EditQuantityDialog({
 }) {
 
   const mutation = useOrderMutation(orderId, (params: { quantity: number }) =>
-    adminClient.orders.lineItems.update(orderId, lineItemId, params),
+    adminClient.orders.items.update(orderId, lineItemId, params),
   )
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -442,7 +442,7 @@ function LineItemsCard({ order }: { order: Order }) {
   const [editItem, setEditItem] = useState<{ id: string; quantity: number } | null>(null)
 
   const deleteMutation = useOrderMutation(orderId, (lineItemId: string) =>
-    adminClient.orders.lineItems.delete(orderId, lineItemId),
+    adminClient.orders.items.delete(orderId, lineItemId),
   )
 
   return (

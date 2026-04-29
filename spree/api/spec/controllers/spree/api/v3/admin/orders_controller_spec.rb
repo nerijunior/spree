@@ -98,7 +98,7 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
       expect(json_response['email']).to eq('test@example.com')
     end
 
-    context 'with user assignment' do
+    context 'with user assignment via user_id' do
       let(:customer) { create(:user) }
       let(:create_params) { { user_id: customer.prefixed_id } }
 
@@ -108,6 +108,89 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
         expect(response).to have_http_status(:created)
         created_order = Spree::Order.find_by_prefix_id(json_response['id'])
         expect(created_order.user).to eq(customer)
+      end
+    end
+
+    context 'with customer assignment via customer_id' do
+      let(:customer) { create(:user) }
+      let(:create_params) { { customer_id: customer.prefixed_id } }
+
+      it 'creates order assigned to the customer' do
+        subject
+
+        expect(response).to have_http_status(:created)
+        created_order = Spree::Order.find_by_prefix_id(json_response['id'])
+        expect(created_order.user).to eq(customer)
+      end
+    end
+
+    context 'with inline items' do
+      let(:variant) { create(:variant, prices: [build(:price, currency: 'USD', amount: 19.99)]) }
+      let(:create_params) do
+        {
+          email: 'test@example.com',
+          items: [{ variant_id: variant.prefixed_id, quantity: 3 }]
+        }
+      end
+
+      it 'creates the order with the line items' do
+        subject
+
+        expect(response).to have_http_status(:created)
+        created = Spree::Order.find_by_prefix_id(json_response['id'])
+        expect(created.line_items.count).to eq(1)
+        expect(created.line_items.first.variant).to eq(variant)
+        expect(created.line_items.first.quantity).to eq(3)
+      end
+    end
+
+    context 'with use_customer_default_address' do
+      let(:address) { create(:address) }
+      let(:customer) { create(:user, bill_address: address, ship_address: address) }
+      let(:create_params) do
+        {
+          customer_id: customer.prefixed_id,
+          use_customer_default_address: true
+        }
+      end
+
+      it 'copies the customer default addresses onto the order' do
+        subject
+
+        expect(response).to have_http_status(:created)
+        created = Spree::Order.find_by_prefix_id(json_response['id'])
+        expect(created.bill_address).to be_present
+        expect(created.ship_address).to be_present
+        expect(created.bill_address.address1).to eq(address.address1)
+      end
+    end
+
+    context 'with metadata' do
+      let(:create_params) do
+        {
+          email: 'test@example.com',
+          metadata: { external_reference: 'subscription-12345', source: 'recurring' }
+        }
+      end
+
+      it 'stores metadata on the order' do
+        subject
+
+        expect(response).to have_http_status(:created)
+        created = Spree::Order.find_by_prefix_id(json_response['id'])
+        expect(created.metadata['external_reference']).to eq('subscription-12345')
+        expect(created.metadata['source']).to eq('recurring')
+      end
+    end
+
+    context 'creates order with status draft' do
+      it 'sets status to draft' do
+        subject
+
+        expect(response).to have_http_status(:created)
+        created = Spree::Order.find_by_prefix_id(json_response['id'])
+        expect(created.status).to eq('draft')
+        expect(created.completed_at).to be_nil
       end
     end
   end
@@ -122,6 +205,31 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(json_response['email']).to eq('updated@example.com')
+    end
+
+    context 'with customer assignment via customer_id' do
+      let(:customer) { create(:user) }
+
+      it 'assigns the customer' do
+        patch :update, params: { id: order.prefixed_id, customer_id: customer.prefixed_id }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(order.reload.user).to eq(customer)
+        expect(json_response['customer_id']).to eq(customer.prefixed_id)
+      end
+    end
+
+    context 'with customer reassignment via customer_id' do
+      let(:original_customer) { create(:user) }
+      let(:new_customer) { create(:user) }
+      let!(:order) { create(:order, store: store, state: 'cart', user: original_customer) }
+
+      it 'reassigns to the new customer' do
+        patch :update, params: { id: order.prefixed_id, customer_id: new_customer.prefixed_id }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(order.reload.user).to eq(new_customer)
+      end
     end
   end
 
@@ -142,6 +250,52 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
         subject
         expect(response).to have_http_status(:forbidden)
       end
+    end
+  end
+
+  describe 'PATCH #complete' do
+    let!(:order) { create(:order_ready_to_ship, store: store) }
+
+    before { request.headers.merge!(headers) }
+
+    it 'completes the order' do
+      patch :complete, params: { id: order.prefixed_id }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(order.reload.completed_at).to be_present
+    end
+
+    it 'accepts payment_pending flag without re-processing payments' do
+      patch :complete, params: { id: order.prefixed_id, payment_pending: true }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(order.reload.completed_at).to be_present
+    end
+
+    it 'passes notify_customer flag to the service' do
+      service_double = instance_double(Spree::Orders::Complete)
+      allow(Spree).to receive(:order_complete_service).and_return(service_double)
+      expect(service_double).to receive(:call).with(
+        hash_including(order: order, notify_customer: true)
+      ).and_return(Spree::ServiceModule::Result.new(true, order, nil))
+
+      patch :complete, params: { id: order.prefixed_id, notify_customer: true }, as: :json
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'omits notify_customer when not given (service defaults to false)' do
+      service_double = instance_double(Spree::Orders::Complete)
+      allow(Spree).to receive(:order_complete_service).and_return(service_double)
+      expect(service_double).to receive(:call) do |args|
+        expect(args[:notify_customer]).to be_nil # service default kicks in (false)
+        expect(args[:order]).to eq(order)
+        Spree::ServiceModule::Result.new(true, order, nil)
+      end
+
+      patch :complete, params: { id: order.prefixed_id }, as: :json
+
+      expect(response).to have_http_status(:ok)
     end
   end
 

@@ -73,7 +73,13 @@ import type { Store, Product, Order, Media, Category, TaxCategory, Country, Vari
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
+  OrderCreateParams,
   OrderUpdateParams,
+  OrderCompleteParams,
+  OrderCancelParams,
+  OrderApproveParams,
+  GiftCardApplyParams,
+  StoreCreditApplyParams,
   MediaCreateParams,
   MediaUpdateParams,
   LineItemCreateParams,
@@ -194,24 +200,55 @@ export class AdminClient {
         params: getParams(params),
       }),
 
+    create: (params: OrderCreateParams, options?: RequestOptions): Promise<Order> =>
+      this.request<Order>('POST', '/orders', { ...options, body: params }),
+
     update: (id: string, params: OrderUpdateParams | Record<string, unknown>, options?: RequestOptions): Promise<Order> =>
       this.request<Order>('PATCH', `/orders/${id}`, { ...options, body: params }),
 
-    cancel: (id: string, options?: RequestOptions): Promise<Order> =>
-      this.request<Order>('PATCH', `/orders/${id}/cancel`, options),
+    delete: (id: string, options?: RequestOptions): Promise<void> =>
+      this.request<void>('DELETE', `/orders/${id}`, options),
+
+    complete: (id: string, params?: OrderCompleteParams, options?: RequestOptions): Promise<Order> =>
+      this.request<Order>('PATCH', `/orders/${id}/complete`, { ...options, body: params }),
+
+    cancel: (id: string, params?: OrderCancelParams, options?: RequestOptions): Promise<Order> =>
+      this.request<Order>('PATCH', `/orders/${id}/cancel`, { ...options, body: params }),
+
+    approve: (id: string, params?: OrderApproveParams, options?: RequestOptions): Promise<Order> =>
+      this.request<Order>('PATCH', `/orders/${id}/approve`, { ...options, body: params }),
+
+    resume: (id: string, options?: RequestOptions): Promise<Order> =>
+      this.request<Order>('PATCH', `/orders/${id}/resume`, options),
 
     resendConfirmation: (id: string, options?: RequestOptions): Promise<void> =>
       this.request<void>('POST', `/orders/${id}/resend_confirmation`, options),
 
-    lineItems: {
+    giftCards: {
+      apply: (orderId: string, params: GiftCardApplyParams, options?: RequestOptions): Promise<unknown> =>
+        this.request('POST', `/orders/${orderId}/gift_cards`, { ...options, body: params }),
+
+      remove: (orderId: string, id: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/orders/${orderId}/gift_cards/${id}`, options),
+    },
+
+    storeCredits: {
+      apply: (orderId: string, params?: StoreCreditApplyParams, options?: RequestOptions): Promise<Order> =>
+        this.request<Order>('POST', `/orders/${orderId}/store_credits`, { ...options, body: params }),
+
+      remove: (orderId: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/orders/${orderId}/store_credits`, options),
+    },
+
+    items: {
       create: (orderId: string, params: LineItemCreateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('POST', `/orders/${orderId}/line_items`, { ...options, body: params }),
+        this.request('POST', `/orders/${orderId}/items`, { ...options, body: params }),
 
       update: (orderId: string, id: string, params: LineItemUpdateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/line_items/${id}`, { ...options, body: params }),
+        this.request('PATCH', `/orders/${orderId}/items/${id}`, { ...options, body: params }),
 
       delete: (orderId: string, id: string, options?: RequestOptions): Promise<void> =>
-        this.request<void>('DELETE', `/orders/${orderId}/line_items/${id}`, options),
+        this.request<void>('DELETE', `/orders/${orderId}/items/${id}`, options),
     },
 
     fulfillments: {

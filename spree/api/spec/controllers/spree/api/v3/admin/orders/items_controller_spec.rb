@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Spree::Api::V3::Admin::Orders::LineItemsController, type: :controller do
+RSpec.describe Spree::Api::V3::Admin::Orders::ItemsController, type: :controller do
   render_views
 
   include_context 'API v3 Admin authenticated'

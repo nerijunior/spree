@@ -56,7 +56,13 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Creates a new draft order. Optionally assign a user and set initial attributes.'
+      description <<~DESC
+        Creates a new draft order in one shot. Customer, items, addresses, currency,
+        market, locale, notes, metadata, and a coupon code can all be provided inline.
+
+        Invalid coupon codes are non-fatal — the order is created and the failure
+        is reported on the service result (not in the API response body for now).
+      DESC
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -65,10 +71,47 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
         type: :object,
         properties: {
           email: { type: :string, example: 'customer@example.com' },
-          user_id: { type: :string, description: 'Prefixed user ID to assign' },
+          customer_id: { type: :string, description: 'Customer prefixed ID. Alias: user_id (legacy).' },
+          use_customer_default_address: { type: :boolean, description: "When true with customer_id, copies the customer's saved billing/shipping addresses onto the order." },
           currency: { type: :string, example: 'USD' },
-          channel: { type: :string, example: 'admin' },
-          internal_note: { type: :string }
+          market_id: { type: :string, description: 'Market prefixed ID' },
+          locale: { type: :string, example: 'en-US' },
+          customer_note: { type: :string, description: 'Public, customer-visible note' },
+          internal_note: { type: :string, description: 'Staff-only note' },
+          metadata: { type: :object, description: 'Arbitrary key/value metadata' },
+          shipping_address: {
+            type: :object,
+            properties: {
+              first_name: { type: :string }, last_name: { type: :string },
+              address1: { type: :string }, city: { type: :string },
+              postal_code: { type: :string }, country_iso: { type: :string },
+              state_abbr: { type: :string }, phone: { type: :string }
+            }
+          },
+          shipping_address_id: { type: :string, description: 'Existing customer address prefixed ID' },
+          billing_address: {
+            type: :object,
+            properties: {
+              first_name: { type: :string }, last_name: { type: :string },
+              address1: { type: :string }, city: { type: :string },
+              postal_code: { type: :string }, country_iso: { type: :string },
+              state_abbr: { type: :string }, phone: { type: :string }
+            }
+          },
+          billing_address_id: { type: :string, description: 'Existing customer address prefixed ID' },
+          items: {
+            type: :array,
+            items: {
+              type: :object,
+              required: %w[variant_id quantity],
+              properties: {
+                variant_id: { type: :string, description: 'Variant prefixed ID' },
+                quantity: { type: :integer, example: 1 },
+                metadata: { type: :object }
+              }
+            }
+          },
+          coupon_code: { type: :string, description: 'Optional. Applied non-fatally; invalid codes do not block creation.' }
         }
       }
 
@@ -138,7 +181,6 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
           email: { type: :string },
           special_instructions: { type: :string },
           internal_note: { type: :string },
-          channel: { type: :string },
           ship_address: {
             type: :object,
             properties: {
@@ -165,13 +207,15 @@ RSpec.describe 'Admin Orders API', type: :request, swagger_doc: 'api-reference/a
               phone: { type: :string }
             }
           },
-          line_items: {
+          items: {
             type: :array,
             items: {
               type: :object,
+              required: %w[variant_id],
               properties: {
-                variant_id: { type: :string },
-                quantity: { type: :integer }
+                variant_id: { type: :string, description: 'Variant prefixed ID' },
+                quantity: { type: :integer, example: 1 },
+                metadata: { type: :object }
               }
             }
           }

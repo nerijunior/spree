@@ -51,7 +51,7 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
         type: :object,
         required: %w[payment_method_id],
         properties: {
-          payment_method_id: { type: :string, description: 'Payment method ID or prefixed ID' },
+          payment_method_id: { type: :string, description: 'Payment method prefixed ID' },
           amount: { type: :number, example: 99.99 },
           source_id: { type: :string, description: 'Payment source prefixed ID' }
         }
@@ -62,7 +62,7 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
         let(:order_without_payment) { create(:completed_order_with_totals, store: store) }
         let(:order_id) { order_without_payment.prefixed_id }
         let(:payment_method) { create(:check_payment_method, stores: [store]) }
-        let(:body) { { payment_method_id: payment_method.id, amount: order_without_payment.total } }
+        let(:body) { { payment_method_id: payment_method.prefixed_id, amount: order_without_payment.total } }
 
         run_test! do |response|
           data = JSON.parse(response.body)

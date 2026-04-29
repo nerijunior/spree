@@ -167,16 +167,19 @@ RSpec.configure do |config|
         { name: 'Products', description: 'Product management' },
         { name: 'Variants', description: 'Product variant management' },
         { name: 'Option Types', description: 'Option type and value management' },
-        { name: 'Taxonomies', description: 'Taxonomy management' },
-        { name: 'Taxons', description: 'Taxon (category) management' },
-        { name: 'Assets', description: 'Product image and asset management' },
-        { name: 'Prices', description: 'Variant price management' }
+        { name: 'Prices', description: 'Variant price management' },
+        { name: 'Orders', description: 'Order management — list, create, update, items, complete, cancel, approve' },
+        { name: 'Payments', description: 'Order payment management — capture, void, off-session charges' },
+        { name: 'Refunds', description: 'Order refund management' },
+        { name: 'Fulfillments', description: 'Order fulfillment management — ship, cancel, split' },
+        { name: 'Order Gift Cards', description: 'Apply / remove gift cards on an order' },
+        { name: 'Order Store Credits', description: 'Apply / remove customer store credit on an order' }
       ],
       'x-tagGroups': [
         { name: 'Authentication', tags: ['Authentication'] },
-        { name: 'Catalog', tags: %w[Products Variants Assets Prices] },
-        { name: 'Categories', tags: %w[Taxonomies Taxons] },
-        { name: 'Options', tags: ['Option Types'] }
+        { name: 'Catalog', tags: %w[Products Variants Prices] },
+        { name: 'Options', tags: ['Option Types'] },
+        { name: 'Orders', tags: ['Orders', 'Payments', 'Refunds', 'Fulfillments', 'Order Gift Cards', 'Order Store Credits'] }
       ],
       components: {
         securitySchemes: {

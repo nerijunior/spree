@@ -11,11 +11,11 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
   let!(:line_item) { create(:line_item, order: order, variant: variant, quantity: 2) }
   let(:Authorization) { "Bearer #{admin_jwt_token}" }
 
-  path '/api/v3/admin/orders/{order_id}/line_items' do
+  path '/api/v3/admin/orders/{order_id}/items' do
     let(:order_id) { order.prefixed_id }
 
-    get 'List line items' do
-      tags 'Line Items'
+    get 'List order items' do
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns all line items for an order.'
@@ -26,7 +26,7 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
 
-      response '200', 'line items found' do
+      response '200', 'items found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
 
         run_test! do |response|
@@ -37,8 +37,8 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       end
     end
 
-    post 'Add a line item' do
-      tags 'Line Items'
+    post 'Add an item' do
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
@@ -58,7 +58,7 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
         }
       }
 
-      response '201', 'line item added' do
+      response '201', 'item added' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:new_variant) { create(:variant, product: create(:product, stores: [store])) }
         let(:body) { { variant_id: new_variant.prefixed_id, quantity: 3 } }
@@ -71,12 +71,12 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/line_items/{id}' do
+  path '/api/v3/admin/orders/{order_id}/items/{id}' do
     let(:order_id) { order.prefixed_id }
     let(:id) { line_item.prefixed_id }
 
-    get 'Show a line item' do
-      tags 'Line Items'
+    get 'Show an item' do
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns details of a specific line item.'
@@ -87,9 +87,9 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Line item prefixed ID'
+                description: 'Item prefixed ID'
 
-      response '200', 'line item found' do
+      response '200', 'item found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
 
         run_test! do |response|
@@ -99,12 +99,12 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       end
     end
 
-    patch 'Update a line item' do
-      tags 'Line Items'
+    patch 'Update an item' do
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Updates a line item quantity or metadata.'
+      description 'Updates an order item quantity or metadata.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -112,7 +112,7 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Line item prefixed ID'
+                description: 'Item prefixed ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
@@ -120,7 +120,7 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
         }
       }
 
-      response '200', 'line item updated' do
+      response '200', 'item updated' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:body) { { quantity: 5 } }
 
@@ -131,10 +131,10 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       end
     end
 
-    delete 'Remove a line item' do
-      tags 'Line Items'
+    delete 'Remove an item' do
+      tags 'Orders'
       security [api_key: [], bearer_auth: []]
-      description 'Removes a line item from the order.'
+      description 'Removes an item from the order.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -142,7 +142,7 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Line item prefixed ID'
+                description: 'Item prefixed ID'
 
       response '204', 'line item removed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }

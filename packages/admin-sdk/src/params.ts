@@ -70,43 +70,79 @@ export interface FulfillmentUpdateParams {
   selected_delivery_rate_id?: string;
 }
 
+export interface AddressInputParams {
+  first_name?: string;
+  last_name?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  postal_code?: string;
+  country_iso?: string;
+  state_abbr?: string;
+  phone?: string;
+}
+
 export interface OrderCreateParams {
   email?: string;
+  customer_id?: string;
   user_id?: string;
+  use_customer_default_address?: boolean;
   currency?: string;
-  channel?: string;
+  market_id?: string;
+  locale?: string;
+  customer_note?: string;
   internal_note?: string;
+  metadata?: Record<string, unknown>;
+  shipping_address?: AddressInputParams;
+  shipping_address_id?: string;
+  billing_address?: AddressInputParams;
+  billing_address_id?: string;
+  items?: Array<{
+    variant_id: string;
+    quantity: number;
+    metadata?: Record<string, unknown>;
+  }>;
+  coupon_code?: string;
 }
 
 export interface OrderUpdateParams {
   email?: string;
-  special_instructions?: string;
+  customer_id?: string;
+  customer_note?: string;
   internal_note?: string;
-  channel?: string;
-  ship_address?: {
-    firstname?: string;
-    lastname?: string;
-    address1?: string;
-    city?: string;
-    zipcode?: string;
-    country_iso?: string;
-    state_abbr?: string;
-    phone?: string;
-  };
-  bill_address?: {
-    firstname?: string;
-    lastname?: string;
-    address1?: string;
-    city?: string;
-    zipcode?: string;
-    country_iso?: string;
-    state_abbr?: string;
-    phone?: string;
-  };
+  ship_address?: AddressInputParams;
+  bill_address?: AddressInputParams;
   line_items?: Array<{
     variant_id?: string;
     quantity?: number;
   }>;
+}
+
+export interface OrderCompleteParams {
+  payment_pending?: boolean;
+  notify_customer?: boolean;
+}
+
+export interface OrderCancelParams {
+  reason?: 'customer' | 'declined' | 'fraud' | 'inventory' | 'staff' | 'other' | 'expired';
+  note?: string;
+  restock_items?: boolean;
+  refund_payments?: boolean;
+  refund_amount?: number;
+  notify_customer?: boolean;
+}
+
+export interface OrderApproveParams {
+  level?: string;
+  note?: string;
+}
+
+export interface GiftCardApplyParams {
+  code: string;
+}
+
+export interface StoreCreditApplyParams {
+  amount?: number;
 }
 
 export interface DirectUploadCreateParams {

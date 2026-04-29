@@ -12,11 +12,10 @@ module Spree
           def create
             authorize!(:create, Spree::Order)
 
-            result = Spree.cart_create_service.call(
-              user: resolve_user,
+            result = Spree.order_create_service.call(
               store: current_store,
-              currency: params[:currency] || current_store.default_currency,
-              order_params: order_create_params
+              user: resolve_user,
+              params: order_create_params
             )
 
             if result.success?
@@ -30,10 +29,15 @@ module Spree
           # PATCH /api/v3/admin/orders/:id
           def update
             with_order_lock do
-              if @resource.update(order_update_params)
-                render json: serialize_resource(@resource.reload)
+              result = Spree.order_update_service.call(
+                order: @resource,
+                params: order_update_params
+              )
+
+              if result.success?
+                render json: serialize_resource(result.value)
               else
-                render_validation_error(@resource.errors)
+                render_validation_error(@resource.errors.presence || result.error)
               end
             end
           end
@@ -48,7 +52,11 @@ module Spree
           # PATCH /api/v3/admin/orders/:id/complete
           def complete
             with_order_lock do
-              result = Spree.checkout_complete_service.call(order: @resource)
+              result = Spree.order_complete_service.call(
+                order: @resource,
+                payment_pending: ActiveModel::Type::Boolean.new.cast(params[:payment_pending]),
+                notify_customer: ActiveModel::Type::Boolean.new.cast(params[:notify_customer])
+              )
 
               if result.success?
                 render json: serialize_resource(@resource.reload)
@@ -127,25 +135,33 @@ module Spree
           private
 
           def resolve_user
-            return unless params[:user_id].present?
+            customer_param = params[:customer_id].presence || params[:user_id].presence
+            return unless customer_param
 
-            Spree.user_class.find_by_param!(params[:user_id])
+            Spree.user_class.find_by_param!(customer_param)
           end
 
           def order_create_params
-            {
-              email: params[:email],
-              channel: params[:channel],
-              internal_note: params[:internal_note]
-            }.compact
+            params.permit(
+              :email, :customer_id, :user_id, :use_customer_default_address,
+              :currency, :market_id, :locale,
+              :customer_note, :internal_note,
+              :shipping_address_id, :billing_address_id,
+              :coupon_code,
+              metadata: {},
+              shipping_address: Spree::PermittedAttributes.address_attributes,
+              billing_address: Spree::PermittedAttributes.address_attributes,
+              items: [:variant_id, :quantity, { metadata: {} }]
+            )
           end
 
           def order_update_params
             params.permit(
               *Spree::PermittedAttributes.checkout_attributes,
+              :customer_id,
               ship_address: Spree::PermittedAttributes.address_attributes,
               bill_address: Spree::PermittedAttributes.address_attributes,
-              line_items: Spree::PermittedAttributes.line_item_attributes
+              items: [:variant_id, :quantity, { metadata: {} }]
             )
           end
         end

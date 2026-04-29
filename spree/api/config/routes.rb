@@ -145,7 +145,7 @@ Spree::Core::Engine.add_routes do
             post :resend_confirmation
           end
 
-          resources :line_items, controller: 'orders/line_items'
+          resources :items, only: [:index, :show, :create, :update, :destroy], controller: 'orders/items'
           resources :fulfillments, controller: 'orders/fulfillments', only: [:index, :show, :update] do
             member do
               patch :fulfill
@@ -162,6 +162,8 @@ Spree::Core::Engine.add_routes do
           end
           resources :refunds, controller: 'orders/refunds', only: [:index, :create]
           resources :adjustments, controller: 'orders/adjustments', only: [:index, :show]
+          resources :gift_cards, controller: 'orders/gift_cards', only: [:create, :destroy]
+          resource :store_credits, controller: 'orders/store_credits', only: [:create, :destroy]
         end
       end
 

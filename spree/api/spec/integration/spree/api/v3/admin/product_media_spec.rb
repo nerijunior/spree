@@ -2,7 +2,9 @@
 
 require 'swagger_helper'
 
-RSpec.describe 'Admin Product Media API', type: :request, swagger_doc: 'api-reference/admin.yaml' do
+# NOTE: This spec exercises the API but is excluded from the OpenAPI doc until 6.0
+# product media rework is finalized. See docs/plans/5.4-6.0-product-media-system.md.
+RSpec.describe 'Admin Product Media API', type: :request do
   include_context 'API v3 Admin'
 
   let!(:product) { create(:product, stores: [store]) }
@@ -10,11 +12,11 @@ RSpec.describe 'Admin Product Media API', type: :request, swagger_doc: 'api-refe
   let(:Authorization) { "Bearer #{admin_jwt_token}" }
 
   path '/api/v3/admin/products/{product_id}/media' do
-    get 'List product assets' do
-      tags 'Product Assets'
+    get 'List product media' do
+      tags 'Product Media'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Returns a paginated list of assets (images) for a product.'
+      description 'Returns a paginated list of media (images, video) for a product.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -34,12 +36,12 @@ RSpec.describe 'Admin Product Media API', type: :request, swagger_doc: 'api-refe
       end
     end
 
-    post 'Create a product asset' do
-      tags 'Product Assets'
+    post 'Create a product media item' do
+      tags 'Product Media'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Creates a new asset (image) for a product.'
+      description 'Creates a new media item (image, video) for a product.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -50,12 +52,12 @@ RSpec.describe 'Admin Product Media API', type: :request, swagger_doc: 'api-refe
         properties: {
           alt: { type: :string, example: 'Product front view' },
           position: { type: :integer, example: 1 },
-          type: { type: :string, example: 'Spree::Image', description: 'Asset type (defaults to Spree::Image)' },
+          type: { type: :string, example: 'Spree::Image', description: 'Media type (defaults to Spree::Image)' },
           url: { type: :string, example: 'https://example.com/image.jpg', description: 'External URL to import image from (async). Returns 202 Accepted.' }
         }
       }
 
-      response '202', 'asset import from URL enqueued' do
+      response '202', 'media import from URL enqueued' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
         let(:product_id) { product.prefixed_id }
         let(:body) { { url: 'https://example.com/image.jpg', position: 1 } }
@@ -76,18 +78,18 @@ RSpec.describe 'Admin Product Media API', type: :request, swagger_doc: 'api-refe
   end
 
   path '/api/v3/admin/products/{product_id}/media/{id}' do
-    patch 'Update a product asset' do
-      tags 'Product Assets'
+    patch 'Update a product media item' do
+      tags 'Product Media'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Updates a product asset. Only provided fields are updated.'
+      description 'Updates a product media item. Only provided fields are updated.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :product_id, in: :path, type: :string, required: true, description: 'Product prefixed ID'
-      parameter name: :id, in: :path, type: :string, required: true, description: 'Asset prefixed ID'
+      parameter name: :id, in: :path, type: :string, required: true, description: 'Media prefixed ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
@@ -109,16 +111,16 @@ RSpec.describe 'Admin Product Media API', type: :request, swagger_doc: 'api-refe
       end
     end
 
-    delete 'Delete a product asset' do
-      tags 'Product Assets'
+    delete 'Delete a product media item' do
+      tags 'Product Media'
       security [api_key: [], bearer_auth: []]
-      description 'Deletes an asset from a product.'
+      description 'Deletes a media item from a product.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :product_id, in: :path, type: :string, required: true, description: 'Product prefixed ID'
-      parameter name: :id, in: :path, type: :string, required: true, description: 'Asset prefixed ID'
+      parameter name: :id, in: :path, type: :string, required: true, description: 'Media prefixed ID'
 
       response '204', 'media deleted' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }

@@ -3,8 +3,8 @@ module Spree
     module V3
       module Admin
         module Orders
-          class LineItemsController < BaseController
-            # POST /api/v3/admin/orders/:order_id/line_items
+          class ItemsController < BaseController
+            # POST /api/v3/admin/orders/:order_id/items
             def create
               with_order_lock do
                 result = Spree.cart_add_item_service.call(
@@ -22,7 +22,7 @@ module Spree
               end
             end
 
-            # PATCH /api/v3/admin/orders/:order_id/line_items/:id
+            # PATCH /api/v3/admin/orders/:order_id/items/:id
             def update
               with_order_lock do
                 if permitted_params[:quantity].present?
@@ -47,7 +47,7 @@ module Spree
               end
             end
 
-            # DELETE /api/v3/admin/orders/:order_id/line_items/:id
+            # DELETE /api/v3/admin/orders/:order_id/items/:id
             def destroy
               with_order_lock do
                 Spree.cart_remove_line_item_service.call(

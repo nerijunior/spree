@@ -101,8 +101,10 @@ module Spree
       # Uses the association's target class to validate the record exists.
       # Only resolves when a matching belongs_to association exists — columns
       # like external_id that happen to end with _id are left untouched.
+      # Resolves aliased FKs (via alias_attribute) to their canonical name.
       def resolve_prefixed_id_for_attribute(attribute_name, prefixed_id_value)
-        reflection = belongs_to_reflections_by_fk[attribute_name]
+        canonical_name = attribute_aliases[attribute_name] || attribute_name
+        reflection = belongs_to_reflections_by_fk[canonical_name]
 
         if reflection
           reflection.klass.find_by_param!(prefixed_id_value).id

@@ -2,52 +2,57 @@
 
 require 'swagger_helper'
 
-# NOTE: This spec exercises the API but is excluded from the OpenAPI doc until 6.0
-# typed adjustments split (TaxLine/Discount/Fee) is finalized.
-# See docs/plans/6.0-split-adjustments.md.
-RSpec.describe 'Admin Order Adjustments API', type: :request do
+RSpec.describe 'Admin Order Gift Cards API', type: :request, swagger_doc: 'api-reference/admin.yaml' do
   include_context 'API v3 Admin'
 
-  let!(:order) { create(:order, store: store, state: 'cart') }
-  let!(:adjustment) { create(:adjustment, adjustable: order, order: order, amount: 5.00, label: 'Admin discount') }
+  let!(:order) { create(:order_with_line_items, store: store, state: 'cart') }
+  let!(:gift_card) { create(:gift_card, store: store) }
+  let!(:store_credit_payment_method) { create(:store_credit_payment_method, stores: [store]) }
   let(:Authorization) { "Bearer #{admin_jwt_token}" }
 
-  path '/api/v3/admin/orders/{order_id}/adjustments' do
+  path '/api/v3/admin/orders/{order_id}/gift_cards' do
     let(:order_id) { order.prefixed_id }
 
-    get 'List adjustments' do
-      tags 'Adjustments'
+    post 'Apply a gift card to an order' do
+      tags 'Order Gift Cards'
+      consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
-      description 'Returns all adjustments for an order. Read-only — adjustments are computed from promotions, taxes, and fees.'
+      description 'Applies a gift card by code to the order. Returns the gift card.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
+      parameter name: :body, in: :body, schema: {
+        type: :object,
+        required: %w[code],
+        properties: {
+          code: { type: :string, description: 'Gift card code', example: 'GIFT-XXXX-YYYY' }
+        }
+      }
 
-      response '200', 'adjustments found' do
+      response '201', 'gift card applied' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
+        let(:body) { { code: gift_card.code } }
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data['data']).to be_an(Array)
-          expect(data['data'].length).to be >= 1
+          expect(data['id']).to eq(gift_card.prefixed_id)
         end
       end
     end
   end
 
-  path '/api/v3/admin/orders/{order_id}/adjustments/{id}' do
+  path '/api/v3/admin/orders/{order_id}/gift_cards/{id}' do
     let(:order_id) { order.prefixed_id }
-    let(:id) { adjustment.prefixed_id }
+    let(:id) { gift_card.prefixed_id }
 
-    get 'Show an adjustment' do
-      tags 'Adjustments'
-      produces 'application/json'
+    delete 'Remove a gift card from an order' do
+      tags 'Order Gift Cards'
       security [api_key: [], bearer_auth: []]
-      description 'Returns details of a specific adjustment.'
+      description 'Removes the gift card from the order.'
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
@@ -55,15 +60,14 @@ RSpec.describe 'Admin Order Adjustments API', type: :request do
       parameter name: :order_id, in: :path, type: :string, required: true,
                 description: 'Order prefixed ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Adjustment prefixed ID'
+                description: 'Gift card prefixed ID'
 
-      response '200', 'adjustment found' do
+      response '204', 'gift card removed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['id']).to eq(adjustment.prefixed_id)
-        end
+        before { order.update_column(:gift_card_id, gift_card.id) }
+
+        run_test!
       end
     end
   end
