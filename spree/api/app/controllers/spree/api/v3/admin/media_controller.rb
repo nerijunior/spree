@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class MediaController < ResourceController
+          scoped_resource :products
+
           def create
             if permitted_params[:url].present?
               create_from_url

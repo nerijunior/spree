@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class OptionTypesController < ResourceController
+          scoped_resource :products
+
           # POST /api/v3/admin/option_types
           def create
             authorize!(:create, Spree::OptionType)

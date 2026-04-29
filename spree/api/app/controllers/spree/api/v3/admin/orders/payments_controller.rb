@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Orders
           class PaymentsController < BaseController
+            scoped_resource :payments
+
             before_action :set_resource, only: [:show, :capture, :void]
 
             # POST /api/v3/admin/orders/:order_id/payments

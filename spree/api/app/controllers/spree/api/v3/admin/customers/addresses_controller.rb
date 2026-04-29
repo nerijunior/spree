@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Customers
           class AddressesController < ResourceController
+            scoped_resource :customers
+
             # POST /api/v3/admin/customers/:customer_id/addresses
             def create
               @resource = @parent.addresses.new(address_attrs)

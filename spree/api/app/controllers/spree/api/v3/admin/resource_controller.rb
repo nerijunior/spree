@@ -2,8 +2,12 @@ module Spree
   module Api
     module V3
       module Admin
+        # Mirrors Admin::BaseController's concerns. Both classes anchor parallel
+        # inheritance branches (V3::BaseController vs V3::ResourceController);
+        # any concern added here MUST also be added to Admin::BaseController.
         class ResourceController < Spree::Api::V3::ResourceController
           include Spree::Api::V3::AdminAuthentication
+          include Spree::Api::V3::ScopedAuthorization
 
           protected
 

@@ -65,11 +65,12 @@ export function createAdminClient(config: AdminClientConfig): Client {
     };
 
     const makeRequest = () => {
-      const requestFn = createRequestFn(
-        requestConfig,
-        basePath,
-        { headerName: 'Authorization', headerValue: config.secretKey ? `Bearer ${config.secretKey}` : currentToken ? `Bearer ${currentToken}` : '' },
-      );
+      // Secret keys go in `X-Spree-Api-Key` (server-to-server integrations).
+      // JWT tokens go in `Authorization: Bearer` (admin SPA sessions).
+      const auth = config.secretKey
+        ? { headerName: 'X-Spree-Api-Key', headerValue: config.secretKey }
+        : { headerName: 'Authorization', headerValue: currentToken ? `Bearer ${currentToken}` : '' };
+      const requestFn = createRequestFn(requestConfig, basePath, auth);
       return requestFn<T>(method, path, mergedOptions);
     };
 

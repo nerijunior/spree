@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class CategoriesController < ResourceController
+          scoped_resource :categories
+
           protected
 
           def model_class

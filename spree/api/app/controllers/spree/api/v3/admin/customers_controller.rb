@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class CustomersController < ResourceController
+          scoped_resource :customers
+
           def create
             @resource = Spree.user_class.new(permitted_params)
             authorize!(:create, @resource)

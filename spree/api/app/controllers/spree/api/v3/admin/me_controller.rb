@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class MeController < Admin::BaseController
+          skip_scope_check!
+
           # GET /api/v3/admin/me
           # Returns the current admin user along with a serialized representation
           # of their permissions (derived from CanCanCan rules). The SPA uses

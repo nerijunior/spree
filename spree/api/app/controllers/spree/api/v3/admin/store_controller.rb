@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class StoreController < Admin::BaseController
+          scoped_resource :settings
+
           # GET /api/v3/admin/store
           def show
             authorize! :show, current_store

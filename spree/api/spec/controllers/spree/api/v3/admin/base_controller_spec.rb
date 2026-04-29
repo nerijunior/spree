@@ -2,6 +2,8 @@ require 'spec_helper'
 
 # Anonymous controller to test Admin::BaseController authentication and audience enforcement
 class Spree::Api::V3::Admin::TestController < Spree::Api::V3::Admin::BaseController
+  skip_scope_check!
+
   def index
     render json: { ok: true }
   end
@@ -9,6 +11,8 @@ end
 
 RSpec.describe Spree::Api::V3::Admin::BaseController, type: :controller do
   controller(Spree::Api::V3::Admin::TestController) do
+    skip_scope_check!
+
     def index
       if current_user
         render json: { ok: true, user_id: current_user.id }

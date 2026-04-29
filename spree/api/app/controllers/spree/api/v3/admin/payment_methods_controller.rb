@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class PaymentMethodsController < ResourceController
+          scoped_resource :settings
+
           protected
 
           def model_class

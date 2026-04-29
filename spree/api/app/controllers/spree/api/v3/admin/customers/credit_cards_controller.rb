@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Customers
           class CreditCardsController < ResourceController
+            scoped_resource :customers
+
             protected
 
             def set_parent

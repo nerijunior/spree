@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class TagsController < BaseController
+          skip_scope_check!
+
           MAX_RESULTS = 50
 
           def index

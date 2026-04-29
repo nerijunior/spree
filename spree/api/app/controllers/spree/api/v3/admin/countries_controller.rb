@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class CountriesController < ResourceController
+          scoped_resource :settings
+
           # Override base index to skip pagination — there are ~250 countries
           # and address-form dropdowns need them all at once. Pagy's global
           # max_limit (100) prevents using the paginated path for this.

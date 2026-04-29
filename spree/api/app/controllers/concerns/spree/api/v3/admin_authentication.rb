@@ -16,6 +16,17 @@ module Spree
           Spree::Api::V3::JwtAuthentication::JWT_AUDIENCE_ADMIN
         end
 
+        # API-key-only requests bypass CanCanCan: the ScopedAuthorization
+        # concern is the authoritative gate (read_/write_ scopes per resource).
+        # JWT admin users keep CanCanCan abilities; if both credentials are
+        # present, the JWT user wins for permission resolution.
+        def current_ability
+          return super if current_user
+          return super unless @current_api_key
+
+          @current_ability ||= Spree::ApiKeyAbility.new(ability_options)
+        end
+
         # Authenticates admin requests via secret API key OR JWT token.
         # Secret keys are checked first (server-to-server integrations),
         # then JWT tokens (admin SPA sessions).

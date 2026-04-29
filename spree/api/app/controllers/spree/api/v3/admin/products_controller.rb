@@ -3,6 +3,8 @@ module Spree
     module V3
       module Admin
         class ProductsController < ResourceController
+          scoped_resource :products
+
           # POST /api/v3/admin/products/:id/clone
           def clone
             @resource = find_resource

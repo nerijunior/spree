@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Products
           class VariantsController < ResourceController
+            scoped_resource :products
+
             protected
 
             def model_class

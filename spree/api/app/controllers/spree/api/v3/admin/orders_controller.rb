@@ -5,6 +5,8 @@ module Spree
         class OrdersController < ResourceController
           include Spree::Api::V3::OrderLock
 
+          scoped_resource :orders
+
           skip_before_action :set_resource, only: [:index, :create]
           before_action :set_resource, only: [:show, :update, :destroy, :complete, :cancel, :approve, :resume, :resend_confirmation]
 
@@ -40,13 +42,6 @@ module Spree
                 render_validation_error(@resource.errors.presence || result.error)
               end
             end
-          end
-
-          # DELETE /api/v3/admin/orders/:id
-          # CanCanCan restricts destroy to orders where can_be_deleted? is true
-          def destroy
-            @resource.destroy
-            head :no_content
           end
 
           # PATCH /api/v3/admin/orders/:id/complete

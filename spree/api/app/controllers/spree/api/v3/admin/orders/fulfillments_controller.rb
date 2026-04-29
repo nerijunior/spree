@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Orders
           class FulfillmentsController < BaseController
+            scoped_resource :fulfillments
+
             before_action :set_resource, only: [:show, :update, :fulfill, :cancel, :resume, :split]
 
             # PATCH /api/v3/admin/orders/:order_id/fulfillments/:id

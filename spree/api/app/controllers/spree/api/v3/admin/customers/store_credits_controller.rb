@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Customers
           class StoreCreditsController < ResourceController
+            scoped_resource :store_credits
+
             # POST /api/v3/admin/customers/:customer_id/store_credits
             def create
               @resource = @parent.store_credits.new(create_attrs)

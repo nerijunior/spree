@@ -50,9 +50,18 @@ module Spree
         end
 
         # DELETE /api/v3/resource/:id
+        # Honors `can_be_deleted?` if the model defines it — domain rules like
+        # "completed orders cannot be deleted" live on the model, not on
+        # CanCanCan abilities, so they apply to all callers (JWT and API key).
         def destroy
-          @resource.destroy
+          if @resource.respond_to?(:can_be_deleted?) && !@resource.can_be_deleted?
+            raise CanCan::AccessDenied.new("#{@resource.class.model_name.human} cannot be deleted")
+          end
+
+          @resource.destroy!
           head :no_content
+        rescue ActiveRecord::RecordNotDestroyed => e
+          render_validation_error(e.record.errors.presence || e.message)
         end
 
         protected

@@ -10,6 +10,7 @@ FactoryBot.define do
 
     trait :secret do
       key_type { 'secret' }
+      scopes { ['write_all'] }
     end
 
     trait :revoked do

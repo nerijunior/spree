@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Orders
           class RefundsController < BaseController
+            scoped_resource :refunds
+
             # POST /api/v3/admin/orders/:order_id/refunds
             def create
               with_order_lock do

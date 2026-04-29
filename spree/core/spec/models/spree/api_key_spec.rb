@@ -256,4 +256,63 @@ RSpec.describe Spree::ApiKey, type: :model do
       expect(api_key.revoked_by).to eq(user)
     end
   end
+
+  describe 'scopes (Admin API authorization)' do
+    describe 'validation' do
+      it 'requires scopes for secret keys' do
+        key = build(:api_key, :secret, store: store, scopes: [])
+        expect(key).not_to be_valid
+        expect(key.errors[:scopes]).to be_present
+      end
+
+      it 'rejects unknown scopes for secret keys' do
+        key = build(:api_key, :secret, store: store, scopes: ['read_orders', 'bogus_scope'])
+        expect(key).not_to be_valid
+        expect(key.errors[:scopes].join).to include('bogus_scope')
+      end
+
+      it 'accepts known scopes for secret keys' do
+        key = build(:api_key, :secret, store: store, scopes: %w[read_orders write_customers])
+        expect(key).to be_valid
+      end
+
+      it 'does not require scopes for publishable keys' do
+        key = build(:api_key, :publishable, store: store, scopes: [])
+        expect(key).to be_valid
+      end
+    end
+
+    describe '#has_scope?' do
+      it 'returns true for an exact scope match' do
+        key = build(:api_key, :secret, store: store, scopes: ['read_orders'])
+        expect(key.has_scope?('read_orders')).to be true
+      end
+
+      it 'returns false for a scope not granted' do
+        key = build(:api_key, :secret, store: store, scopes: ['read_orders'])
+        expect(key.has_scope?('write_orders')).to be false
+        expect(key.has_scope?('read_customers')).to be false
+      end
+
+      it 'treats write_X as implying read_X' do
+        key = build(:api_key, :secret, store: store, scopes: ['write_orders'])
+        expect(key.has_scope?('read_orders')).to be true
+        expect(key.has_scope?('write_orders')).to be true
+      end
+
+      it 'expands read_all to every read_* scope' do
+        key = build(:api_key, :secret, store: store, scopes: ['read_all'])
+        expect(key.has_scope?('read_orders')).to be true
+        expect(key.has_scope?('read_customers')).to be true
+        expect(key.has_scope?('write_orders')).to be false
+      end
+
+      it 'expands write_all to every read_* and write_* scope' do
+        key = build(:api_key, :secret, store: store, scopes: ['write_all'])
+        expect(key.has_scope?('read_orders')).to be true
+        expect(key.has_scope?('write_orders')).to be true
+        expect(key.has_scope?('write_customers')).to be true
+      end
+    end
+  end
 end

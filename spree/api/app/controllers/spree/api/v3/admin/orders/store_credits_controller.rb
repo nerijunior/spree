@@ -4,6 +4,8 @@ module Spree
       module Admin
         module Orders
           class StoreCreditsController < BaseController
+            scoped_resource :store_credits
+
             skip_before_action :set_resource, raise: false
 
             # POST /api/v3/admin/orders/:order_id/store_credits

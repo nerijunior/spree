@@ -5,6 +5,11 @@ RSpec.describe Spree::Api::V3::Admin::MeController, type: :controller do
 
   include_context 'API v3 Admin authenticated'
 
+  # /admin/me reflects the calling admin user — exercise JWT-only here
+  # (sending a secret key would route to the API-key principal, which has
+  # no Spree user to introspect).
+  let(:headers) { { 'Authorization' => "Bearer #{admin_jwt_token}" } }
+
   before { request.headers.merge!(headers) }
 
   describe 'GET #show' do

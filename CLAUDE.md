@@ -34,6 +34,7 @@ Current plans:
 
 
 - `5.5-6.0-order-cancellation-and-approval.md` — First-class `OrderCancellation` + `OrderApproval` models, capture reasons/restock/refund decisions, polymorphic actor; 6.0 drops denormalized columns
+- `5.5-admin-api-key-scopes.md` — Shopify-style `read_*`/`write_*` scopes on `Spree::ApiKey` for Admin API authorization (apps), independent of CanCanCan (which stays for JWT users)
 - `5.4-disjunctive-option-faceting.md` — Per-option-type filter params with disjunctive facet counts (OR within option type, AND across)
 - `5.4-option-type-enhancements.md` — Add `kind` (dropdown/color_swatch/buttons) to OptionType, `color_code` + `image` to OptionValue for swatch support
 - `5.4-6.0-custom-fields-rename.md` — Rename Metafields → Custom Fields (5.4 API bridge + 6.0 model rename)
