@@ -40,624 +40,6 @@ info:
     ```
   version: v3
 paths:
-  "/api/v3/admin/orders/{order_id}/adjustments":
-    get:
-      summary: List adjustments
-      tags:
-      - Adjustments
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Returns all adjustments for an order. Read-only — adjustments are
-        computed from promotions, taxes, and fees.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: order_id
-        in: path
-        required: true
-        description: Order prefixed ID
-        schema:
-          type: string
-      responses:
-        '200':
-          description: adjustments found
-          content:
-            application/json:
-              example:
-                data:
-                - id: adj_UkLWZg9DAJ
-                  label: Admin discount
-                  display_amount: "$0.00"
-                  included: false
-                  created_at: '2026-04-29T15:59:32.503Z'
-                  updated_at: '2026-04-29T15:59:32.510Z'
-                  amount: '0.0'
-                  order_id: or_UkLWZg9DAJ
-                meta:
-                  page: 1
-                  limit: 25
-                  count: 1
-                  pages: 1
-                  from: 1
-                  to: 1
-                  in: 1
-                  previous:
-                  next:
-  "/api/v3/admin/orders/{order_id}/adjustments/{id}":
-    get:
-      summary: Show an adjustment
-      tags:
-      - Adjustments
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Returns details of a specific adjustment.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: order_id
-        in: path
-        required: true
-        description: Order prefixed ID
-        schema:
-          type: string
-      - name: id
-        in: path
-        required: true
-        description: Adjustment prefixed ID
-        schema:
-          type: string
-      responses:
-        '200':
-          description: adjustment found
-          content:
-            application/json:
-              example:
-                id: adj_UkLWZg9DAJ
-                label: Admin discount
-                display_amount: "$0.00"
-                included: false
-                created_at: '2026-04-29T15:59:33.096Z'
-                updated_at: '2026-04-29T15:59:33.098Z'
-                amount: '0.0'
-                order_id: or_UkLWZg9DAJ
-  "/api/v3/admin/products/{product_id}/media":
-    get:
-      summary: List product media
-      tags:
-      - Product Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Returns a paginated list of media (images, video) for a product.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: page
-        in: query
-        required: false
-        description: Page number
-        schema:
-          type: integer
-      - name: limit
-        in: query
-        required: false
-        description: Number of records per page
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: media found
-          content:
-            application/json:
-              example:
-                data:
-                - id: media_UkLWZg9DAJ
-                  product_id: prod_UkLWZg9DAJ
-                  variant_ids:
-                  - variant_UkLWZg9DAJ
-                  position: 1
-                  alt:
-                  media_type: image
-                  focal_point_x:
-                  focal_point_y:
-                  external_video_url:
-                  original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
-                  mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
-                  small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
-                  medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
-                  large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
-                  xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
-                  og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
-                  created_at: '2026-04-29T15:59:57.579Z'
-                  updated_at: '2026-04-29T15:59:57.584Z'
-                  viewable_id: variant_UkLWZg9DAJ
-                  viewable_type: Spree::Variant
-                meta:
-                  page: 1
-                  limit: 25
-                  count: 1
-                  pages: 1
-                  from: 1
-                  to: 1
-                  in: 1
-                  previous:
-                  next:
-    post:
-      summary: Create a product media item
-      tags:
-      - Product Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Creates a new media item (image, video) for a product.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      responses:
-        '202':
-          description: media import from URL enqueued
-        '422':
-          description: validation error (attachment required)
-          content:
-            application/json:
-              example:
-                error:
-                  code: validation_error
-                  message: Attachment can't be blank
-                  details:
-                    attachment:
-                    - can't be blank
-              schema:
-                "$ref": "#/components/schemas/ErrorResponse"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                alt:
-                  type: string
-                  example: Product front view
-                position:
-                  type: integer
-                  example: 1
-                type:
-                  type: string
-                  example: Spree::Image
-                  description: Media type (defaults to Spree::Image)
-                url:
-                  type: string
-                  example: https://example.com/image.jpg
-                  description: External URL to import image from (async). Returns
-                    202 Accepted.
-  "/api/v3/admin/products/{product_id}/media/{id}":
-    patch:
-      summary: Update a product media item
-      tags:
-      - Product Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Updates a product media item. Only provided fields are updated.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: id
-        in: path
-        required: true
-        description: Media prefixed ID
-        schema:
-          type: string
-      responses:
-        '200':
-          description: media updated
-          content:
-            application/json:
-              example:
-                id: media_UkLWZg9DAJ
-                product_id: prod_UkLWZg9DAJ
-                variant_ids:
-                - variant_UkLWZg9DAJ
-                position: 1
-                alt: Updated alt text
-                media_type: image
-                focal_point_x:
-                focal_point_y:
-                external_video_url:
-                original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
-                mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
-                small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
-                medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
-                large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
-                xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
-                og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
-                created_at: '2026-04-29T15:59:58.609Z'
-                updated_at: '2026-04-29T15:59:58.899Z'
-                viewable_id: variant_UkLWZg9DAJ
-                viewable_type: Spree::Variant
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                alt:
-                  type: string
-                  example: Updated alt text
-                position:
-                  type: integer
-                  example: 2
-    delete:
-      summary: Delete a product media item
-      tags:
-      - Product Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Deletes a media item from a product.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: id
-        in: path
-        required: true
-        description: Media prefixed ID
-        schema:
-          type: string
-      responses:
-        '204':
-          description: media deleted
-  "/api/v3/admin/products/{product_id}/variants/{variant_id}/media":
-    get:
-      summary: List variant media
-      tags:
-      - Variant Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Returns a paginated list of media (images, video) for a variant.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: variant_id
-        in: path
-        required: true
-        description: Variant prefixed ID
-        schema:
-          type: string
-      - name: page
-        in: query
-        required: false
-        description: Page number
-        schema:
-          type: integer
-      - name: limit
-        in: query
-        required: false
-        description: Number of records per page
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: variant media found
-          content:
-            application/json:
-              example:
-                data:
-                - id: media_UkLWZg9DAJ
-                  product_id: prod_UkLWZg9DAJ
-                  variant_ids:
-                  - variant_gbHJdmfrXB
-                  position: 1
-                  alt:
-                  media_type: image
-                  focal_point_x:
-                  focal_point_y:
-                  external_video_url:
-                  original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
-                  mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
-                  small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
-                  medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
-                  large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
-                  xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
-                  og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
-                  created_at: '2026-04-29T16:00:03.230Z'
-                  updated_at: '2026-04-29T16:00:03.232Z'
-                  viewable_id: variant_gbHJdmfrXB
-                  viewable_type: Spree::Variant
-                meta:
-                  page: 1
-                  limit: 25
-                  count: 1
-                  pages: 1
-                  from: 1
-                  to: 1
-                  in: 1
-                  previous:
-                  next:
-    post:
-      summary: Create a variant media item
-      tags:
-      - Variant Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Creates a new media item (image, video) for a variant.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: variant_id
-        in: path
-        required: true
-        description: Variant prefixed ID
-        schema:
-          type: string
-      responses:
-        '202':
-          description: variant media import from URL enqueued
-        '422':
-          description: validation error (attachment required)
-          content:
-            application/json:
-              example:
-                error:
-                  code: validation_error
-                  message: Attachment can't be blank
-                  details:
-                    attachment:
-                    - can't be blank
-              schema:
-                "$ref": "#/components/schemas/ErrorResponse"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                alt:
-                  type: string
-                  example: Variant image
-                position:
-                  type: integer
-                  example: 1
-                type:
-                  type: string
-                  example: Spree::Image
-                  description: Media type (defaults to Spree::Image)
-                url:
-                  type: string
-                  example: https://example.com/image.jpg
-                  description: External URL to import image from (async). Returns
-                    202 Accepted.
-  "/api/v3/admin/products/{product_id}/variants/{variant_id}/media/{id}":
-    patch:
-      summary: Update a variant media item
-      tags:
-      - Variant Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Updates a variant media item. Only provided fields are updated.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: variant_id
-        in: path
-        required: true
-        description: Variant prefixed ID
-        schema:
-          type: string
-      - name: id
-        in: path
-        required: true
-        description: Media prefixed ID
-        schema:
-          type: string
-      responses:
-        '200':
-          description: variant media updated
-          content:
-            application/json:
-              example:
-                id: media_UkLWZg9DAJ
-                product_id: prod_UkLWZg9DAJ
-                variant_ids:
-                - variant_gbHJdmfrXB
-                position: 1
-                alt: Updated variant image
-                media_type: image
-                focal_point_x:
-                focal_point_y:
-                external_video_url:
-                original_url: http://localhost:3000/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/thinking-cat.jpg
-                mini_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjgsMTI4XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--91c795e37aabebcd6d835b0ec511e9ff9f42229d/thinking-cat.jpg
-                small_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyNTYsMjU2XSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--412eb7d358e08c9e384728ff0d6150a725ae2ff4/thinking-cat.jpg
-                medium_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls0MDAsNDAwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--341cac2fb7fb7b5265fbca9cf5f6ba03a645f4fb/thinking-cat.jpg
-                large_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOls3MjAsNzIwXSwic2F2ZXIiOnsic3RyaXAiOnRydWUsInF1YWxpdHkiOjc1LCJsb3NzbGVzcyI6ZmFsc2UsImFscGhhX3EiOjg1LCJyZWR1Y3Rpb25fZWZmb3J0Ijo2LCJzbWFydF9zdWJzYW1wbGUiOnRydWV9fSwicHVyIjoidmFyaWF0aW9uIn19--2a20e958723b87ff75d0681199260faa9b1fdcd1/thinking-cat.jpg
-                xlarge_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsyMDAwLDIwMDBdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6NzUsImxvc3NsZXNzIjpmYWxzZSwiYWxwaGFfcSI6ODUsInJlZHVjdGlvbl9lZmZvcnQiOjYsInNtYXJ0X3N1YnNhbXBsZSI6dHJ1ZX19LCJwdXIiOiJ2YXJpYXRpb24ifX0=--ddd095e8f694911905f100ba0f63bd3131a293ce/thinking-cat.jpg
-                og_image_url: http://localhost:3000/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--3b629ef2aa813d248c6f5821ac29239af940250f/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJ3ZWJwIiwicmVzaXplX3RvX2ZpbGwiOlsxMjAwLDYzMF0sInNhdmVyIjp7InN0cmlwIjp0cnVlLCJxdWFsaXR5Ijo3NSwibG9zc2xlc3MiOmZhbHNlLCJhbHBoYV9xIjo4NSwicmVkdWN0aW9uX2VmZm9ydCI6Niwic21hcnRfc3Vic2FtcGxlIjp0cnVlfX0sInB1ciI6InZhcmlhdGlvbiJ9fQ==--132b3a0a2b76bb0a03fa5fe8d337136a7ec3a980/thinking-cat.jpg
-                created_at: '2026-04-29T16:00:04.299Z'
-                updated_at: '2026-04-29T16:00:04.592Z'
-                viewable_id: variant_gbHJdmfrXB
-                viewable_type: Spree::Variant
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                alt:
-                  type: string
-                  example: Updated variant image
-                position:
-                  type: integer
-                  example: 2
-    delete:
-      summary: Delete a variant media item
-      tags:
-      - Variant Media
-      security:
-      - api_key: []
-        bearer_auth: []
-      description: Deletes a media item from a variant.
-      parameters:
-      - name: x-spree-api-key
-        in: header
-        required: true
-        schema:
-          type: string
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer token for admin authentication
-        schema:
-          type: string
-      - name: product_id
-        in: path
-        required: true
-        description: Product prefixed ID
-        schema:
-          type: string
-      - name: variant_id
-        in: path
-        required: true
-        description: Variant prefixed ID
-        schema:
-          type: string
-      - name: id
-        in: path
-        required: true
-        description: Media prefixed ID
-        schema:
-          type: string
-      responses:
-        '204':
-          description: variant media deleted
   "/api/v3/store/customers/me/addresses":
     get:
       summary: List customer addresses
@@ -720,7 +102,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 67 Lovely Street
+                  address1: 65 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -738,7 +120,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 66 Lovely Street
+                  address1: 64 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -756,7 +138,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 65 Lovely Street
+                  address1: 63 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -1005,7 +387,7 @@ paths:
                 first_name: John
                 last_name: Doe
                 full_name: John Doe
-                address1: 79 Lovely Street
+                address1: 77 Lovely Street
                 address2: Northwest
                 postal_code: '10118'
                 city: New York
@@ -1080,7 +462,7 @@ paths:
                 first_name: John
                 last_name: Doe
                 full_name: John Doe
-                address1: 85 Lovely Street
+                address1: 83 Lovely Street
                 address2: Northwest
                 postal_code: '10118'
                 city: Los Angeles
@@ -1208,16 +590,16 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6IjBkN2ZkNGY4LWM3MjAtNDZlNS05OWM4LTk5ODQ1NThlN2Y0ZiIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDgyMDEzfQ.rSgbM_4Burg-CxDBtJdl-zhm-dmwW2i8i3BH5VE8m78
-                refresh_token: wCxXpbHe4qCGW8kCmGwF1TBZ
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6IjUyMWQ1YzAxLWZkZjgtNDQ3My04MDk2LTBhNmIyYzlhMzQyNiIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDk4MjU1fQ.REJwQWqlzarNd_TADKFBUnuFk7HCQJPoCCBcaQIV2pE
+                refresh_token: XPJQbpb99u3n8mfatXsiPygL
                 user:
                   id: cus_UkLWZg9DAJ
                   email: test@example.com
-                  first_name: Brent
-                  last_name: Howell
+                  first_name: Mathew
+                  last_name: Bayer
                   phone:
                   accepts_email_marketing: false
-                  full_name: Brent Howell
+                  full_name: Mathew Bayer
                   available_store_credit_total: '0'
                   display_available_store_credit_total: "$0.00"
                   addresses: []
@@ -1290,16 +672,16 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6IjkxMjkxN2U4LTkzY2QtNDk4Yi05YzlkLTkwMmNlNTY4ZDMxOSIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDgyMDE0fQ.iNMfHrigR-mVxbt7gnYGxM5Qziq9rq5K9Q_sSEaJq8U
-                refresh_token: ig5mKBAuVE5MemW2UaubSick
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6IjU2ZTA2YmZiLTQ2MTQtNGYxNC05YmFmLWJiOTY3OWU0N2QwYyIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDk4MjU2fQ.Y_B6-QarGKzxJu4d76m-B489kmJ9fXBpbgXo9HnLA0Y
+                refresh_token: VzP8jvcXUsAmMAXyYLGxjqde
                 user:
                   id: cus_UkLWZg9DAJ
                   email: test@example.com
-                  first_name: Bernadine
-                  last_name: Doyle
+                  first_name: Ahmad
+                  last_name: Grady
                   phone:
                   accepts_email_marketing: false
-                  full_name: Bernadine Doyle
+                  full_name: Ahmad Grady
                   available_store_credit_total: '0'
                   display_available_store_credit_total: "$0.00"
                   addresses: []
@@ -1463,9 +845,9 @@ paths:
                 data:
                 - id: cart_gbHJdmfrXB
                   market_id:
-                  number: R496917299
-                  token: 14v8s9wyYvneSSMd6DD5r2LtMDguAnDm9u6
-                  email: angele@dach.biz
+                  number: R182881602
+                  token: 7xmFzBupB64Eqt1AJrjxAZshQ6hpfxqeukX
+                  email: elidia_dubuque@fadeloga.us
                   customer_note:
                   currency: USD
                   locale: en
@@ -1507,8 +889,8 @@ paths:
                     variant_id: variant_gbHJdmfrXB
                     quantity: 1
                     currency: USD
-                    name: Product 579733
-                    slug: product-579733
+                    name: Product 477312
+                    slug: product-477312
                     options_text: ''
                     price: '10.0'
                     display_price: "$10.00"
@@ -1533,7 +915,7 @@ paths:
                     digital_links: []
                   fulfillments:
                   - id: ful_gbHJdmfrXB
-                    number: H64308445398
+                    number: H50238594154
                     tracking: U10000
                     tracking_url:
                     cost: '100.0'
@@ -1562,7 +944,7 @@ paths:
                     stock_location:
                       id: sloc_UkLWZg9DAJ
                       state_abbr: NY
-                      name: Shanel Schaefer
+                      name: Rashida Ward
                       address1: 1600 Pennsylvania Ave NW
                       city: Washington
                       zipcode: '20500'
@@ -1594,7 +976,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 100 Lovely Street
+                    address1: 98 Lovely Street
                     address2: Northwest
                     postal_code: '10118'
                     city: New York
@@ -1613,7 +995,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 101 Lovely Street
+                    address1: 99 Lovely Street
                     address2: Northwest
                     postal_code: '10118'
                     city: New York
@@ -1632,9 +1014,9 @@ paths:
                   market:
                 - id: cart_UkLWZg9DAJ
                   market_id:
-                  number: R384180305
-                  token: QBU9FrPXCFJzmaRRAjyZBy9Kz4fd2FdpYt5
-                  email: angele@dach.biz
+                  number: R180174120
+                  token: M8LpDgv8esPyaFgerorVBCzTNxbbRBiBcH6
+                  email: elidia_dubuque@fadeloga.us
                   customer_note:
                   currency: USD
                   locale: en
@@ -1676,8 +1058,8 @@ paths:
                     variant_id: variant_UkLWZg9DAJ
                     quantity: 1
                     currency: USD
-                    name: Product 566791
-                    slug: product-566791
+                    name: Product 466677
+                    slug: product-466677
                     options_text: ''
                     price: '10.0'
                     display_price: "$10.00"
@@ -1702,7 +1084,7 @@ paths:
                     digital_links: []
                   fulfillments:
                   - id: ful_UkLWZg9DAJ
-                    number: H91469194561
+                    number: H72269460516
                     tracking: U10000
                     tracking_url:
                     cost: '100.0'
@@ -1731,7 +1113,7 @@ paths:
                     stock_location:
                       id: sloc_UkLWZg9DAJ
                       state_abbr: NY
-                      name: Shanel Schaefer
+                      name: Rashida Ward
                       address1: 1600 Pennsylvania Ave NW
                       city: Washington
                       zipcode: '20500'
@@ -1763,7 +1145,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 98 Lovely Street
+                    address1: 96 Lovely Street
                     address2: Northwest
                     postal_code: '10118'
                     city: New York
@@ -1782,7 +1164,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 99 Lovely Street
+                    address1: 97 Lovely Street
                     address2: Northwest
                     postal_code: '10118'
                     city: New York
@@ -1874,8 +1256,8 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R691642289
-                token: W1AjJm3NKZSMmctV9Tda2rfwcLhQZcmem8Y
+                number: R019335701
+                token: gt4CxjNxUGXa3c8guMYCXPvRMWBbpKPSDCy
                 email:
                 customer_note:
                 currency: USD
@@ -2030,9 +1412,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R511540545
-                token: NMTe7trEmwcBD9EW6mWjsFPYsLZKUD3NKhk
-                email: austin@wildermanharber.com
+                number: R136520724
+                token: RDTgrgyzKwVcNA6uExX2tPfK9FiT5RiXg5X
+                email: bryon@abernathyturner.com
                 customer_note:
                 currency: USD
                 locale: en
@@ -2059,7 +1441,7 @@ paths:
                 display_delivery_total: "$0.00"
                 warnings:
                 - code: line_item_removed
-                  message: Product 619413 was removed because it was sold out
+                  message: Product 517886 was removed because it was sold out
                   line_item_id: li_UkLWZg9DAJ
                   variant_id: variant_UkLWZg9DAJ
                 store_credit_total: '0.0'
@@ -2084,7 +1466,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 108 Lovely Street
+                  address1: 106 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2103,7 +1485,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 109 Lovely Street
+                  address1: 107 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2201,9 +1583,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R101821028
-                token: auf9jP48vgoAgv6dDF5pocrdj2xRFmaC79Y
-                email: katheleen_gutmann@ebertdurgan.com
+                number: R589446831
+                token: 5jpsbFd46zdFZnxX83WMCjoaVuRUz5NjNCv
+                email: shellie@mertz.us
                 customer_note: Leave at door
                 currency: USD
                 locale: en
@@ -2247,8 +1629,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 628443
-                  slug: product-628443
+                  name: Product 52369
+                  slug: product-52369
                   options_text: ''
                   price: '19.99'
                   display_price: "$19.99"
@@ -2273,7 +1655,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_gbHJdmfrXB
-                  number: H07153056867
+                  number: H91438962756
                   tracking:
                   tracking_url:
                   cost: '10.0'
@@ -2302,7 +1684,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Kendrick Nienow
+                    name: Ike Schumm
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -2334,7 +1716,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 112 Lovely Street
+                  address1: 110 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2353,7 +1735,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 113 Lovely Street
+                  address1: 111 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2539,9 +1921,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R496488366
-                token: QyG1CoSmhsREvUj68UV6mdCjbK6B588iEDX
-                email: quiana.fay@hahnosinski.us
+                number: R265003786
+                token: aFhxuJ1gwfZ9RxSPHFyEdgDesj1URBDnDwg
+                email: elaina@christiansen.ca
                 customer_note:
                 currency: USD
                 locale: en
@@ -2583,8 +1965,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 643922
-                  slug: product-643922
+                  name: Product 545852
+                  slug: product-545852
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -2609,7 +1991,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H01312263235
+                  number: H27932063184
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -2638,7 +2020,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Kyra Jast
+                    name: Hiram Schmidt
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -2670,7 +2052,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 118 Lovely Street
+                  address1: 116 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2689,7 +2071,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 119 Lovely Street
+                  address1: 117 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2772,8 +2154,8 @@ paths:
               example:
                 id: or_UkLWZg9DAJ
                 market_id:
-                number: R661978413
-                email: cherri@gusikowski.info
+                number: R600375601
+                email: jestine_considine@whitespinka.us
                 customer_note:
                 currency: USD
                 locale: en
@@ -2800,7 +2182,7 @@ paths:
                 display_delivery_total: "$10.00"
                 fulfillment_status: backorder
                 payment_status: paid
-                completed_at: '2026-04-29T16:00:20.549Z'
+                completed_at: '2026-04-29T20:31:02.835Z'
                 store_credit_total: '0.0'
                 display_store_credit_total: "$0.00"
                 covered_by_store_credit: false
@@ -2810,8 +2192,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 662849
-                  slug: product-662849
+                  name: Product 566923
+                  slug: product-566923
                   options_text: ''
                   price: '19.99'
                   display_price: "$19.99"
@@ -2836,7 +2218,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_gbHJdmfrXB
-                  number: H95827918638
+                  number: H21719438891
                   tracking:
                   tracking_url:
                   cost: '10.0'
@@ -2865,7 +2247,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Carola Lueilwitz
+                    name: Zella Flatley
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -2894,8 +2276,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: BGS-def49f44c66f
-                  number: P97I9JEM
+                  response_code: BGS-3cd8d54d3a63
+                  number: P5SEJH2N
                   amount: '29.99'
                   display_amount: "$29.99"
                   status: completed
@@ -2922,7 +2304,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 126 Lovely Street
+                  address1: 124 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -2941,7 +2323,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 127 Lovely Street
+                  address1: 125 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -3751,16 +3133,16 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImYzY2MwMDFiLTMzMTgtNGE5YS1hNzM3LWRhNTAwMTE4MmMyNCIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDgyMDI3fQ.2nR7D1VUtVOj9FetV56yOhfIdSpAoQGXQIT5X19D3YE
-                refresh_token: JxbtKAkym9dtQo5d3PawV1A2
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImNlZTBlMmVlLTVjYTMtNGNmNy1hYjRkLWFlNzY3MWE0ODAyMCIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDk4MjY5fQ.b_0Zzjl18__wi6pnjPBGIzu7aE8I1LJ-7Uz5vg2e-_4
+                refresh_token: NYmxCAw5u8FtKDzarLk2VB1A
                 user:
                   id: cus_UkLWZg9DAJ
                   email: customer@example.com
-                  first_name: Gayla
-                  last_name: Witting
+                  first_name: Katlyn
+                  last_name: Kuhn
                   phone:
                   accepts_email_marketing: false
-                  full_name: Gayla Witting
+                  full_name: Katlyn Kuhn
                   available_store_credit_total: '0'
                   display_available_store_credit_total: "$0.00"
                   addresses: []
@@ -3930,8 +3312,8 @@ paths:
                 data:
                 - id: or_UkLWZg9DAJ
                   market_id:
-                  number: R832819108
-                  email: sanjuana@goldnerwisozk.us
+                  number: R270430768
+                  email: dayna@cummingswilderman.us
                   customer_note:
                   currency: USD
                   locale: en
@@ -3958,7 +3340,7 @@ paths:
                   display_delivery_total: "$100.00"
                   fulfillment_status:
                   payment_status:
-                  completed_at: '2026-04-29T16:00:28.242Z'
+                  completed_at: '2026-04-29T20:31:10.038Z'
                   store_credit_total: '0.0'
                   display_store_credit_total: "$0.00"
                   covered_by_store_credit: false
@@ -3968,8 +3350,8 @@ paths:
                     variant_id: variant_UkLWZg9DAJ
                     quantity: 1
                     currency: USD
-                    name: Product 755263
-                    slug: product-755263
+                    name: Product 653038
+                    slug: product-653038
                     options_text: ''
                     price: '10.0'
                     display_price: "$10.00"
@@ -3994,7 +3376,7 @@ paths:
                     digital_links: []
                   fulfillments:
                   - id: ful_UkLWZg9DAJ
-                    number: H44154252716
+                    number: H02369830101
                     tracking: U10000
                     tracking_url:
                     cost: '100.0'
@@ -4023,7 +3405,7 @@ paths:
                     stock_location:
                       id: sloc_UkLWZg9DAJ
                       state_abbr: NY
-                      name: Alane Hegmann
+                      name: Shayla Gerlach
                       address1: 1600 Pennsylvania Ave NW
                       city: Washington
                       zipcode: '20500'
@@ -4055,7 +3437,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 146 Lovely Street
+                    address1: 144 Lovely Street
                     address2: Northwest
                     postal_code: '10118'
                     city: New York
@@ -4074,7 +3456,7 @@ paths:
                     first_name: John
                     last_name: Doe
                     full_name: John Doe
-                    address1: 147 Lovely Street
+                    address1: 145 Lovely Street
                     address2: Northwest
                     postal_code: '10118'
                     city: New York
@@ -4185,8 +3567,8 @@ paths:
               example:
                 id: or_UkLWZg9DAJ
                 market_id:
-                number: R624689755
-                email: marya@breitenberg.biz
+                number: R634795563
+                email: reita_boyle@predovic.co.uk
                 customer_note:
                 currency: USD
                 locale: en
@@ -4213,7 +3595,7 @@ paths:
                 display_delivery_total: "$100.00"
                 fulfillment_status:
                 payment_status:
-                completed_at: '2026-04-29T16:00:28.955Z'
+                completed_at: '2026-04-29T20:31:10.734Z'
                 store_credit_total: '0.0'
                 display_store_credit_total: "$0.00"
                 covered_by_store_credit: false
@@ -4223,8 +3605,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 772121
-                  slug: product-772121
+                  name: Product 673736
+                  slug: product-673736
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -4249,7 +3631,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H33308593214
+                  number: H68508572865
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -4278,7 +3660,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Valery Conn
+                    name: Rivka Harvey
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -4310,7 +3692,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 152 Lovely Street
+                  address1: 150 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4329,7 +3711,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 153 Lovely Street
+                  address1: 151 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4398,8 +3780,8 @@ paths:
           content:
             application/json:
               example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImQ5MmE1OWU0LTMzMDAtNDk0Ny04MzFmLTU4OGZlYzNjNGYxOCIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDgyMDMwfQ.-EYQoFb28Sqk6onWxtgXarFXyr3ysIgg2W1uGpM440w
-                refresh_token: KV2opHCMpzNqp5bpPCo9Yd6u
+                token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX3R5cGUiOiJjdXN0b21lciIsImp0aSI6ImEwYjExODAyLTY3ZWEtNGUzNy04M2Q4LTg1MTQ2YTVhNGIwMyIsImlzcyI6InNwcmVlIiwiYXVkIjoic3RvcmVfYXBpIiwiZXhwIjoxNzc3NDk4MjcxfQ.5idDO7ASyl4HrqvrIOBrurfHFjFFGZl-jjAwtgtiP7o
+                refresh_token: 2AobsjUHtC2zLJjrBGx7jc5z
                 user:
                   id: cus_UkLWZg9DAJ
                   email: newuser@example.com
@@ -4513,12 +3895,12 @@ paths:
             application/json:
               example:
                 id: cus_UkLWZg9DAJ
-                email: marianela.hand@pfeffer.biz
-                first_name: Jonah
-                last_name: Rutherford
+                email: veronika.rosenbaum@rogahn.ca
+                first_name: Manuela
+                last_name: O'Kon
                 phone: 555-555-0199
                 accepts_email_marketing: false
-                full_name: Jonah Rutherford
+                full_name: Manuela O'Kon
                 available_store_credit_total: '0'
                 display_available_store_credit_total: "$0.00"
                 addresses:
@@ -4526,7 +3908,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 159 Lovely Street
+                  address1: 157 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4544,7 +3926,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 158 Lovely Street
+                  address1: 156 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4563,7 +3945,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 159 Lovely Street
+                  address1: 157 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4582,7 +3964,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 158 Lovely Street
+                  address1: 156 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4652,7 +4034,7 @@ paths:
             application/json:
               example:
                 id: cus_UkLWZg9DAJ
-                email: classie@thielhuel.co.uk
+                email: jama.wyman@morar.co.uk
                 first_name: Updated
                 last_name: Name
                 phone: 555-555-0199
@@ -4665,7 +4047,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 161 Lovely Street
+                  address1: 159 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4683,7 +4065,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 160 Lovely Street
+                  address1: 158 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4702,7 +4084,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 161 Lovely Street
+                  address1: 159 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4721,7 +4103,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 160 Lovely Street
+                  address1: 158 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -4892,9 +4274,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R684238326
-                token: u6ecSSHe1CGhDripbUftdK41Jsec1LqM4bc
-                email: sal_pouros@greenfelder.biz
+                number: R686751507
+                token: PfLkSHCKhzw3ZFoT3Evj6bX72KEAePEERfW
+                email: stuart@gutmannmohr.co.uk
                 customer_note:
                 currency: USD
                 locale: en
@@ -4943,8 +4325,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 855536
-                  slug: product-855536
+                  name: Product 755782
+                  slug: product-755782
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -4969,7 +4351,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H53375671698
+                  number: H81703772553
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -4998,7 +4380,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Camila McCullough
+                    name: Larita Lakin
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -5030,7 +4412,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 178 Lovely Street
+                  address1: 176 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5049,7 +4431,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 179 Lovely Street
+                  address1: 177 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5152,9 +4534,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R636351307
-                token: ZuEsV7CieZAFaG4m17MPKposzN9bASB18Gg
-                email: takako@kerluke.co.uk
+                number: R666419309
+                token: nc7Dy8DuA7PFHd5sn1zM2b8gpHDPfgEp1tt
+                email: sherman_larkin@hauck.us
                 customer_note:
                 currency: USD
                 locale: en
@@ -5196,8 +4578,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 878882
-                  slug: product-878882
+                  name: Product 772017
+                  slug: product-772017
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -5222,7 +4604,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H40345253216
+                  number: H42154252733
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -5251,7 +4633,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Shane DuBuque
+                    name: Margarett Hoeger
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -5283,7 +4665,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 186 Lovely Street
+                  address1: 184 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5302,7 +4684,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 187 Lovely Street
+                  address1: 185 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5394,9 +4776,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R682532547
-                token: cJ71DWMVgw44QB3afABkDchQ8VC76qvjNjp
-                email: tanisha@dareferry.biz
+                number: R679060655
+                token: gePNeiWirzf2J7y37iBdarBX4qVLfs3eEgi
+                email: stacie_aufderhar@morissette.com
                 customer_note:
                 currency: USD
                 locale: en
@@ -5440,8 +4822,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 89648
-                  slug: product-89648
+                  name: Product 796254
+                  slug: product-796254
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -5466,7 +4848,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H83618197901
+                  number: H02184977229
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -5495,7 +4877,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Yer Cassin
+                    name: Bridget Heller
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -5527,7 +4909,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 194 Lovely Street
+                  address1: 192 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5546,7 +4928,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 195 Lovely Street
+                  address1: 193 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5652,9 +5034,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R134509356
-                token: Pc31yhLMexVeuwqP7x3aKHw8r1v9n8X1PHk
-                email: sherice_gutmann@keeling.biz
+                number: R134922089
+                token: v2NsykGGYJxbRhYHnN1wb62cK4Q7KNoBxYx
+                email: darwin_christiansen@berge.co.uk
                 customer_note:
                 currency: USD
                 locale: en
@@ -5693,8 +5075,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 919205
-                  slug: product-919205
+                  name: Product 813626
+                  slug: product-813626
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -5719,7 +5101,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H44860419830
+                  number: H20006652345
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -5748,7 +5130,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Lue Windler
+                    name: Taisha Koch
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -5777,8 +5159,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: 1-SC-20260429160039175123
-                  number: P1F24VXD
+                  response_code: 1-SC-20260429203120465620
+                  number: PYZM56EO
                   amount: '50.0'
                   display_amount: "$50.00"
                   status: checkout
@@ -5805,7 +5187,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 202 Lovely Street
+                  address1: 200 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5824,7 +5206,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 203 Lovely Street
+                  address1: 201 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -5957,9 +5339,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R058228208
-                token: vKMtw8bFJNKEKCDEo6wkcCGjagCReoeQ5hT
-                email: vernice@hoeger.com
+                number: R739841957
+                token: Zsmwu1S5EBR4ua9KCtREh1LboGrdYxeCjXh
+                email: rhoda@bahringer.info
                 customer_note:
                 currency: USD
                 locale: en
@@ -6001,8 +5383,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 955154
-                  slug: product-955154
+                  name: Product 856826
+                  slug: product-856826
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -6027,7 +5409,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H82159045492
+                  number: H08780625784
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -6056,7 +5438,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Arleen Bartell
+                    name: Lynsey Bode
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -6085,8 +5467,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: 1-SC-20260429160041706187
-                  number: PB0HE5QW
+                  response_code: 1-SC-20260429203123363868
+                  number: P605ZYX4
                   amount: '50.0'
                   display_amount: "$50.00"
                   status: invalid
@@ -6113,7 +5495,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 218 Lovely Street
+                  address1: 216 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -6132,7 +5514,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 219 Lovely Street
+                  address1: 217 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -6210,7 +5592,7 @@ paths:
               example:
                 data:
                 - id: gc_UkLWZg9DAJ
-                  code: 2FE4341082F198C4
+                  code: 49492AAAF001FBB7
                   status: active
                   currency: USD
                   amount: '10.0'
@@ -6306,7 +5688,7 @@ paths:
             application/json:
               example:
                 id: gc_UkLWZg9DAJ
-                code: ED365F485FE3776A
+                code: 7C8C28BE6FE5ECDE
                 status: active
                 currency: USD
                 amount: '10.0'
@@ -6397,9 +5779,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R775361233
-                token: W1EWaRx5iBZnn83Vn66BSjeqUq9jQjy438s
-                email: emanuel_cormier@herman.info
+                number: R160774453
+                token: VshV5k2uUhjKTJj8apmDPv31xd5qkh3sh5Y
+                email: rex.corwin@oberbrunner.com
                 customer_note:
                 currency: USD
                 locale: en
@@ -6447,8 +5829,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 984707
-                  slug: product-984707
+                  name: Product 888823
+                  slug: product-888823
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -6475,8 +5857,8 @@ paths:
                   variant_id: variant_gbHJdmfrXB
                   quantity: 1
                   currency: USD
-                  name: Product 99985
-                  slug: product-99985
+                  name: Product 895490
+                  slug: product-895490
                   options_text: ''
                   price: '19.99'
                   display_price: "$19.99"
@@ -6506,7 +5888,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 233 Lovely Street
+                  address1: 231 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -6619,9 +6001,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R042592274
-                token: uJnik897i8sPndA2u7koP8pUgbZW9rte8gs
-                email: maryrose.stamm@herman.name
+                number: R417441624
+                token: 6fGMJoT6FeteiGKiWb7Awm5ZSeEZGUYFXPT
+                email: jacquelyn@kling.ca
                 customer_note:
                 currency: USD
                 locale: en
@@ -6666,8 +6048,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 102651
-                  slug: product-102651
+                  name: Product 925658
+                  slug: product-925658
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -6697,7 +6079,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 242 Lovely Street
+                  address1: 240 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -6790,9 +6172,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R910961026
-                token: uEZu67z8eF6jkqokHhX5ZG5oj3hk4gparTn
-                email: vincenza@rath.us
+                number: R327511489
+                token: vz6NujDsYszBfSh8snFmiUjv4XN8jV22n8D
+                email: jaye_shanahan@okon.co.uk
                 customer_note:
                 currency: USD
                 locale: en
@@ -6843,7 +6225,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 245 Lovely Street
+                  address1: 243 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -7393,7 +6775,7 @@ paths:
               example:
                 id: or_UkLWZg9DAJ
                 market_id:
-                number: R404436615
+                number: R773500111
                 email: guest@example.com
                 customer_note:
                 currency: USD
@@ -7421,7 +6803,7 @@ paths:
                 display_delivery_total: "$100.00"
                 fulfillment_status:
                 payment_status:
-                completed_at: '2026-04-29T16:00:49.872Z'
+                completed_at: '2026-04-29T20:31:31.385Z'
                 store_credit_total: '0.0'
                 display_store_credit_total: "$0.00"
                 covered_by_store_credit: false
@@ -7431,8 +6813,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 106449
-                  slug: product-106449
+                  name: Product 966442
+                  slug: product-966442
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -7457,7 +6839,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H83574844550
+                  number: H86313255182
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -7486,7 +6868,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Nora Mueller
+                    name: Tandra Weber
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -7518,7 +6900,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 253 Lovely Street
+                  address1: 251 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -7537,7 +6919,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 254 Lovely Street
+                  address1: 252 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -7631,9 +7013,9 @@ paths:
                 id: ps_gbHJdmfrXB
                 status: pending
                 currency: USD
-                external_id: bogus_7c95fb2319657ba994cc2207
+                external_id: bogus_5be4f6882cb65c798b36044b
                 external_data:
-                  client_secret: bogus_secret_1dccd1a9fa1716cf
+                  client_secret: bogus_secret_83acefba58c748fa
                 customer_external_id:
                 expires_at:
                 amount: '110.0'
@@ -7731,7 +7113,7 @@ paths:
                 id: ps_UkLWZg9DAJ
                 status: pending
                 currency: USD
-                external_id: bogus_ccc13a869ffecd10dffe7812
+                external_id: bogus_eea6b836764131d01d8930c3
                 external_data:
                   client_secret: secret_123
                 customer_external_id:
@@ -7793,7 +7175,7 @@ paths:
                 id: ps_UkLWZg9DAJ
                 status: pending
                 currency: USD
-                external_id: bogus_554e57fdc224df25d5e22aa4
+                external_id: bogus_c42d7bb8c46ce77865501174
                 external_data:
                   client_secret: secret_123
                 customer_external_id:
@@ -7895,7 +7277,7 @@ paths:
                 id: ps_UkLWZg9DAJ
                 status: completed
                 currency: USD
-                external_id: bogus_b2779ff1fd23789a717fc8b5
+                external_id: bogus_da9af71a978676085b99ce61
                 external_data:
                   client_secret: secret_123
                 customer_external_id:
@@ -7980,8 +7362,8 @@ paths:
               example:
                 id: pss_gbHJdmfrXB
                 status: pending
-                external_id: bogus_seti_18928969f2502cd4c2c1ce32
-                external_client_secret: bogus_seti_secret_64707f0d54f29d38
+                external_id: bogus_seti_69d0c0fba541cf751511c029
+                external_client_secret: bogus_seti_secret_e91402dff84ebb58
                 external_data: {}
                 payment_method_id: pm_UkLWZg9DAJ
                 payment_source_id:
@@ -8080,8 +7462,8 @@ paths:
               example:
                 id: pss_UkLWZg9DAJ
                 status: pending
-                external_id: seti_test_95227153d866b2994ca7ca92
-                external_client_secret: seti_secret_17c2c2cef27524e368875fb0
+                external_id: seti_test_c9f7f791cdf7b9c36dea5ae9
+                external_client_secret: seti_secret_e7cca325c5d0792f378adc51
                 external_data:
                   client_secret: secret_123
                 payment_method_id: pm_UkLWZg9DAJ
@@ -8157,8 +7539,8 @@ paths:
               example:
                 id: pss_UkLWZg9DAJ
                 status: completed
-                external_id: seti_test_7dba83629f90b18f1b1e43fa
-                external_client_secret: seti_secret_f0f84f9147db743c3bd09176
+                external_id: seti_test_73a3566842a3d01db9a800e0
+                external_client_secret: seti_secret_2f94274fab6af1dfb46b5b39
                 external_data:
                   client_secret: secret_123
                 payment_method_id: pm_UkLWZg9DAJ
@@ -8252,7 +7634,7 @@ paths:
                 id: py_UkLWZg9DAJ
                 payment_method_id: pm_UkLWZg9DAJ
                 response_code:
-                number: PT31KFV5
+                number: PHAY8LI4
                 amount: '110.0'
                 display_amount: "$110.00"
                 status: checkout
@@ -8348,7 +7730,7 @@ paths:
                   body_html: ''
                 - id: pol_OIJLhNcSbf
                   name: Privacy Policy
-                  slug: privacy-policy-ea963688-a324-427f-98ef-cb1454aa0b36
+                  slug: privacy-policy-24a44547-bd29-493a-9028-25e30b0c6417
                   body: We respect your privacy.
                   body_html: |
                     <div class="trix-content">
@@ -8592,12 +7974,12 @@ paths:
               example:
                 data:
                 - id: prod_UkLWZg9DAJ
-                  name: Product 1167671
-                  slug: product-1167671
+                  name: Product 1066950
+                  slug: product-1066950
                   meta_description:
                   meta_keywords:
                   variant_count: 1
-                  available_on: '2025-04-29T16:01:00.580Z'
+                  available_on: '2025-04-29T20:31:41.571Z'
                   purchasable: true
                   in_stock: false
                   backorderable: true
@@ -8619,41 +8001,40 @@ paths:
                     price_list_id:
                   original_price:
                 - id: prod_gbHJdmfrXB
-                  name: Product 1171988
-                  slug: product-1171988
+                  name: Product 1078704
+                  slug: product-1078704
                   meta_description:
                   meta_keywords:
                   variant_count: 0
-                  available_on: '2025-04-29T16:01:00.655Z'
+                  available_on: '2025-04-29T20:31:41.632Z'
                   purchasable: true
                   in_stock: false
                   backorderable: true
                   available: true
-                  description: Odio ullam voluptatum illo laborum. Molestiae temporibus
-                    architecto iusto ratione officia aliquam similique facilis. Molestiae
-                    omnis error enim veritatis. Sequi voluptate asperiores repudiandae
-                    dignissimos accusantium maxime perspiciatis praesentium. Dicta
-                    assumenda reprehenderit commodi quo placeat minima voluptatum
-                    incidunt. Labore quos quod quo id consectetur fugiat eaque. Nobis
-                    amet cum voluptates rem minus quasi corporis. Exercitationem reprehenderit
-                    maxime enim inventore assumenda. Voluptatibus debitis aliquam
-                    inventore quis similique. Eaque accusantium corporis saepe doloremque
-                    laudantium quam. Similique aspernatur molestiae reiciendis consequatur
-                    distinctio quia. Distinctio quaerat doloribus totam ex laudantium
-                    nulla eaque. Odit laborum voluptas voluptates pariatur animi praesentium
-                    accusamus. Quae et numquam a cupiditate pariatur ducimus impedit.
-                    Ducimus consequatur neque eligendi natus nihil esse. Rem sapiente
-                    maiores iusto reiciendis. Ad dolore eum sed odio tempore eveniet
-                    ipsum accusamus. Fugit aperiam quasi aut officia eligendi. Ipsa
-                    adipisci asperiores doloribus eaque. Maxime perferendis non recusandae
-                    sed id ipsam suscipit ducimus. Minima officiis fugit laborum dolorum
-                    neque eius.
+                  description: Id qui consequatur sapiente dolor eveniet ipsum. Quidem
+                    vel possimus corporis aut a porro doloremque. Quasi sint totam
+                    placeat quos vel dicta iusto sapiente. Amet non tempora perferendis
+                    saepe. Nesciunt distinctio accusantium vitae tempore. Aut et id
+                    odio qui sapiente minima nemo ipsum. Et veniam nesciunt minus
+                    itaque quam. Aspernatur ipsum facere aut dignissimos. Ullam natus
+                    commodi magnam quisquam aperiam laudantium ut asperiores. Quis
+                    facere dolorum deserunt soluta. Commodi ut in harum rem maiores
+                    dolore. Facilis ex vel saepe cupiditate. Cumque molestias esse
+                    nulla odio itaque. Non velit cumque reprehenderit eaque iste.
+                    Fugit quidem deserunt quisquam accusamus sed sequi dolorum. Repellat
+                    voluptatum perferendis doloribus culpa quibusdam at voluptas.
+                    Sed deserunt perspiciatis ea temporibus. Eaque veniam necessitatibus
+                    inventore dicta reiciendis doloremque. Cupiditate officia illo
+                    impedit assumenda. Consequuntur commodi inventore quidem molestiae
+                    laborum. Quaerat voluptatem maiores quos veniam neque molestias.
+                    Eaque unde officiis illo dignissimos voluptate laboriosam ad enim.
+                    Et accusamus adipisci dolor facere tempore itaque.
                   description_html: |-
-                    Odio ullam voluptatum illo laborum. Molestiae temporibus architecto iusto ratione officia aliquam similique facilis. Molestiae omnis error enim veritatis. Sequi voluptate asperiores repudiandae dignissimos accusantium maxime perspiciatis praesentium.
-                    Dicta assumenda reprehenderit commodi quo placeat minima voluptatum incidunt. Labore quos quod quo id consectetur fugiat eaque. Nobis amet cum voluptates rem minus quasi corporis. Exercitationem reprehenderit maxime enim inventore assumenda. Voluptatibus debitis aliquam inventore quis similique.
-                    Eaque accusantium corporis saepe doloremque laudantium quam. Similique aspernatur molestiae reiciendis consequatur distinctio quia. Distinctio quaerat doloribus totam ex laudantium nulla eaque. Odit laborum voluptas voluptates pariatur animi praesentium accusamus. Quae et numquam a cupiditate pariatur ducimus impedit.
-                    Ducimus consequatur neque eligendi natus nihil esse. Rem sapiente maiores iusto reiciendis. Ad dolore eum sed odio tempore eveniet ipsum accusamus. Fugit aperiam quasi aut officia eligendi.
-                    Ipsa adipisci asperiores doloribus eaque. Maxime perferendis non recusandae sed id ipsam suscipit ducimus. Minima officiis fugit laborum dolorum neque eius.
+                    Id qui consequatur sapiente dolor eveniet ipsum. Quidem vel possimus corporis aut a porro doloremque. Quasi sint totam placeat quos vel dicta iusto sapiente. Amet non tempora perferendis saepe.
+                    Nesciunt distinctio accusantium vitae tempore. Aut et id odio qui sapiente minima nemo ipsum. Et veniam nesciunt minus itaque quam. Aspernatur ipsum facere aut dignissimos.
+                    Ullam natus commodi magnam quisquam aperiam laudantium ut asperiores. Quis facere dolorum deserunt soluta. Commodi ut in harum rem maiores dolore. Facilis ex vel saepe cupiditate. Cumque molestias esse nulla odio itaque.
+                    Non velit cumque reprehenderit eaque iste. Fugit quidem deserunt quisquam accusamus sed sequi dolorum. Repellat voluptatum perferendis doloribus culpa quibusdam at voluptas. Sed deserunt perspiciatis ea temporibus. Eaque veniam necessitatibus inventore dicta reiciendis doloremque.
+                    Cupiditate officia illo impedit assumenda. Consequuntur commodi inventore quidem molestiae laborum. Quaerat voluptatem maiores quos veniam neque molestias. Eaque unde officiis illo dignissimos voluptate laboriosam ad enim. Et accusamus adipisci dolor facere tempore itaque.
                   default_variant_id: variant_EfhxLZ9ck8
                   thumbnail_url:
                   tags: []
@@ -8755,12 +8136,12 @@ paths:
             application/json:
               example:
                 id: prod_UkLWZg9DAJ
-                name: Product 1446790
-                slug: product-1446790
+                name: Product 1341741
+                slug: product-1341741
                 meta_description:
                 meta_keywords:
                 variant_count: 1
-                available_on: '2025-04-29T16:01:02.256Z'
+                available_on: '2025-04-29T20:31:43.333Z'
                 purchasable: true
                 in_stock: false
                 backorderable: true
@@ -8787,7 +8168,7 @@ paths:
                   amount_in_cents: 999
                   currency: USD
                   display_amount: "$9.99"
-                  recorded_at: '2026-04-14T16:01:02Z'
+                  recorded_at: '2026-04-14T20:31:43Z'
               schema:
                 "$ref": "#/components/schemas/Product"
         '404':
@@ -9162,9 +8543,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R021918322
-                token: SAUJRQh1TveULkP81cF4ixpTswBACZZcF6F
-                email: sulema@collierberge.info
+                number: R702444710
+                token: KKKKz15uUX3wLs3WeMci3aiDUn8NLgjRMRd
+                email: kenny_reichel@volkmanbahringer.biz
                 customer_note:
                 currency: USD
                 locale: en
@@ -9203,8 +8584,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 1643340
-                  slug: product-1643340
+                  name: Product 1546874
+                  slug: product-1546874
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -9229,7 +8610,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H00294560922
+                  number: H03249355163
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -9258,7 +8639,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Silva Hills
+                    name: Nada Hettinger
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -9287,8 +8668,8 @@ paths:
                 payments:
                 - id: py_UkLWZg9DAJ
                   payment_method_id: pm_UkLWZg9DAJ
-                  response_code: 1-SC-20260429160107728556
-                  number: PE5SHORE
+                  response_code: 1-SC-20260429203148434892
+                  number: POQWOLDS
                   amount: '10.0'
                   display_amount: "$10.00"
                   status: checkout
@@ -9315,7 +8696,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 317 Lovely Street
+                  address1: 315 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -9334,7 +8715,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 318 Lovely Street
+                  address1: 316 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -9431,9 +8812,9 @@ paths:
               example:
                 id: cart_UkLWZg9DAJ
                 market_id:
-                number: R685003154
-                token: 2HqSo4dFnwipJUsBxSm53XA3SC7q9auGjkx
-                email: zackary_bartell@brown.biz
+                number: R968281647
+                token: vyW18bBrgGcr9BHW4DWLGKxUtYnnhyyRGVG
+                email: tricia_reilly@schuster.us
                 customer_note:
                 currency: USD
                 locale: en
@@ -9475,8 +8856,8 @@ paths:
                   variant_id: variant_UkLWZg9DAJ
                   quantity: 1
                   currency: USD
-                  name: Product 1662543
-                  slug: product-1662543
+                  name: Product 1567335
+                  slug: product-1567335
                   options_text: ''
                   price: '10.0'
                   display_price: "$10.00"
@@ -9501,7 +8882,7 @@ paths:
                   digital_links: []
                 fulfillments:
                 - id: ful_UkLWZg9DAJ
-                  number: H00399261907
+                  number: H34150382243
                   tracking: U10000
                   tracking_url:
                   cost: '100.0'
@@ -9530,7 +8911,7 @@ paths:
                   stock_location:
                     id: sloc_UkLWZg9DAJ
                     state_abbr: NY
-                    name: Ermelinda Trantow
+                    name: Kylee Jones
                     address1: 1600 Pennsylvania Ave NW
                     city: Washington
                     zipcode: '20500'
@@ -9562,7 +8943,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 325 Lovely Street
+                  address1: 323 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -9581,7 +8962,7 @@ paths:
                   first_name: John
                   last_name: Doe
                   full_name: John Doe
-                  address1: 326 Lovely Street
+                  address1: 324 Lovely Street
                   address2: Northwest
                   postal_code: '10118'
                   city: New York
@@ -9660,7 +9041,7 @@ paths:
                 data:
                 - id: wl_UkLWZg9DAJ
                   name: My Wishlist
-                  token: qKXFEJg674GQFMJdhX4aP21s
+                  token: NtdmeixQzCBf9oTPYdxpf9Sv
                   is_default: false
                   is_private: true
                 meta:
@@ -9736,7 +9117,7 @@ paths:
               example:
                 id: wl_gbHJdmfrXB
                 name: Birthday Ideas
-                token: L23Wwbu1VdwURuQb3d9QhNo3
+                token: 8cXeJyppojDAcyKGtrqEhahv
                 is_default: false
                 is_private: true
               schema:
@@ -9832,7 +9213,7 @@ paths:
               example:
                 id: wl_UkLWZg9DAJ
                 name: My Wishlist
-                token: vnMGJpfADtGcEPdtKSfeNcMf
+                token: 7kZxgV92WcKPHpXSc1Cn695L
                 is_default: false
                 is_private: true
               schema:
@@ -9894,7 +9275,7 @@ paths:
               example:
                 id: wl_UkLWZg9DAJ
                 name: Updated Name
-                token: 4SxcHcYqoPne3UnSxaWTyemQ
+                token: zTmZe61pQGipm76nbGax6Wii
                 is_default: false
                 is_private: true
               schema:
@@ -10009,7 +9390,7 @@ paths:
                 variant:
                   id: variant_gbHJdmfrXB
                   product_id: prod_gbHJdmfrXB
-                  sku: SKU-206
+                  sku: SKU-191
                   options_text: ''
                   track_inventory: true
                   media_count: 0
@@ -10357,11 +9738,11 @@ components:
       properties:
         item_id:
           type: string
-          description: Line item prefixed ID
+          description: Line item ID
           example: li_abc123
         variant_id:
           type: string
-          description: Variant prefixed ID
+          description: Variant ID
           example: variant_abc123
         quantity:
           type: integer

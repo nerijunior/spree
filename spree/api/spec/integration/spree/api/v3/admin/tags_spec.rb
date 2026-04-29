@@ -9,10 +9,17 @@ RSpec.describe 'Admin Tags API', type: :request, swagger_doc: 'api-reference/adm
 
   path '/api/v3/admin/tags' do
     get 'List tags' do
-      tags 'Tags'
+      tags 'Configuration'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns tag names for a given taggable type. Used for autocomplete in tag inputs on products, orders, and customers.'
+
+      admin_sdk_example <<~JS
+        const { data: tags } = await client.tags.list({
+          taggable_type: 'Spree::User',
+          q: 'vip',
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true

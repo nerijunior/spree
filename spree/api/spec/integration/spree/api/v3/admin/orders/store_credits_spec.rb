@@ -15,18 +15,25 @@ RSpec.describe 'Admin Order Store Credits API', type: :request, swagger_doc: 'ap
     let(:order_id) { order.prefixed_id }
 
     post "Apply customer's store credit to an order" do
-      tags 'Order Store Credits'
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Applies the order customer\'s available store credit. ' \
                   'When `amount` is omitted, applies up to the order outstanding balance.'
+      admin_scope :write, :store_credits
+
+      admin_sdk_example <<~JS
+        const order = await client.orders.storeCredits.apply('or_UkLWZg9DAJ', {
+          amount: 25.00,
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
@@ -46,15 +53,20 @@ RSpec.describe 'Admin Order Store Credits API', type: :request, swagger_doc: 'ap
     end
 
     delete "Remove store credit from an order" do
-      tags 'Order Store Credits'
+      tags 'Orders'
       security [api_key: [], bearer_auth: []]
       description "Removes any applied store credit from the order."
+      admin_scope :write, :store_credits
+
+      admin_sdk_example <<~JS
+        await client.orders.storeCredits.remove('or_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
 
       response '204', 'store credit removed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }

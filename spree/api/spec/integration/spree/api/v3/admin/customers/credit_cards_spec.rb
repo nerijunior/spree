@@ -14,10 +14,15 @@ RSpec.describe 'Admin Customer Credit Cards API', type: :request, swagger_doc: '
     let(:customer_id) { customer.prefixed_id }
 
     get 'List customer credit cards' do
-      tags 'Customer Credit Cards'
+      tags 'Customers'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns the customer\'s saved credit cards. Useful for off-session admin charges via `POST /admin/orders/:id/payments { source_id }`.'
+      admin_scope :read, :customers
+
+      admin_sdk_example <<~JS
+        const { data: cards } = await client.customers.creditCards.list('cus_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -39,9 +44,15 @@ RSpec.describe 'Admin Customer Credit Cards API', type: :request, swagger_doc: '
     let(:id) { credit_card.prefixed_id }
 
     get 'Show a customer credit card' do
-      tags 'Customer Credit Cards'
+      tags 'Customers'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
+      description 'Returns a saved credit card by ID.'
+      admin_scope :read, :customers
+
+      admin_sdk_example <<~JS
+        const card = await client.customers.creditCards.get('cus_UkLWZg9DAJ', 'cc_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -59,8 +70,14 @@ RSpec.describe 'Admin Customer Credit Cards API', type: :request, swagger_doc: '
     end
 
     delete 'Delete a customer credit card' do
-      tags 'Customer Credit Cards'
+      tags 'Customers'
       security [api_key: [], bearer_auth: []]
+      description 'Deletes a saved credit card.'
+      admin_scope :write, :customers
+
+      admin_sdk_example <<~JS
+        await client.customers.creditCards.delete('cus_UkLWZg9DAJ', 'cc_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true

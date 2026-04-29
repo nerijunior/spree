@@ -154,14 +154,13 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
     before { request.headers.merge!(headers) }
 
     let(:tax_category) { create(:tax_category) }
-    let(:shipping_category) { create(:shipping_category) }
     let(:taxonomy) { create(:taxonomy, store: store) }
     let(:category1) { create(:taxon, taxonomy: taxonomy) }
     let(:category2) { create(:taxon, taxonomy: taxonomy) }
 
     it 'creates a minimal product' do
       expect {
-        post :create, params: { name: 'Simple Product', price: 19.99, shipping_category_id: shipping_category.id }, as: :json
+        post :create, params: { name: 'Simple Product', price: 19.99 }, as: :json
       }.to change(Spree::Product, :count).by(1)
 
       expect(response).to have_http_status(:created)
@@ -176,7 +175,6 @@ RSpec.describe Spree::Api::V3::Admin::ProductsController, type: :controller do
           status: 'draft',
           cost_price: 8.50,
           sku: 'PREM-TEE',
-          shipping_category_id: shipping_category.id,
           tax_category_id: tax_category.prefixed_id,
           category_ids: [category1.prefixed_id, category2.prefixed_id],
           tags: ['premium', 'cotton', 'summer'],

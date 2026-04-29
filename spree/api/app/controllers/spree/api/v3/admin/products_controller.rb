@@ -62,7 +62,7 @@ module Spree
               :name, :description, :slug, :status,
               :available_on, :discontinue_on, :make_active_at,
               :meta_title, :meta_description, :meta_keywords,
-              :tax_category_id, :shipping_category_id,
+              :tax_category_id,
               :promotionable, :digital,
               # Master-variant convenience fields (forwarded to master variant)
               :sku, :barcode, :price, :compare_at_price,

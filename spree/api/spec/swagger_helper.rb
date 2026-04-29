@@ -131,10 +131,11 @@ RSpec.configure do |config|
           All responses are JSON. List endpoints return paginated responses with `data` and `meta` keys.
           Single resource endpoints return a flat JSON object.
 
-          ## Prefixed IDs
+          ## Resource IDs
 
-          All resources use Stripe-style prefixed IDs (e.g., `prod_86Rf07xd4z`, `variant_k5nR8xLq`).
-          These IDs must be used in all API requests.
+          Every resource is identified by an opaque string ID (e.g. `prod_86Rf07xd4z`,
+          `variant_k5nR8xLq`, `or_UkLWZg9DAJ`). Use these IDs everywhere — URL paths,
+          request bodies, and Ransack filters all accept them directly.
 
           ## Error Handling
 
@@ -164,30 +165,17 @@ RSpec.configure do |config|
       ],
       tags: [
         { name: 'Authentication', description: 'Admin user authentication' },
-        { name: 'Products', description: 'Product management' },
-        { name: 'Variants', description: 'Product variant management' },
-        { name: 'Option Types', description: 'Option type and value management' },
-        { name: 'Prices', description: 'Variant price management' },
-        { name: 'Orders', description: 'Order management — list, create, update, items, complete, cancel, approve' },
-        { name: 'Payments', description: 'Order payment management — capture, void, off-session charges' },
-        { name: 'Refunds', description: 'Order refund management' },
-        { name: 'Fulfillments', description: 'Order fulfillment management — ship, cancel, split' },
-        { name: 'Order Gift Cards', description: 'Apply / remove gift cards on an order' },
-        { name: 'Order Store Credits', description: 'Apply / remove customer store credit on an order' },
-        { name: 'Customers', description: 'Customer management — profile, tags, marketing consent, notes' },
-        { name: 'Customer Addresses', description: "Saved address book per customer with default billing/shipping flags" },
-        { name: 'Customer Store Credits', description: "Per-customer store credit balances issued by admin" },
-        { name: 'Customer Credit Cards', description: "Customer's saved credit cards (read-only)" },
-        { name: 'Payment Methods', description: 'Store-configured payment methods (read-only)' },
-        { name: 'Tags', description: 'Tag autocomplete for product/order/customer tag inputs' }
+        { name: 'Product Catalog', description: 'Products, variants, and option types' },
+        { name: 'Orders', description: 'Order management — orders, items, payments, fulfillments, refunds, gift cards, store credits' },
+        { name: 'Customers', description: 'Customer management — profiles, addresses, store credits, credit cards' },
+        { name: 'Configuration', description: 'Store configuration — payment methods, tag autocomplete' }
       ],
       'x-tagGroups': [
         { name: 'Authentication', tags: ['Authentication'] },
-        { name: 'Catalog', tags: %w[Products Variants Prices] },
-        { name: 'Options', tags: ['Option Types'] },
-        { name: 'Orders', tags: ['Orders', 'Payments', 'Refunds', 'Fulfillments', 'Order Gift Cards', 'Order Store Credits'] },
-        { name: 'Customers', tags: ['Customers', 'Customer Addresses', 'Customer Store Credits', 'Customer Credit Cards'] },
-        { name: 'Configuration', tags: ['Payment Methods', 'Tags'] }
+        { name: 'Product Catalog', tags: ['Product Catalog'] },
+        { name: 'Orders', tags: ['Orders'] },
+        { name: 'Customers', tags: ['Customers'] },
+        { name: 'Configuration', tags: ['Configuration'] }
       ],
       components: {
         securitySchemes: {

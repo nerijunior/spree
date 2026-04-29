@@ -14,16 +14,21 @@ RSpec.describe 'Admin Order Refunds API', type: :request, swagger_doc: 'api-refe
     let(:order_id) { order.prefixed_id }
 
     get 'List refunds' do
-      tags 'Refunds'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns all refunds for an order.'
+      admin_scope :read, :refunds
+
+      admin_sdk_example <<~JS
+        const { data: refunds } = await client.orders.refunds.list('or_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
 
       response '200', 'refunds found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -36,24 +41,33 @@ RSpec.describe 'Admin Order Refunds API', type: :request, swagger_doc: 'api-refe
     end
 
     post 'Create a refund' do
-      tags 'Refunds'
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Creates a refund for a payment on the order. The refund is automatically processed via the payment gateway.'
+      admin_scope :write, :refunds
+
+      admin_sdk_example <<~JS
+        const refund = await client.orders.refunds.create('or_UkLWZg9DAJ', {
+          payment_id: 'pay_UkLWZg9DAJ',
+          amount: 5.00,
+          refund_reason_id: 'refrsn_UkLWZg9DAJ',
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         required: %w[payment_id amount],
         properties: {
-          payment_id: { type: :string, description: 'Payment prefixed ID' },
+          payment_id: { type: :string, description: 'Payment ID' },
           amount: { type: :number, example: 10.00 },
-          refund_reason_id: { type: :string, description: 'Refund reason prefixed ID' }
+          refund_reason_id: { type: :string, description: 'Refund reason ID' }
         }
       }
 

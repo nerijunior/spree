@@ -14,9 +14,15 @@ RSpec.describe 'Admin Customer Store Credits API', type: :request, swagger_doc: 
     let(:customer_id) { customer.prefixed_id }
 
     get 'List customer store credits' do
-      tags 'Customer Store Credits'
+      tags 'Customers'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
+      description 'Returns store credits issued to the customer.'
+      admin_scope :read, :store_credits
+
+      admin_sdk_example <<~JS
+        const { data: storeCredits } = await client.customers.storeCredits.list('cus_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -33,11 +39,21 @@ RSpec.describe 'Admin Customer Store Credits API', type: :request, swagger_doc: 
     end
 
     post 'Issue a store credit to a customer' do
-      tags 'Customer Store Credits'
+      tags 'Customers'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description '`created_by` is set automatically from the authenticated admin.'
+      admin_scope :write, :store_credits
+
+      admin_sdk_example <<~JS
+        const credit = await client.customers.storeCredits.create('cus_UkLWZg9DAJ', {
+          amount: 25.00,
+          currency: 'USD',
+          category_id: 1,
+          memo: 'Goodwill credit',
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -71,11 +87,20 @@ RSpec.describe 'Admin Customer Store Credits API', type: :request, swagger_doc: 
     let(:id) { store_credit.prefixed_id }
 
     patch 'Update a store credit' do
-      tags 'Customer Store Credits'
+      tags 'Customers'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Update memo / category / amount. The amount can only be changed if `amount_used == 0`.'
+      admin_scope :write, :store_credits
+
+      admin_sdk_example <<~JS
+        const credit = await client.customers.storeCredits.update(
+          'cus_UkLWZg9DAJ',
+          'sc_UkLWZg9DAJ',
+          { memo: 'Reissued for damaged shipment' },
+        )
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -101,9 +126,14 @@ RSpec.describe 'Admin Customer Store Credits API', type: :request, swagger_doc: 
     end
 
     delete 'Delete a store credit' do
-      tags 'Customer Store Credits'
+      tags 'Customers'
       security [api_key: [], bearer_auth: []]
       description 'Deletes an unused store credit (amount_used == 0). Returns 422 otherwise.'
+      admin_scope :write, :store_credits
+
+      admin_sdk_example <<~JS
+        await client.customers.storeCredits.delete('cus_UkLWZg9DAJ', 'sc_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true

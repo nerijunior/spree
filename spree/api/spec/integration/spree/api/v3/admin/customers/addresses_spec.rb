@@ -15,10 +15,15 @@ RSpec.describe 'Admin Customer Addresses API', type: :request, swagger_doc: 'api
     let(:customer_id) { customer.prefixed_id }
 
     get 'List customer addresses' do
-      tags 'Customer Addresses'
+      tags 'Customers'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns the customer\'s saved addresses.'
+      admin_scope :read, :customers
+
+      admin_sdk_example <<~JS
+        const { data: addresses } = await client.customers.addresses.list('cus_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -35,11 +40,27 @@ RSpec.describe 'Admin Customer Addresses API', type: :request, swagger_doc: 'api
     end
 
     post 'Create a customer address' do
-      tags 'Customer Addresses'
+      tags 'Customers'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Adds a new address to the customer\'s address book. Pass `is_default_billing: true` or `is_default_shipping: true` to set as the default — the previous default loses its flag in the same transaction.'
+      admin_scope :write, :customers
+
+      admin_sdk_example <<~JS
+        const address = await client.customers.addresses.create('cus_UkLWZg9DAJ', {
+          first_name: 'Jane',
+          last_name: 'Doe',
+          address1: '350 Fifth Avenue',
+          city: 'New York',
+          postal_code: '10118',
+          country_iso: 'US',
+          state_abbr: 'NY',
+          phone: '+1 212 555 1234',
+          label: 'Office',
+          is_default_shipping: true,
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -87,10 +108,20 @@ RSpec.describe 'Admin Customer Addresses API', type: :request, swagger_doc: 'api
     let(:id) { address.prefixed_id }
 
     patch 'Update a customer address' do
-      tags 'Customer Addresses'
+      tags 'Customers'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
+      description 'Updates a customer address.'
+      admin_scope :write, :customers
+
+      admin_sdk_example <<~JS
+        const address = await client.customers.addresses.update(
+          'cus_UkLWZg9DAJ',
+          'addr_UkLWZg9DAJ',
+          { city: 'Manhattan' },
+        )
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -117,9 +148,14 @@ RSpec.describe 'Admin Customer Addresses API', type: :request, swagger_doc: 'api
     end
 
     delete 'Delete a customer address' do
-      tags 'Customer Addresses'
+      tags 'Customers'
       security [api_key: [], bearer_auth: []]
       description 'Deletes the address. If it was a default, the customer loses that default (no auto-promotion).'
+      admin_scope :write, :customers
+
+      admin_sdk_example <<~JS
+        await client.customers.addresses.delete('cus_UkLWZg9DAJ', 'addr_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true

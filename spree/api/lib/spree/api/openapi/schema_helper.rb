@@ -130,8 +130,8 @@ module Spree
               type: :object,
               description: 'An item within a fulfillment — which line item and how many units are in this fulfillment',
               properties: {
-                item_id: { type: :string, description: 'Line item prefixed ID', example: 'li_abc123' },
-                variant_id: { type: :string, description: 'Variant prefixed ID', example: 'variant_abc123' },
+                item_id: { type: :string, description: 'Line item ID', example: 'li_abc123' },
+                variant_id: { type: :string, description: 'Variant ID', example: 'variant_abc123' },
                 quantity: { type: :integer, description: 'Quantity in this fulfillment', example: 2 }
               },
               required: %w[item_id variant_id quantity]

@@ -13,16 +13,21 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
     let(:order_id) { order.prefixed_id }
 
     get 'List fulfillments' do
-      tags 'Fulfillments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns all shipments for an order.'
+      admin_scope :read, :fulfillments
+
+      admin_sdk_example <<~JS
+        const { data: fulfillments } = await client.orders.fulfillments.list('or_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
 
       response '200', 'fulfillments found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -41,18 +46,23 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
     let(:id) { shipment.prefixed_id }
 
     get 'Show a shipment' do
-      tags 'Fulfillments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns details of a specific shipment.'
+      admin_scope :read, :fulfillments
+
+      admin_sdk_example <<~JS
+        const fulfillment = await client.orders.fulfillments.get('or_UkLWZg9DAJ', 'ful_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Fulfillment prefixed ID'
+                description: 'Fulfillment ID'
 
       response '200', 'shipment found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -66,19 +76,26 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
     end
 
     patch 'Update a shipment' do
-      tags 'Fulfillments'
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Updates a shipment (tracking, shipping rate).'
+      admin_scope :write, :fulfillments
+
+      admin_sdk_example <<~JS
+        const fulfillment = await client.orders.fulfillments.update('or_UkLWZg9DAJ', 'ful_UkLWZg9DAJ', {
+          tracking: '1Z999AA10123456784',
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Fulfillment prefixed ID'
+                description: 'Fulfillment ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
@@ -101,18 +118,23 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
 
   path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/fulfill' do
     patch 'Fulfill a fulfillment' do
-      tags 'Fulfillments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Marks a fulfillment as fulfilled.'
+      admin_scope :write, :fulfillments
+
+      admin_sdk_example <<~JS
+        const fulfillment = await client.orders.fulfillments.fulfill('or_UkLWZg9DAJ', 'ful_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Fulfillment prefixed ID'
+                description: 'Fulfillment ID'
 
       response '200', 'fulfillment fulfilled' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -133,18 +155,23 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
 
   path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/cancel' do
     patch 'Cancel a fulfillment' do
-      tags 'Fulfillments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Cancels a fulfillment.'
+      admin_scope :write, :fulfillments
+
+      admin_sdk_example <<~JS
+        const fulfillment = await client.orders.fulfillments.cancel('or_UkLWZg9DAJ', 'ful_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Fulfillment prefixed ID'
+                description: 'Fulfillment ID'
 
       response '200', 'fulfillment canceled' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -161,18 +188,23 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
 
   path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/resume' do
     patch 'Resume a fulfillment' do
-      tags 'Fulfillments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Resumes a canceled fulfillment.'
+      admin_scope :write, :fulfillments
+
+      admin_sdk_example <<~JS
+        const fulfillment = await client.orders.fulfillments.resume('or_UkLWZg9DAJ', 'ful_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Fulfillment prefixed ID'
+                description: 'Fulfillment ID'
 
       response '200', 'fulfillment resumed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -193,26 +225,33 @@ RSpec.describe 'Admin Order Fulfillments API', type: :request, swagger_doc: 'api
 
   path '/api/v3/admin/orders/{order_id}/fulfillments/{id}/split' do
     patch 'Split a fulfillment' do
-      tags 'Fulfillments'
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Transfers items from this shipment to a new shipment at a different stock location.'
+      admin_scope :write, :fulfillments
+
+      admin_sdk_example <<~JS
+        const fulfillment = await client.orders.fulfillments.split('or_UkLWZg9DAJ', 'ful_UkLWZg9DAJ', {
+          quantity: 1,
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Fulfillment prefixed ID'
+                description: 'Fulfillment ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         required: %w[variant_id quantity],
         properties: {
-          variant_id: { type: :string, description: 'Variant prefixed ID' },
+          variant_id: { type: :string, description: 'Variant ID' },
           quantity: { type: :integer, example: 1 },
-          stock_location_id: { type: :string, description: 'Target stock location prefixed ID' }
+          stock_location_id: { type: :string, description: 'Target stock location ID' }
         }
       }
 

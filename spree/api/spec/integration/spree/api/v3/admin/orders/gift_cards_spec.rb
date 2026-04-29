@@ -14,17 +14,24 @@ RSpec.describe 'Admin Order Gift Cards API', type: :request, swagger_doc: 'api-r
     let(:order_id) { order.prefixed_id }
 
     post 'Apply a gift card to an order' do
-      tags 'Order Gift Cards'
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Applies a gift card by code to the order. Returns the gift card.'
+      admin_scope :write, :gift_cards
+
+      admin_sdk_example <<~JS
+        await client.orders.giftCards.apply('or_UkLWZg9DAJ', {
+          code: 'GIFT-XXXX-YYYY',
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         required: %w[code],
@@ -50,17 +57,22 @@ RSpec.describe 'Admin Order Gift Cards API', type: :request, swagger_doc: 'api-r
     let(:id) { gift_card.prefixed_id }
 
     delete 'Remove a gift card from an order' do
-      tags 'Order Gift Cards'
+      tags 'Orders'
       security [api_key: [], bearer_auth: []]
       description 'Removes the gift card from the order.'
+      admin_scope :write, :gift_cards
+
+      admin_sdk_example <<~JS
+        await client.orders.giftCards.remove('or_UkLWZg9DAJ', 'gc_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Gift card prefixed ID'
+                description: 'Gift card ID'
 
       response '204', 'gift card removed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }

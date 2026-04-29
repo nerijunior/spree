@@ -10,10 +10,15 @@ RSpec.describe 'Admin Payment Methods API', type: :request, swagger_doc: 'api-re
 
   path '/api/v3/admin/payment_methods' do
     get 'List payment methods' do
-      tags 'Payment Methods'
+      tags 'Configuration'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns the store\'s configured payment methods. Use `source_required: true` to know which methods need a saved source.'
+      admin_scope :read, :settings
+
+      admin_sdk_example <<~JS
+        const { data: paymentMethods } = await client.paymentMethods.list()
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true
@@ -33,9 +38,15 @@ RSpec.describe 'Admin Payment Methods API', type: :request, swagger_doc: 'api-re
     let(:id) { payment_method.prefixed_id }
 
     get 'Show a payment method' do
-      tags 'Payment Methods'
+      tags 'Configuration'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
+      description 'Returns a payment method by ID.'
+      admin_scope :read, :settings
+
+      admin_sdk_example <<~JS
+        const paymentMethod = await client.paymentMethods.get('pm_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true

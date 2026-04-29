@@ -13,16 +13,21 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
     let(:order_id) { order.prefixed_id }
 
     get 'List payments' do
-      tags 'Payments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns all payments for an order.'
+      admin_scope :read, :payments
+
+      admin_sdk_example <<~JS
+        const { data: payments } = await client.orders.payments.list('or_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
 
       response '200', 'payments found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -36,24 +41,33 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
     end
 
     post 'Create a payment' do
-      tags 'Payments'
+      tags 'Orders'
       consumes 'application/json'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Creates a new payment for the order.'
+      admin_scope :write, :payments
+
+      admin_sdk_example <<~JS
+        const payment = await client.orders.payments.create('or_UkLWZg9DAJ', {
+          payment_method_id: 'pm_UkLWZg9DAJ',
+          amount: 99.99,
+          source_id: 'cc_UkLWZg9DAJ',
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         required: %w[payment_method_id],
         properties: {
-          payment_method_id: { type: :string, description: 'Payment method prefixed ID' },
+          payment_method_id: { type: :string, description: 'Payment method ID' },
           amount: { type: :number, example: 99.99 },
-          source_id: { type: :string, description: 'Payment source prefixed ID' }
+          source_id: { type: :string, description: 'Payment source ID' }
         }
       }
 
@@ -77,18 +91,23 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
     let(:id) { payment.prefixed_id }
 
     get 'Show a payment' do
-      tags 'Payments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns details of a specific payment.'
+      admin_scope :read, :payments
+
+      admin_sdk_example <<~JS
+        const payment = await client.orders.payments.get('or_UkLWZg9DAJ', 'pay_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Payment prefixed ID'
+                description: 'Payment ID'
 
       response '200', 'payment found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -103,18 +122,23 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
 
   path '/api/v3/admin/orders/{order_id}/payments/{id}/capture' do
     patch 'Capture a payment' do
-      tags 'Payments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Captures a pending payment.'
+      admin_scope :write, :payments
+
+      admin_sdk_example <<~JS
+        const payment = await client.orders.payments.capture('or_UkLWZg9DAJ', 'pay_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Payment prefixed ID'
+                description: 'Payment ID'
 
       response '200', 'payment captured' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -135,18 +159,23 @@ RSpec.describe 'Admin Order Payments API', type: :request, swagger_doc: 'api-ref
 
   path '/api/v3/admin/orders/{order_id}/payments/{id}/void' do
     patch 'Void a payment' do
-      tags 'Payments'
+      tags 'Orders'
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Voids a payment.'
+      admin_scope :write, :payments
+
+      admin_sdk_example <<~JS
+        const payment = await client.orders.payments.void('or_UkLWZg9DAJ', 'pay_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Payment prefixed ID'
+                description: 'Payment ID'
 
       response '200', 'payment voided' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }

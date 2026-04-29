@@ -19,12 +19,17 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns all line items for an order.'
+      admin_scope :read, :orders
+
+      admin_sdk_example <<~JS
+        const { data: items } = await client.orders.items.list('or_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
 
       response '200', 'items found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -43,12 +48,20 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Adds a new line item to the order.'
+      admin_scope :write, :orders
+
+      admin_sdk_example <<~JS
+        const item = await client.orders.items.create('or_UkLWZg9DAJ', {
+          variant_id: 'variant_k5nR8xLq',
+          quantity: 2,
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         required: %w[variant_id],
@@ -80,14 +93,19 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Returns details of a specific line item.'
+      admin_scope :read, :orders
+
+      admin_sdk_example <<~JS
+        const item = await client.orders.items.get('or_UkLWZg9DAJ', 'li_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Item prefixed ID'
+                description: 'Item ID'
 
       response '200', 'item found' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
@@ -105,14 +123,21 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       produces 'application/json'
       security [api_key: [], bearer_auth: []]
       description 'Updates an order item quantity or metadata.'
+      admin_scope :write, :orders
+
+      admin_sdk_example <<~JS
+        const item = await client.orders.items.update('or_UkLWZg9DAJ', 'li_UkLWZg9DAJ', {
+          quantity: 5,
+        })
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Item prefixed ID'
+                description: 'Item ID'
       parameter name: :body, in: :body, schema: {
         type: :object,
         properties: {
@@ -135,14 +160,19 @@ RSpec.describe 'Admin Order Line Items API', type: :request, swagger_doc: 'api-r
       tags 'Orders'
       security [api_key: [], bearer_auth: []]
       description 'Removes an item from the order.'
+      admin_scope :write, :orders
+
+      admin_sdk_example <<~JS
+        await client.orders.items.delete('or_UkLWZg9DAJ', 'li_UkLWZg9DAJ')
+      JS
 
       parameter name: 'x-spree-api-key', in: :header, type: :string, required: true
       parameter name: :Authorization, in: :header, type: :string, required: true,
                 description: 'Bearer token for admin authentication'
       parameter name: :order_id, in: :path, type: :string, required: true,
-                description: 'Order prefixed ID'
+                description: 'Order ID'
       parameter name: :id, in: :path, type: :string, required: true,
-                description: 'Item prefixed ID'
+                description: 'Item ID'
 
       response '204', 'line item removed' do
         let(:'x-spree-api-key') { secret_api_key.plaintext_token }
