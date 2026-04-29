@@ -177,8 +177,8 @@ export interface CustomerAddressParams {
   city?: string;
   zipcode?: string;
   postal_code?: string;
-  country_id?: string | number;
-  state_id?: string | number;
+  country_id?: string;
+  state_id?: string;
   country_iso?: string;
   state_abbr?: string;
   phone?: string;
@@ -191,13 +191,13 @@ export interface CustomerAddressParams {
 export interface CustomerStoreCreditCreateParams {
   amount: number;
   currency: string;
-  category_id: string | number;
+  category_id: string;
   memo?: string;
 }
 
 export interface CustomerStoreCreditUpdateParams {
   amount?: number;
-  category_id?: string | number;
+  category_id?: string;
   memo?: string;
 }
 
@@ -232,18 +232,7 @@ export interface ProductCreateParams {
   tax_category_id?: string;
   category_ids?: Array<string>;
   tags?: Array<string>;
-  variants?: Array<{
-    sku?: string;
-    price?: number;
-    option_type?: string;
-    option_value?: string;
-    total_on_hand?: number;
-    prices?: Array<{
-      currency: string;
-      amount: number;
-      compare_at_amount?: number;
-    }>;
-  }>;
+  variants?: VariantCreateParams[];
 }
 
 export interface ProductUpdateParams {
@@ -255,18 +244,7 @@ export interface ProductUpdateParams {
   tax_category_id?: string;
   category_ids?: Array<string>;
   tags?: Array<string>;
-  variants?: Array<{
-    sku?: string;
-    price?: number;
-    option_type?: string;
-    option_value?: string;
-    total_on_hand?: number;
-    prices?: Array<{
-      currency: string;
-      amount: number;
-      compare_at_amount?: number;
-    }>;
-  }>;
+  variants?: VariantUpdateParams[];
 }
 
 export interface CategoryCreateParams {
@@ -295,9 +273,25 @@ export interface CategoryUpdateParams {
   sort_order?: string;
 }
 
+export interface VariantOptionPair {
+  name: string;
+  value: string;
+}
+
+export interface VariantPrice {
+  currency: string;
+  amount: number;
+  compare_at_amount?: number;
+}
+
+export interface VariantStockItem {
+  stock_location_id: string;
+  count_on_hand: number;
+  backorderable?: boolean;
+}
+
 export interface VariantCreateParams {
   sku?: string;
-  price?: number;
   compare_at_price?: number;
   cost_price?: number;
   cost_currency?: string;
@@ -309,26 +303,15 @@ export interface VariantCreateParams {
   dimensions_unit?: string;
   track_inventory?: boolean;
   tax_category_id?: string;
-  option_type?: string;
-  option_value?: string;
-  total_on_hand?: number;
   position?: number;
   barcode?: string;
-  prices?: Array<{
-    currency: string;
-    amount: number;
-    compare_at_amount?: number;
-  }>;
-  stock_items?: Array<{
-    stock_location_id?: string;
-    count_on_hand?: number;
-    backorderable?: boolean;
-  }>;
+  options?: VariantOptionPair[];
+  prices?: VariantPrice[];
+  stock_items?: VariantStockItem[];
 }
 
 export interface VariantUpdateParams {
   sku?: string;
-  price?: number;
   compare_at_price?: number;
   cost_price?: number;
   cost_currency?: string;
@@ -340,19 +323,9 @@ export interface VariantUpdateParams {
   dimensions_unit?: string;
   track_inventory?: boolean;
   tax_category_id?: string;
-  option_type?: string;
-  option_value?: string;
-  total_on_hand?: number;
   position?: number;
   barcode?: string;
-  prices?: Array<{
-    currency: string;
-    amount: number;
-    compare_at_amount?: number;
-  }>;
-  stock_items?: Array<{
-    stock_location_id?: string;
-    count_on_hand?: number;
-    backorderable?: boolean;
-  }>;
+  options?: VariantOptionPair[];
+  prices?: VariantPrice[];
+  stock_items?: VariantStockItem[];
 }

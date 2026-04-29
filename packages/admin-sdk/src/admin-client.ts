@@ -69,7 +69,7 @@ export interface MeResponse {
   };
   permissions: PermissionRule[];
 }
-import type { Store, Product, Order, Media, Category, TaxCategory, Country, Variant, PaymentMethod, Customer, CreditCard, Payment, Address, StoreCredit } from './types';
+import type { Store, Product, Order, Media, Category, TaxCategory, Country, Variant, PaymentMethod, Customer, CreditCard, Payment, Address, StoreCredit, LineItem, Fulfillment, Refund, Adjustment, OptionType } from './types';
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
@@ -91,6 +91,10 @@ import type {
   LineItemCreateParams,
   LineItemUpdateParams,
   FulfillmentUpdateParams,
+  VariantCreateParams,
+  VariantUpdateParams,
+  OptionTypeCreateParams,
+  OptionTypeUpdateParams,
   DirectUploadCreateParams,
 } from './params';
 
@@ -187,6 +191,46 @@ export class AdminClient {
       delete: (productId: string, id: string, options?: RequestOptions): Promise<void> =>
         this.request<void>('DELETE', `/products/${productId}/media/${id}`, options),
     },
+
+    variants: {
+      list: (productId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Variant>> =>
+        this.request<PaginatedResponse<Variant>>('GET', `/products/${productId}/variants`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      get: (productId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Variant> =>
+        this.request<Variant>('GET', `/products/${productId}/variants/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
+
+      create: (productId: string, params: VariantCreateParams, options?: RequestOptions): Promise<Variant> =>
+        this.request<Variant>('POST', `/products/${productId}/variants`, { ...options, body: params }),
+
+      update: (productId: string, id: string, params: VariantUpdateParams, options?: RequestOptions): Promise<Variant> =>
+        this.request<Variant>('PATCH', `/products/${productId}/variants/${id}`, { ...options, body: params }),
+
+      delete: (productId: string, id: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/products/${productId}/variants/${id}`, options),
+
+      media: {
+        list: (productId: string, variantId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Media>> =>
+          this.request<PaginatedResponse<Media>>('GET', `/products/${productId}/variants/${variantId}/media`, {
+            ...options,
+            params: params ? transformListParams(params) : undefined,
+          }),
+
+        create: (productId: string, variantId: string, params: MediaCreateParams, options?: RequestOptions): Promise<Media> =>
+          this.request<Media>('POST', `/products/${productId}/variants/${variantId}/media`, { ...options, body: params }),
+
+        update: (productId: string, variantId: string, id: string, params: MediaUpdateParams, options?: RequestOptions): Promise<Media> =>
+          this.request<Media>('PATCH', `/products/${productId}/variants/${variantId}/media/${id}`, { ...options, body: params }),
+
+        delete: (productId: string, variantId: string, id: string, options?: RequestOptions): Promise<void> =>
+          this.request<void>('DELETE', `/products/${productId}/variants/${variantId}/media/${id}`, options),
+      },
+    },
   };
 
   // ============================================
@@ -247,25 +291,55 @@ export class AdminClient {
     },
 
     items: {
-      create: (orderId: string, params: LineItemCreateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('POST', `/orders/${orderId}/items`, { ...options, body: params }),
+      list: (orderId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<LineItem>> =>
+        this.request<PaginatedResponse<LineItem>>('GET', `/orders/${orderId}/items`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
 
-      update: (orderId: string, id: string, params: LineItemUpdateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/items/${id}`, { ...options, body: params }),
+      get: (orderId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<LineItem> =>
+        this.request<LineItem>('GET', `/orders/${orderId}/items/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
+
+      create: (orderId: string, params: LineItemCreateParams, options?: RequestOptions): Promise<LineItem> =>
+        this.request<LineItem>('POST', `/orders/${orderId}/items`, { ...options, body: params }),
+
+      update: (orderId: string, id: string, params: LineItemUpdateParams, options?: RequestOptions): Promise<LineItem> =>
+        this.request<LineItem>('PATCH', `/orders/${orderId}/items/${id}`, { ...options, body: params }),
 
       delete: (orderId: string, id: string, options?: RequestOptions): Promise<void> =>
         this.request<void>('DELETE', `/orders/${orderId}/items/${id}`, options),
     },
 
     fulfillments: {
-      update: (orderId: string, id: string, params: FulfillmentUpdateParams, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/fulfillments/${id}`, { ...options, body: params }),
+      list: (orderId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Fulfillment>> =>
+        this.request<PaginatedResponse<Fulfillment>>('GET', `/orders/${orderId}/fulfillments`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
 
-      fulfill: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/fulfillments/${id}/fulfill`, options),
+      get: (orderId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Fulfillment> =>
+        this.request<Fulfillment>('GET', `/orders/${orderId}/fulfillments/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
 
-      cancel: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/fulfillments/${id}/cancel`, options),
+      update: (orderId: string, id: string, params: FulfillmentUpdateParams, options?: RequestOptions): Promise<Fulfillment> =>
+        this.request<Fulfillment>('PATCH', `/orders/${orderId}/fulfillments/${id}`, { ...options, body: params }),
+
+      fulfill: (orderId: string, id: string, options?: RequestOptions): Promise<Fulfillment> =>
+        this.request<Fulfillment>('PATCH', `/orders/${orderId}/fulfillments/${id}/fulfill`, options),
+
+      cancel: (orderId: string, id: string, options?: RequestOptions): Promise<Fulfillment> =>
+        this.request<Fulfillment>('PATCH', `/orders/${orderId}/fulfillments/${id}/cancel`, options),
+
+      resume: (orderId: string, id: string, options?: RequestOptions): Promise<Fulfillment> =>
+        this.request<Fulfillment>('PATCH', `/orders/${orderId}/fulfillments/${id}/resume`, options),
+
+      split: (orderId: string, id: string, params: { quantity: number; line_item_id?: string }, options?: RequestOptions): Promise<Fulfillment> =>
+        this.request<Fulfillment>('PATCH', `/orders/${orderId}/fulfillments/${id}/split`, { ...options, body: params }),
     },
 
     payments: {
@@ -284,12 +358,61 @@ export class AdminClient {
       create: (orderId: string, params: PaymentCreateParams, options?: RequestOptions): Promise<Payment> =>
         this.request<Payment>('POST', `/orders/${orderId}/payments`, { ...options, body: params }),
 
-      capture: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/payments/${id}/capture`, options),
+      capture: (orderId: string, id: string, options?: RequestOptions): Promise<Payment> =>
+        this.request<Payment>('PATCH', `/orders/${orderId}/payments/${id}/capture`, options),
 
-      void: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
-        this.request('PATCH', `/orders/${orderId}/payments/${id}/void`, options),
+      void: (orderId: string, id: string, options?: RequestOptions): Promise<Payment> =>
+        this.request<Payment>('PATCH', `/orders/${orderId}/payments/${id}/void`, options),
     },
+
+    refunds: {
+      list: (orderId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Refund>> =>
+        this.request<PaginatedResponse<Refund>>('GET', `/orders/${orderId}/refunds`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      create: (orderId: string, params: { payment_id: string; amount: number; reason_id?: string; refund_reason_id?: string }, options?: RequestOptions): Promise<Refund> =>
+        this.request<Refund>('POST', `/orders/${orderId}/refunds`, { ...options, body: params }),
+    },
+
+    adjustments: {
+      list: (orderId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Adjustment>> =>
+        this.request<PaginatedResponse<Adjustment>>('GET', `/orders/${orderId}/adjustments`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      get: (orderId: string, id: string, options?: RequestOptions): Promise<Adjustment> =>
+        this.request<Adjustment>('GET', `/orders/${orderId}/adjustments/${id}`, options),
+    },
+  };
+
+  // ============================================
+  // Option Types
+  // ============================================
+
+  readonly optionTypes = {
+    list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<OptionType>> =>
+      this.request<PaginatedResponse<OptionType>>('GET', '/option_types', {
+        ...options,
+        params: params ? transformListParams(params) : undefined,
+      }),
+
+    get: (id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<OptionType> =>
+      this.request<OptionType>('GET', `/option_types/${id}`, {
+        ...options,
+        params: getParams(params),
+      }),
+
+    create: (params: OptionTypeCreateParams, options?: RequestOptions): Promise<OptionType> =>
+      this.request<OptionType>('POST', '/option_types', { ...options, body: params }),
+
+    update: (id: string, params: OptionTypeUpdateParams, options?: RequestOptions): Promise<OptionType> =>
+      this.request<OptionType>('PATCH', `/option_types/${id}`, { ...options, body: params }),
+
+    delete: (id: string, options?: RequestOptions): Promise<void> =>
+      this.request<void>('DELETE', `/option_types/${id}`, options),
   };
 
   // ============================================
