@@ -231,6 +231,40 @@ RSpec.describe Spree::Api::V3::Admin::OrdersController, type: :controller do
         expect(order.reload.user).to eq(new_customer)
       end
     end
+
+    context 'with tags' do
+      it 'sets tags on a previously untagged order' do
+        patch :update, params: { id: order.prefixed_id, tags: ['VIP'] }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(order.reload.tag_list).to contain_exactly('VIP')
+        expect(json_response['tags']).to contain_exactly('VIP')
+      end
+
+      it 'replaces existing tags' do
+        order.update!(tag_list: ['old'])
+        patch :update, params: { id: order.prefixed_id, tags: %w[new fresh] }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(order.reload.tag_list).to contain_exactly('new', 'fresh')
+      end
+
+      it 'clears tags when given an empty array' do
+        order.update!(tag_list: ['old'])
+        patch :update, params: { id: order.prefixed_id, tags: [] }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(order.reload.tag_list).to be_empty
+      end
+
+      it 'leaves tags untouched when key is omitted' do
+        order.update!(tag_list: ['VIP'])
+        patch :update, params: { id: order.prefixed_id, email: 'nochange@example.com' }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(order.reload.tag_list).to contain_exactly('VIP')
+      end
+    end
   end
 
   describe 'DELETE #destroy' do

@@ -92,7 +92,7 @@ module Spree
             end
 
             def permitted_params
-              params.permit(*Spree::PermittedAttributes.shipment_attributes - [:id])
+              params.permit(:tracking, :selected_shipping_rate_id, :stock_location_id, :state)
             end
           end
         end

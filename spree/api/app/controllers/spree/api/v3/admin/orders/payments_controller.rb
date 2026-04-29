@@ -69,7 +69,7 @@ module Spree
             end
 
             def permitted_params
-              params.permit(*Spree::PermittedAttributes.payment_attributes, :source_id)
+              params.permit(:amount, :payment_method_id, :source_id)
             end
 
             # Saved-source charges require an order customer — sources are scoped

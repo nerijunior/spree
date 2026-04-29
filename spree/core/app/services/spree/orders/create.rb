@@ -29,6 +29,7 @@ module Spree
         ApplicationRecord.transaction do
           order = build_order
           assign_addresses(order)
+          order.tags = @params[:tags] if @params[:tags]
           order.save!
 
           add_items(order) if @params[:items].present?

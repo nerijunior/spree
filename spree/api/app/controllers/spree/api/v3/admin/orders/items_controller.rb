@@ -74,7 +74,7 @@ module Spree
             end
 
             def permitted_params
-              params.permit(*Spree::PermittedAttributes.line_item_attributes, { options: {} })
+              params.permit(:variant_id, :quantity, metadata: {}, options: {})
             end
 
             private

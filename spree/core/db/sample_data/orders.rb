@@ -78,7 +78,7 @@ end
 
 orders.each(&:create_proposed_shipments)
 
-Spree::Order.where(id: orders.map(&:id)).update_all(state: :complete, completed_at: Time.current - 1.day)
+Spree::Order.where(id: orders.map(&:id)).update_all(state: :complete, status: 'placed', completed_at: Time.current - 1.day)
 
 # Adjustments (tax)
 tax_rate = Spree::TaxRate.find_by(name: 'California')

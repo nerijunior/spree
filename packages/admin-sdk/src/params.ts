@@ -145,6 +145,62 @@ export interface StoreCreditApplyParams {
   amount?: number;
 }
 
+export interface CustomerCreateParams {
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  accepts_email_marketing?: boolean;
+  internal_note?: string;
+  metadata?: Record<string, unknown>;
+  tags?: string[];
+}
+
+export interface CustomerUpdateParams {
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  accepts_email_marketing?: boolean;
+  internal_note?: string;
+  metadata?: Record<string, unknown>;
+  tags?: string[];
+}
+
+export interface CustomerAddressParams {
+  firstname?: string;
+  lastname?: string;
+  first_name?: string;
+  last_name?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  zipcode?: string;
+  postal_code?: string;
+  country_id?: string | number;
+  state_id?: string | number;
+  country_iso?: string;
+  state_abbr?: string;
+  phone?: string;
+  company?: string;
+  label?: string;
+  is_default_billing?: boolean;
+  is_default_shipping?: boolean;
+}
+
+export interface CustomerStoreCreditCreateParams {
+  amount: number;
+  currency: string;
+  category_id: string | number;
+  memo?: string;
+}
+
+export interface CustomerStoreCreditUpdateParams {
+  amount?: number;
+  category_id?: string | number;
+  memo?: string;
+}
+
 export interface DirectUploadCreateParams {
   blob: {
     filename: string;

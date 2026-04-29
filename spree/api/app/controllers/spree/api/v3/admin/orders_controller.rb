@@ -129,7 +129,7 @@ module Spree
           end
 
           def collection_includes
-            [:line_items, :user]
+            [:line_items, :user, :rich_text_internal_note]
           end
 
           private
@@ -149,20 +149,38 @@ module Spree
               :shipping_address_id, :billing_address_id,
               :coupon_code,
               metadata: {},
-              shipping_address: Spree::PermittedAttributes.address_attributes,
-              billing_address: Spree::PermittedAttributes.address_attributes,
-              items: [:variant_id, :quantity, { metadata: {} }]
+              tags: [],
+              shipping_address: address_permitted_keys,
+              billing_address: address_permitted_keys,
+              items: item_permitted_keys
             )
           end
 
           def order_update_params
             params.permit(
-              *Spree::PermittedAttributes.checkout_attributes,
-              :customer_id,
-              ship_address: Spree::PermittedAttributes.address_attributes,
-              bill_address: Spree::PermittedAttributes.address_attributes,
-              items: [:variant_id, :quantity, { metadata: {} }]
+              :email, :customer_id, :user_id,
+              :customer_note, :internal_note,
+              :currency, :locale, :market_id,
+              metadata: {},
+              tags: [],
+              ship_address: address_permitted_keys,
+              bill_address: address_permitted_keys,
+              items: item_permitted_keys
             )
+          end
+
+          def address_permitted_keys
+            [
+              :firstname, :lastname, :first_name, :last_name,
+              :address1, :address2, :city,
+              :country_iso, :state_abbr, :country_id, :state_id,
+              :zipcode, :postal_code, :phone, :alternative_phone,
+              :state_name, :company, :label
+            ]
+          end
+
+          def item_permitted_keys
+            [:variant_id, :quantity, { metadata: {} }]
           end
         end
       end

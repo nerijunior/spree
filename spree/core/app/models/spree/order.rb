@@ -131,6 +131,10 @@ module Spree
     acts_as_taggable_on :tags
     acts_as_taggable_tenant :store_id
 
+    def tags=(tags)
+      self.tag_list = tags
+    end
+
     ASSOCIATED_USER_ATTRIBUTES = [:user_id, :email, :bill_address_id, :ship_address_id]
 
     # 6.0 forward-compat: User→Customer rename. Column stays user_id in 5.x.

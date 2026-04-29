@@ -69,7 +69,7 @@ export interface MeResponse {
   };
   permissions: PermissionRule[];
 }
-import type { Store, Product, Order, Media, Category, TaxCategory, Country, Variant } from './types';
+import type { Store, Product, Order, Media, Category, TaxCategory, Country, Variant, PaymentMethod, Customer, CreditCard, Payment, Address, StoreCredit } from './types';
 import type {
   StoreUpdateParams,
   ProductUpdateParams,
@@ -80,6 +80,12 @@ import type {
   OrderApproveParams,
   GiftCardApplyParams,
   StoreCreditApplyParams,
+  PaymentCreateParams,
+  CustomerCreateParams,
+  CustomerUpdateParams,
+  CustomerAddressParams,
+  CustomerStoreCreditCreateParams,
+  CustomerStoreCreditUpdateParams,
   MediaCreateParams,
   MediaUpdateParams,
   LineItemCreateParams,
@@ -263,11 +269,146 @@ export class AdminClient {
     },
 
     payments: {
+      list: (orderId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Payment>> =>
+        this.request<PaginatedResponse<Payment>>('GET', `/orders/${orderId}/payments`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      get: (orderId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Payment> =>
+        this.request<Payment>('GET', `/orders/${orderId}/payments/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
+
+      create: (orderId: string, params: PaymentCreateParams, options?: RequestOptions): Promise<Payment> =>
+        this.request<Payment>('POST', `/orders/${orderId}/payments`, { ...options, body: params }),
+
       capture: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
         this.request('PATCH', `/orders/${orderId}/payments/${id}/capture`, options),
 
       void: (orderId: string, id: string, options?: RequestOptions): Promise<unknown> =>
         this.request('PATCH', `/orders/${orderId}/payments/${id}/void`, options),
+    },
+  };
+
+  // ============================================
+  // Payment Methods
+  // ============================================
+
+  readonly paymentMethods = {
+    list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<PaymentMethod>> =>
+      this.request<PaginatedResponse<PaymentMethod>>('GET', '/payment_methods', {
+        ...options,
+        params: params ? transformListParams(params) : undefined,
+      }),
+
+    get: (id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<PaymentMethod> =>
+      this.request<PaymentMethod>('GET', `/payment_methods/${id}`, {
+        ...options,
+        params: getParams(params),
+      }),
+  };
+
+  // ============================================
+  // Tags
+  // ============================================
+
+  readonly tags = {
+    list: (params: { taggable_type: string; q?: string }, options?: RequestOptions): Promise<{ data: Array<{ name: string }> }> =>
+      this.request<{ data: Array<{ name: string }> }>('GET', '/tags', {
+        ...options,
+        params,
+      }),
+  };
+
+  // ============================================
+  // Customers
+  // ============================================
+
+  readonly customers = {
+    list: (params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Customer>> =>
+      this.request<PaginatedResponse<Customer>>('GET', '/customers', {
+        ...options,
+        params: params ? transformListParams(params) : undefined,
+      }),
+
+    get: (id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Customer> =>
+      this.request<Customer>('GET', `/customers/${id}`, {
+        ...options,
+        params: getParams(params),
+      }),
+
+    creditCards: {
+      list: (customerId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<CreditCard>> =>
+        this.request<PaginatedResponse<CreditCard>>('GET', `/customers/${customerId}/credit_cards`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      get: (customerId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<CreditCard> =>
+        this.request<CreditCard>('GET', `/customers/${customerId}/credit_cards/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
+
+      delete: (customerId: string, id: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/customers/${customerId}/credit_cards/${id}`, options),
+    },
+
+    create: (params: CustomerCreateParams, options?: RequestOptions): Promise<Customer> =>
+      this.request<Customer>('POST', '/customers', { ...options, body: params }),
+
+    update: (id: string, params: CustomerUpdateParams, options?: RequestOptions): Promise<Customer> =>
+      this.request<Customer>('PATCH', `/customers/${id}`, { ...options, body: params }),
+
+    delete: (id: string, options?: RequestOptions): Promise<void> =>
+      this.request<void>('DELETE', `/customers/${id}`, options),
+
+    addresses: {
+      list: (customerId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<Address>> =>
+        this.request<PaginatedResponse<Address>>('GET', `/customers/${customerId}/addresses`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      get: (customerId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<Address> =>
+        this.request<Address>('GET', `/customers/${customerId}/addresses/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
+
+      create: (customerId: string, params: CustomerAddressParams, options?: RequestOptions): Promise<Address> =>
+        this.request<Address>('POST', `/customers/${customerId}/addresses`, { ...options, body: params }),
+
+      update: (customerId: string, id: string, params: CustomerAddressParams, options?: RequestOptions): Promise<Address> =>
+        this.request<Address>('PATCH', `/customers/${customerId}/addresses/${id}`, { ...options, body: params }),
+
+      delete: (customerId: string, id: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/customers/${customerId}/addresses/${id}`, options),
+    },
+
+    storeCredits: {
+      list: (customerId: string, params?: ListParams & Record<string, unknown>, options?: RequestOptions): Promise<PaginatedResponse<StoreCredit>> =>
+        this.request<PaginatedResponse<StoreCredit>>('GET', `/customers/${customerId}/store_credits`, {
+          ...options,
+          params: params ? transformListParams(params) : undefined,
+        }),
+
+      get: (customerId: string, id: string, params?: { expand?: string[] }, options?: RequestOptions): Promise<StoreCredit> =>
+        this.request<StoreCredit>('GET', `/customers/${customerId}/store_credits/${id}`, {
+          ...options,
+          params: getParams(params),
+        }),
+
+      create: (customerId: string, params: CustomerStoreCreditCreateParams, options?: RequestOptions): Promise<StoreCredit> =>
+        this.request<StoreCredit>('POST', `/customers/${customerId}/store_credits`, { ...options, body: params }),
+
+      update: (customerId: string, id: string, params: CustomerStoreCreditUpdateParams, options?: RequestOptions): Promise<StoreCredit> =>
+        this.request<StoreCredit>('PATCH', `/customers/${customerId}/store_credits/${id}`, { ...options, body: params }),
+
+      delete: (customerId: string, id: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/customers/${customerId}/store_credits/${id}`, options),
     },
   };
 

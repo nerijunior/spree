@@ -5,6 +5,7 @@ import { AddressBlock } from '@/components/address-block'
 import { AddressFormDialog, type AddressParams } from '@/components/address-form-dialog'
 import { BackButton } from '@/components/back-button'
 import {
+  CheckCircleIcon,
   CreditCardIcon,
   EllipsisVerticalIcon,
   ExternalLinkIcon,
@@ -13,13 +14,16 @@ import {
   PackageIcon,
   PencilIcon,
   PlusIcon,
+  RotateCcwIcon,
+  ShieldCheckIcon,
   ShoppingCartIcon,
   TrashIcon,
   TruckIcon,
   XCircleIcon,
 } from 'lucide-react'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { useConfirm } from '@/components/confirm-dialog'
+import { TagCombobox } from '@/components/tag-combobox'
 import { adminClient } from '@/client'
 import { formatRelativeTime } from '@/lib/formatters'
 import { Badge, StatusBadge } from '@/components/ui/badge'
@@ -51,7 +55,9 @@ import {
 } from '@/components/ui/sheet'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/use-auth'
@@ -81,6 +87,10 @@ function useOrder(orderId: string) {
           'billing_address',
           'shipping_address',
           'customer',
+          'created_by',
+          'canceler',
+          'approver',
+          'market',
         ],
       }),
     enabled: isAuthenticated,
@@ -142,6 +152,8 @@ function OrderDetailPage() {
         {/* Sidebar */}
         <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
           <CustomerCard order={order} />
+          <TagsCard order={order} />
+          <DiscountsCard order={order} />
           <SpecialInstructionsCard order={order} />
           <InternalNoteCard order={order} />
         </div>
@@ -162,6 +174,15 @@ function OrderHeader({ order }: { order: Order }) {
 
   const cancelMutation = useOrderMutation(orderId, () =>
     adminClient.orders.cancel(orderId),
+  )
+  const completeMutation = useOrderMutation(orderId, () =>
+    adminClient.orders.complete(orderId),
+  )
+  const approveMutation = useOrderMutation(orderId, () =>
+    adminClient.orders.approve(orderId),
+  )
+  const resumeMutation = useOrderMutation(orderId, () =>
+    adminClient.orders.resume(orderId),
   )
   const resendMutation = useOrderMutation(orderId, () =>
     adminClient.orders.resendConfirmation(orderId, {}),
@@ -190,6 +211,45 @@ function OrderHeader({ order }: { order: Order }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {order.status === 'draft' && (
+              <DropdownMenuItem
+                onClick={async () => {
+                  if (await confirm({ message: 'Complete this draft order now?', confirmLabel: 'Complete' })) {
+                    completeMutation.mutate(undefined)
+                  }
+                }}
+                disabled={completeMutation.isPending}
+              >
+                <CheckCircleIcon className="size-4" />
+                Complete Order
+              </DropdownMenuItem>
+            )}
+            {order.considered_risky && !order.approved_at && (
+              <DropdownMenuItem
+                onClick={async () => {
+                  if (await confirm({ message: 'Approve this order?', confirmLabel: 'Approve' })) {
+                    approveMutation.mutate(undefined)
+                  }
+                }}
+                disabled={approveMutation.isPending}
+              >
+                <ShieldCheckIcon className="size-4" />
+                Approve Order
+              </DropdownMenuItem>
+            )}
+            {order.status === 'canceled' && (
+              <DropdownMenuItem
+                onClick={async () => {
+                  if (await confirm({ message: 'Resume this canceled order?', confirmLabel: 'Resume' })) {
+                    resumeMutation.mutate(undefined)
+                  }
+                }}
+                disabled={resumeMutation.isPending}
+              >
+                <RotateCcwIcon className="size-4" />
+                Resume Order
+              </DropdownMenuItem>
+            )}
             {order.completed_at && (
               <>
                 <DropdownMenuItem>
@@ -778,6 +838,7 @@ function ShipmentsCard({ order }: { order: Order }) {
 function PaymentsCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
   const confirm = useConfirm()
+  const [addOpen, setAddOpen] = useState(false)
 
   const payments = order.payments ?? []
 
@@ -788,20 +849,27 @@ function PaymentsCard({ order }: { order: Order }) {
     adminClient.orders.payments.void(orderId, paymentId, {}),
   )
 
-  if (payments.length === 0) return null
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>
           <CreditCardIcon className="size-4" />
           Payments
-          <Badge>{payments.length}</Badge>
+          {payments.length > 0 && <Badge>{payments.length}</Badge>}
         </CardTitle>
         <CardAction className="flex items-center gap-2">
           {order.payment_status && <StatusBadge status={order.payment_status} />}
+          <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
+            <PlusIcon data-icon="inline-start" />
+            Add Payment
+          </Button>
         </CardAction>
       </CardHeader>
+      {payments.length === 0 ? (
+        <CardContent>
+          <p className="text-center text-muted-foreground py-8">No payments yet</p>
+        </CardContent>
+      ) : (
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -871,7 +939,189 @@ function PaymentsCard({ order }: { order: Order }) {
           </tbody>
         </table>
       </div>
+      )}
+      <AddPaymentDialog order={order} open={addOpen} onOpenChange={setAddOpen} />
     </Card>
+  )
+}
+
+function AddPaymentDialog({
+  order,
+  open,
+  onOpenChange,
+}: {
+  order: Order
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const orderId = order.id
+  const customerId = order.customer_id ?? undefined
+  const [paymentMethodId, setPaymentMethodId] = useState<string>('')
+  const [sourceId, setSourceId] = useState<string>('')
+  const [amount, setAmount] = useState<string>(order.amount_due ?? '')
+  const [capture, setCapture] = useState(false)
+
+  // Re-seed amount from outstanding balance whenever the dialog opens.
+  useEffect(() => {
+    if (open) setAmount(order.amount_due ?? '')
+  }, [open, order.amount_due])
+
+  const { data: methodsData } = useQuery({
+    queryKey: ['payment-methods'],
+    queryFn: () => adminClient.paymentMethods.list({ limit: 50 }),
+    enabled: open,
+    staleTime: 60_000,
+  })
+  const paymentMethods = methodsData?.data ?? []
+  const selectedMethod = paymentMethods.find((m) => m.id === paymentMethodId)
+  const sourceRequired = selectedMethod?.source_required ?? false
+
+  const { data: cardsData } = useQuery({
+    queryKey: ['customer-credit-cards', customerId],
+    queryFn: () => customerId ? adminClient.customers.creditCards.list(customerId, { limit: 50 }) : Promise.resolve(null),
+    enabled: open && Boolean(customerId) && sourceRequired,
+    staleTime: 30_000,
+  })
+  const savedCards = cardsData?.data ?? []
+  const canSubmit = Boolean(paymentMethodId) && (!sourceRequired || Boolean(sourceId))
+
+  const mutation = useOrderMutation(orderId, () =>
+    adminClient.orders.payments.create(orderId, {
+      payment_method_id: paymentMethodId,
+      ...(sourceId ? { source_id: sourceId } : {}),
+      ...(amount ? { amount: Number(amount) } : {}),
+    }),
+  )
+
+  const captureMutation = useOrderMutation(orderId, (paymentId: string) =>
+    adminClient.orders.payments.capture(orderId, paymentId, {}),
+  )
+
+  function reset() {
+    setPaymentMethodId('')
+    setSourceId('')
+    setAmount('')
+    setCapture(false)
+  }
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!canSubmit) return
+
+    mutation.mutate(undefined, {
+      onSuccess: (payment) => {
+        if (capture && payment && (payment as { id?: string }).id) {
+          captureMutation.mutate((payment as { id: string }).id, {
+            onSuccess: () => {
+              onOpenChange(false)
+              reset()
+            },
+          })
+        } else {
+          onOpenChange(false)
+          reset()
+        }
+      },
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Payment</DialogTitle>
+          <DialogDescription>
+            Charge a payment method against this order.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <DialogBody>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="pay-method">Payment method</FieldLabel>
+                <Select value={paymentMethodId} onValueChange={(v) => { setPaymentMethodId(v); setSourceId('') }}>
+                  <SelectTrigger id="pay-method">
+                    <SelectValue placeholder="Choose a payment method...">
+                      {(value) => paymentMethods.find((m) => m.id === value)?.name ?? 'Choose a payment method...'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {paymentMethods.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+
+              {sourceRequired && (
+                <Field>
+                  <FieldLabel htmlFor="pay-source">Source</FieldLabel>
+                  {!customerId ? (
+                    <p className="text-sm text-destructive">
+                      This payment method requires a saved source. Assign a customer to the order first.
+                    </p>
+                  ) : savedCards.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Customer has no saved cards for this payment method.
+                    </p>
+                  ) : (
+                    <Select value={sourceId} onValueChange={setSourceId}>
+                      <SelectTrigger id="pay-source">
+                        <SelectValue placeholder="Choose a saved card…">
+                          {(value) => {
+                            const card = savedCards.find((c) => c.id === value)
+                            return card ? `${card.brand} •••• ${card.last4} (${card.month}/${card.year})` : 'Choose a saved card…'
+                          }}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {savedCards.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.brand} •••• {c.last4} ({c.month}/{c.year})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </Field>
+              )}
+
+              <Field>
+                <FieldLabel htmlFor="pay-amount">Amount</FieldLabel>
+                <Input
+                  id="pay-amount"
+                  type="number"
+                  step="0.01"
+                  placeholder={order.amount_due ?? '0.00'}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Leave blank to default to the outstanding balance ({order.display_amount_due ?? '$0.00'}).
+                </p>
+              </Field>
+
+              <Field>
+                <label className="flex items-center gap-2 text-sm">
+                  <Switch checked={capture} onCheckedChange={setCapture} />
+                  Capture immediately
+                </label>
+              </Field>
+            </FieldGroup>
+          </DialogBody>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!canSubmit || mutation.isPending || captureMutation.isPending}>
+              {mutation.isPending || captureMutation.isPending ? 'Processing…' : 'Add Payment'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -904,8 +1154,14 @@ function SummaryRow({
   )
 }
 
+function customerDisplayName(customer?: { first_name: string | null; last_name: string | null; email: string } | null): string {
+  if (!customer) return '—'
+  const name = [customer.first_name, customer.last_name].filter(Boolean).join(' ').trim()
+  return name || customer.email
+}
+
 function OrderSummaryCard({ order }: { order: Order }) {
-  const outstandingBalance = Number.parseFloat(order.total) - Number.parseFloat(order.payment_total)
+  const outstandingBalance = Number.parseFloat(order.amount_due ?? '0')
 
   return (
     <Card>
@@ -913,16 +1169,33 @@ function OrderSummaryCard({ order }: { order: Order }) {
         <CardTitle>Summary</CardTitle>
       </CardHeader>
       <div className="py-1">
+        {order.created_by && (
+          <SummaryRow label="Created by" value={customerDisplayName(order.created_by)} />
+        )}
+        <SummaryRow label="Created at" value={formatDate(order.created_at)} />
+
         {order.completed_at && (
+          <SummaryRow label="Completed at" value={formatDate(order.completed_at)} />
+        )}
+
+        {order.canceled_at && (
           <>
-            <SummaryRow label="Completed" value={formatDate(order.completed_at)} />
-            {order.canceled_at && (
-              <SummaryRow label="Canceled" value={formatDate(order.canceled_at)} />
+            <SummaryRow label="Canceled at" value={formatDate(order.canceled_at)} />
+            {order.canceler && (
+              <SummaryRow label="Canceler" value={customerDisplayName(order.canceler)} />
             )}
-            <Separator />
           </>
         )}
 
+        {order.approved_at && order.approver && (
+          <SummaryRow label="Approved by" value={customerDisplayName(order.approver)} />
+        )}
+
+        <Separator />
+
+        {order.market && (
+          <SummaryRow label="Market" value={order.market.name ?? order.market_id ?? '—'} />
+        )}
         <SummaryRow label="Locale" value={order.locale ?? '—'} />
         <SummaryRow label="Currency" value={order.currency} />
 
@@ -959,12 +1232,174 @@ function OrderSummaryCard({ order }: { order: Order }) {
         <SummaryRow label="Payment total" value={order.display_payment_total} highlight />
         <SummaryRow
           label="Outstanding balance"
-          value={`${order.currency} ${Math.abs(outstandingBalance).toFixed(2)}`}
+          value={order.display_amount_due}
           highlight
           danger={outstandingBalance > 0}
         />
       </div>
     </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Discounts: Gift Card + Store Credit
+// ---------------------------------------------------------------------------
+
+function DiscountsCard({ order }: { order: Order }) {
+  const { orderId } = Route.useParams()
+  const confirm = useConfirm()
+  const [giftCardOpen, setGiftCardOpen] = useState(false)
+
+  const removeGiftCardMutation = useOrderMutation(orderId, () =>
+    adminClient.orders.giftCards.remove(orderId, order.gift_card?.id ?? ''),
+  )
+  const applyStoreCreditMutation = useOrderMutation(orderId, () =>
+    adminClient.orders.storeCredits.apply(orderId),
+  )
+  const removeStoreCreditMutation = useOrderMutation(orderId, () =>
+    adminClient.orders.storeCredits.remove(orderId),
+  )
+
+  const hasStoreCredit = Number.parseFloat(order.store_credit_total ?? '0') > 0
+  const hasCustomer = Boolean(order.customer_id)
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Gift Card &amp; Store Credit</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {/* Gift card */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">Gift card</span>
+              {order.gift_card ? (
+                <span className="text-xs text-muted-foreground">
+                  {order.gift_card.code} · {order.display_gift_card_total}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">None applied</span>
+              )}
+            </div>
+            {order.gift_card ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={async () => {
+                  if (await confirm({ message: 'Remove this gift card from the order?', confirmLabel: 'Remove' })) {
+                    removeGiftCardMutation.mutate(undefined)
+                  }
+                }}
+                disabled={removeGiftCardMutation.isPending}
+              >
+                Remove
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setGiftCardOpen(true)}>
+                <PlusIcon className="size-4" />
+                Apply
+              </Button>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Store credit */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">Store credit</span>
+              {hasStoreCredit ? (
+                <span className="text-xs text-muted-foreground">
+                  {order.display_store_credit_total} applied
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  {hasCustomer ? "Apply customer's available balance" : 'Requires a customer'}
+                </span>
+              )}
+            </div>
+            {hasStoreCredit ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={async () => {
+                  if (await confirm({ message: 'Remove store credit from the order?', confirmLabel: 'Remove' })) {
+                    removeStoreCreditMutation.mutate(undefined)
+                  }
+                }}
+                disabled={removeStoreCreditMutation.isPending}
+              >
+                Remove
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!hasCustomer || applyStoreCreditMutation.isPending}
+                onClick={() => applyStoreCreditMutation.mutate(undefined)}
+              >
+                <PlusIcon className="size-4" />
+                Apply
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <ApplyGiftCardDialog orderId={orderId} open={giftCardOpen} onOpenChange={setGiftCardOpen} />
+    </>
+  )
+}
+
+function ApplyGiftCardDialog({
+  orderId,
+  open,
+  onOpenChange,
+}: {
+  orderId: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const mutation = useOrderMutation(orderId, (params: { code: string }) =>
+    adminClient.orders.giftCards.apply(orderId, params),
+  )
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    const code = (fd.get('code') as string).trim()
+    if (!code) return
+    mutation.mutate({ code }, { onSuccess: () => onOpenChange(false) })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Apply Gift Card</DialogTitle>
+          <DialogDescription>Enter the gift card code to apply it to this order.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <DialogBody>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="gift-card-code">Code</FieldLabel>
+                <Input id="gift-card-code" name="code" placeholder="GIFT-XXXX-YYYY" required autoFocus />
+              </Field>
+            </FieldGroup>
+          </DialogBody>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? 'Applying…' : 'Apply'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -1105,6 +1540,62 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
           <p className="text-sm text-muted-foreground whitespace-pre-wrap">
             {order.customer_note}
           </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">None</p>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Tags
+// ---------------------------------------------------------------------------
+
+function TagsCard({ order }: { order: Order }) {
+  const { orderId } = Route.useParams()
+  const [editing, setEditing] = useState(false)
+  const [tags, setTags] = useState<string[]>(order.tags ?? [])
+
+  const mutation = useOrderMutation(orderId, (params: { tags: string[] }) =>
+    adminClient.orders.update(orderId, params),
+  )
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Tags</CardTitle>
+        <CardAction>
+          <Button variant="ghost" size="icon-xs" onClick={() => {
+            setTags(order.tags ?? [])
+            setEditing(!editing)
+          }}>
+            <PencilIcon className="size-4" />
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        {editing ? (
+          <div className="flex flex-col gap-3">
+            <TagCombobox taggableType="Spree::Order" value={tags} onChange={setTags} />
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={mutation.isPending}
+                onClick={() => mutation.mutate({ tags }, { onSuccess: () => setEditing(false) })}
+              >
+                {mutation.isPending ? 'Saving…' : 'Save'}
+              </Button>
+            </div>
+          </div>
+        ) : order.tags?.length ? (
+          <div className="flex flex-wrap gap-1">
+            {order.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+          </div>
         ) : (
           <p className="text-sm text-muted-foreground">None</p>
         )}

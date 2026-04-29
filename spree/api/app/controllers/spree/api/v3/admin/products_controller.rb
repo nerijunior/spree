@@ -57,9 +57,19 @@ module Spree
 
           def permitted_params
             params.permit(
-              *Spree::PermittedAttributes.product_attributes,
+              :name, :description, :slug, :status,
+              :available_on, :discontinue_on, :make_active_at,
+              :meta_title, :meta_description, :meta_keywords,
+              :tax_category_id, :shipping_category_id,
+              :promotionable, :digital,
+              # Master-variant convenience fields (forwarded to master variant)
+              :sku, :barcode, :price, :compare_at_price,
+              :cost_price, :cost_currency,
+              :weight, :height, :width, :depth, :weight_unit, :dimensions_unit,
+              :track_inventory,
               tags: [],
               category_ids: [],
+              metadata: {},
               prices: [:amount, :compare_at_amount, :currency],
               variants: [
                 :id, :sku, :barcode, :price, :compare_at_price,

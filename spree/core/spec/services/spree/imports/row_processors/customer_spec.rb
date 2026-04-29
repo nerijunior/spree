@@ -73,6 +73,14 @@ RSpec.describe Spree::Imports::RowProcessors::Customer, type: :service do
       expect(user.ship_address).to eq user.bill_address
     end
 
+    it 'links the address back to the user via user_id' do
+      user = subject.process!
+
+      address = user.bill_address
+      expect(address.user_id).to eq user.id
+      expect(user.addresses.reload).to include(address)
+    end
+
     it 'generates a random password for new users' do
       user = subject.process!
 

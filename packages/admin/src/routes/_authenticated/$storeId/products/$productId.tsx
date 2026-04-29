@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { BackButton } from '@/components/back-button'
 import { useConfirm } from '@/components/confirm-dialog'
+import { TagCombobox } from '@/components/tag-combobox'
 import {
   ImagePlusIcon,
   Loader2Icon,
@@ -754,6 +755,7 @@ function CategorizationCard({ form }: FormCardProps) {
             control={form.control}
             render={({ field }) => (
               <TagCombobox
+                taggableType="Spree::Product"
                 value={field.value ?? []}
                 onChange={field.onChange}
               />
@@ -821,74 +823,6 @@ function CategoryCombobox({
           {(category: CategoryOption) => (
             <ComboboxItem key={category.id} value={category}>
               {category.pretty_name}
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
-  )
-}
-
-function TagCombobox({
-  value,
-  onChange,
-}: {
-  value: string[]
-  onChange: (value: string[]) => void
-}) {
-  const anchorRef = useComboboxAnchor()
-  const [inputValue, setInputValue] = useState('')
-
-  // Items = current tags + any new typed value
-  const tagItems = useMemo(() => {
-    const trimmed = inputValue.trim()
-    if (trimmed && !value.includes(trimmed)) {
-      return [...value, trimmed]
-    }
-    return value
-  }, [value, inputValue])
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim()) {
-      e.preventDefault()
-      const tag = inputValue.trim()
-      if (!value.includes(tag)) {
-        onChange([...value, tag])
-      }
-      setInputValue('')
-    }
-  }
-
-  return (
-    <Combobox
-      multiple
-      items={tagItems}
-      value={value}
-      onValueChange={onChange}
-    >
-      <ComboboxChips ref={anchorRef}>
-        <ComboboxValue>
-          {(selectedValues: string[]) =>
-            selectedValues.map((tag) => (
-              <ComboboxChip key={tag}>
-                {tag}
-              </ComboboxChip>
-            ))
-          }
-        </ComboboxValue>
-        <ComboboxChipsInput
-          placeholder="Type to add tags..."
-          value={inputValue}
-          onChange={(e) => setInputValue((e.target as HTMLInputElement).value)}
-          onKeyDown={handleKeyDown}
-        />
-      </ComboboxChips>
-      <ComboboxContent anchor={anchorRef}>
-        <ComboboxEmpty>Type and press Enter to create a tag</ComboboxEmpty>
-        <ComboboxList>
-          {(tag: string) => (
-            <ComboboxItem key={tag} value={tag}>
-              {value.includes(tag) ? tag : <>Create &ldquo;{tag}&rdquo;</>}
             </ComboboxItem>
           )}
         </ComboboxList>

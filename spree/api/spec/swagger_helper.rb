@@ -173,13 +173,21 @@ RSpec.configure do |config|
         { name: 'Refunds', description: 'Order refund management' },
         { name: 'Fulfillments', description: 'Order fulfillment management — ship, cancel, split' },
         { name: 'Order Gift Cards', description: 'Apply / remove gift cards on an order' },
-        { name: 'Order Store Credits', description: 'Apply / remove customer store credit on an order' }
+        { name: 'Order Store Credits', description: 'Apply / remove customer store credit on an order' },
+        { name: 'Customers', description: 'Customer management — profile, tags, marketing consent, notes' },
+        { name: 'Customer Addresses', description: "Saved address book per customer with default billing/shipping flags" },
+        { name: 'Customer Store Credits', description: "Per-customer store credit balances issued by admin" },
+        { name: 'Customer Credit Cards', description: "Customer's saved credit cards (read-only)" },
+        { name: 'Payment Methods', description: 'Store-configured payment methods (read-only)' },
+        { name: 'Tags', description: 'Tag autocomplete for product/order/customer tag inputs' }
       ],
       'x-tagGroups': [
         { name: 'Authentication', tags: ['Authentication'] },
         { name: 'Catalog', tags: %w[Products Variants Prices] },
         { name: 'Options', tags: ['Option Types'] },
-        { name: 'Orders', tags: ['Orders', 'Payments', 'Refunds', 'Fulfillments', 'Order Gift Cards', 'Order Store Credits'] }
+        { name: 'Orders', tags: ['Orders', 'Payments', 'Refunds', 'Fulfillments', 'Order Gift Cards', 'Order Store Credits'] },
+        { name: 'Customers', tags: ['Customers', 'Customer Addresses', 'Customer Store Credits', 'Customer Credit Cards'] },
+        { name: 'Configuration', tags: ['Payment Methods', 'Tags'] }
       ],
       components: {
         securitySchemes: {

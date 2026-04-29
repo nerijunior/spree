@@ -129,6 +129,19 @@ Spree::Core::Engine.add_routes do
         # Tax Categories
         resources :tax_categories, only: [:index, :show]
 
+        # Payment Methods
+        resources :payment_methods, only: [:index, :show]
+
+        # Tags (autocomplete for product/order/user tag inputs)
+        resources :tags, only: [:index]
+
+        # Customers
+        resources :customers do
+          resources :addresses, controller: 'customers/addresses'
+          resources :credit_cards, controller: 'customers/credit_cards', only: [:index, :show, :destroy]
+          resources :store_credits, controller: 'customers/store_credits'
+        end
+
         # Variants (top-level, for search/autocomplete across all products)
         resources :variants, only: [:index, :show]
 

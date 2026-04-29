@@ -15,6 +15,7 @@ module Spree
                    customer_id: [:string, nullable: true],
                    canceled_at: [:string, nullable: true], approved_at: [:string, nullable: true],
                    payment_total: :string, display_payment_total: :string,
+                   tags: [:string, multi: true],
                    metadata: 'Record<string, unknown> | null'
 
           # Admin-only attributes
@@ -23,6 +24,10 @@ module Spree
                      :payment_total, :display_payment_total,
                      canceled_at: :iso8601, approved_at: :iso8601,
                      created_at: :iso8601, updated_at: :iso8601
+
+          attribute :tags do |order|
+            order.tag_list.to_a
+          end
 
           attribute :internal_note do |order|
             order.internal_note&.to_plain_text.presence

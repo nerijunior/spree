@@ -139,8 +139,11 @@ module Spree
         # Ransack query parameters with sort translation.
         # Translates `-field` notation (JSON:API standard) to Ransack `s` format.
         # e.g., sort=-price,name → s=price desc,name asc
+        # Also decodes Stripe-style prefixed IDs found in keys like `*_id_eq`,
+        # `*_id_in`, `*_id_not_eq`, etc. so SPA filters can pass prefixed IDs.
         def ransack_params
           rp = params[:q]&.to_unsafe_h || params[:q] || {}
+          rp = decode_prefixed_id_predicates(rp)
           sort_value = sort_param
 
           if sort_value.present?
@@ -155,6 +158,27 @@ module Spree
           end
 
           rp
+        end
+
+        def decode_prefixed_id_predicates(hash)
+          return hash unless hash.is_a?(Hash)
+
+          hash.each_with_object({}) do |(key, value), result|
+            result[key] = if ransack_id_predicate?(key)
+                            Array(value).map { |v| Spree::PrefixedId.prefixed_id?(v) ? Spree::PrefixedId.decode_prefixed_id(v) || v : v }.then { |arr|
+                              value.is_a?(Array) ? arr : arr.first
+                            }
+                          elsif value.is_a?(Hash)
+                            decode_prefixed_id_predicates(value)
+                          else
+                            value
+                          end
+          end
+        end
+
+        RANSACK_ID_PREDICATE_RE = /_id(?:s)?(?:_(?:eq|not_eq|in|not_in|lt|lteq|gt|gteq))?\z/.freeze
+        def ransack_id_predicate?(key)
+          RANSACK_ID_PREDICATE_RE.match?(key.to_s)
         end
 
         # Sort parameter from the request

@@ -52,8 +52,10 @@ module Spree
 
           def option_type_service_params
             params.permit(
-              :name, :presentation, :position, :filterable,
-              option_values: [:id, *Spree::PermittedAttributes.option_value_attributes]
+              :name, :presentation, :position, :filterable, :kind,
+              option_values: [
+                :id, :name, :presentation, :position, :color_code, :image, :_destroy
+              ]
             )
           end
         end

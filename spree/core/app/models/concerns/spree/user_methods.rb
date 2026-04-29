@@ -36,6 +36,10 @@ module Spree
       normalizes :email, :first_name, :last_name, with: ->(value) { value&.to_s&.squish&.presence }
       acts_as_taggable_on :tags
 
+      def tags=(tags)
+        self.tag_list = tags
+      end
+
       #
       # Associations
       #
@@ -96,9 +100,36 @@ module Spree
       # Backward compatibility alias — remove in Spree 6.0
       def self.multi_search(query) = search(query)
 
-      self.whitelisted_ransackable_associations = %w[bill_address ship_address addresses tags spree_roles]
-      self.whitelisted_ransackable_attributes = %w[id email first_name last_name accepts_email_marketing]
-      self.whitelisted_ransackable_scopes = %w[search multi_search]
+      self.whitelisted_ransackable_associations = %w[bill_address ship_address addresses tags spree_roles orders]
+      self.whitelisted_ransackable_attributes = %w[id email first_name last_name phone accepts_email_marketing
+                                                    created_at updated_at last_sign_in_at]
+      self.whitelisted_ransackable_scopes = %w[search multi_search with_min_total_spent]
+
+      scope :with_min_total_spent, ->(amount) {
+        joins(:orders).where(spree_orders: { state: 'complete' }).
+          group("#{table_name}.id").
+          having('SUM(spree_orders.total) >= ?', amount.to_d)
+      }
+
+      # Precomputes orders_count, total_spent, and last_order_completed_at via a
+      # single aggregate join so list endpoints avoid 4 queries per user. The
+      # values land on the user as virtual attributes.
+      scope :with_order_aggregates, -> {
+        order_table = Spree::Order.table_name
+        select(
+          "#{table_name}.*, " \
+          "COALESCE(orders_agg.orders_count, 0) AS orders_count, " \
+          "COALESCE(orders_agg.total_spent, 0) AS total_spent, " \
+          "orders_agg.last_order_completed_at AS last_order_completed_at"
+        ).joins(
+          "LEFT JOIN (" \
+            "SELECT user_id, COUNT(*) AS orders_count, SUM(total) AS total_spent, MAX(completed_at) AS last_order_completed_at " \
+            "FROM #{order_table} " \
+            "WHERE state = 'complete' AND user_id IS NOT NULL " \
+            "GROUP BY user_id" \
+          ") orders_agg ON orders_agg.user_id = #{table_name}.id"
+        )
+      }
 
       def self.with_email(query)
         where("#{table_name}.email LIKE ?", "%#{query}%")

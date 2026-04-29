@@ -61,7 +61,7 @@ module Spree
           end
 
           def permitted_params
-            params.permit(*Spree::PermittedAttributes.asset_attributes)
+            params.permit(:type, :alt, :position, :attachment, :url, :signed_id)
           end
 
           def create_from_url

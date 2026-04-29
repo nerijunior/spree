@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { PlusIcon } from 'lucide-react'
 import { adminClient } from '@/client'
 import { ResourceTable, resourceSearchSchema } from '@/components/resource-table'
@@ -12,6 +12,7 @@ export const Route = createFileRoute('/_authenticated/$storeId/orders/')({
 
 function OrdersPage() {
   const searchParams = Route.useSearch()
+  const { storeId } = Route.useParams()
 
   return (
     <ResourceTable
@@ -21,9 +22,11 @@ function OrdersPage() {
       searchParams={searchParams}
       defaultParams={{ complete: 1 }}
       actions={
-        <Button size="sm" className="h-[2.125rem]">
-          <PlusIcon className="size-4" />
-          New Order
+        <Button size="sm" className="h-[2.125rem]" asChild>
+          <Link to="/$storeId/orders/new" params={{ storeId }}>
+            <PlusIcon className="size-4" />
+            New Order
+          </Link>
         </Button>
       }
     />
