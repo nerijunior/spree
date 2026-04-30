@@ -131,8 +131,6 @@ def show_success_message
   say 'Useful commands:', :yellow
   say '  bin/rails console                # Rails console'
   say "  bin/rails #{USE_LOCAL_SPREE ? 'spree:load_sample_data' : 'spree_sample:load'}  # Load more sample data"
-  say '  bin/spree version                # Spree CLI version'
-  say '  bin/spree extension my_ext       # Generate a new Spree extension'
   say
 end
 

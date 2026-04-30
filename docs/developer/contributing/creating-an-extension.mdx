@@ -15,10 +15,17 @@ description: Learn how to create a Spree extension.
 
 Let's build a simple extension. Suppose we want the ability to mark certain products as being on sale. We'd like to be able to set a sale price on a product and show products that are on sale on a separate products page. This is a great example of how an extension can be used to build on the solid Spree foundation.
 
+Install the Spree Extension CLI by running:
+
+
+```bash
+gem install spree_extension
+```
+
 Run the following command from a directory of your choice outside of our Spree application:
 
 ```bash
-spree extension simple_sales
+spree-extension simple_sales
 ```
 
 This creates a `spree_simple_sales` directory with several additional files and directories. After generating the extension make sure you change to its directory:
