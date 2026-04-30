@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { envContent, storefrontEnvContent } from '../src/templates/env'
+import { gitignoreContent } from '../src/templates/gitignore'
 import { rootPackageJsonContent } from '../src/templates/package-json'
 import { readmeContent } from '../src/templates/readme'
-import { gitignoreContent } from '../src/templates/gitignore'
 
 describe('envContent', () => {
   it('includes the provided secret key', () => {

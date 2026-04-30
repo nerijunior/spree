@@ -1,5 +1,5 @@
-import type { Command } from 'commander'
 import * as p from '@clack/prompts'
+import type { Command } from 'commander'
 import { detectProject } from '../context.js'
 import { rakeTask } from '../docker.js'
 

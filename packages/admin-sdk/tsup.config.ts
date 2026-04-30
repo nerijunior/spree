@@ -1,5 +1,5 @@
-import { defineConfig } from 'tsup';
-import path from 'node:path';
+import path from 'node:path'
+import { defineConfig } from 'tsup'
 
 export default defineConfig({
   entry: {
@@ -18,6 +18,6 @@ export default defineConfig({
   esbuildOptions(options) {
     options.alias = {
       '@/types': path.resolve(import.meta.dirname, 'src/types/generated/index.ts'),
-    };
+    }
   },
-});
+})

@@ -1,52 +1,53 @@
-import type { RequestFn, RequestOptions } from '@spree/sdk-core';
-import { transformListParams, getParams } from '@spree/sdk-core';
 import type {
+  AddressParams,
+  ListParams,
   ListResponse,
   PaginatedResponse,
-  ListParams,
-  AddressParams,
-} from '@spree/sdk-core';
+  RequestFn,
+  RequestOptions,
+} from '@spree/sdk-core'
+import { getParams, transformListParams } from '@spree/sdk-core'
 import type {
-  AuthTokens,
-  LoginCredentials,
-  RegisterParams,
-  ProductListParams,
-  ProductFiltersParams,
-  ProductFiltersResponse,
-  CategoryListParams,
-  OrderListParams,
-  CreateCartParams,
   AddLineItemParams,
-  UpdateLineItemParams,
-  UpdateCartParams,
+  Address,
+  AuthTokens,
+  Cart,
+  Category,
+  CategoryListParams,
+  CompletePaymentSessionParams,
+  CompletePaymentSetupSessionParams,
+  Country,
+  CreateCartParams,
   CreatePaymentParams,
   CreatePaymentSessionParams,
-  UpdatePaymentSessionParams,
-  CompletePaymentSessionParams,
   CreatePaymentSetupSessionParams,
-  CompletePaymentSetupSessionParams,
-  RequestPasswordResetParams,
-  ResetPasswordParams,
-  Cart,
   CreditCard,
-  GiftCard,
-  Product,
-  Order,
-  Country,
   Currency,
+  Customer,
+  GiftCard,
   Locale,
+  LoginCredentials,
   Market,
-  Policy,
-  Category,
+  Order,
+  OrderListParams,
   Payment,
   PaymentSession,
   PaymentSetupSession,
+  Policy,
+  Product,
+  ProductFiltersParams,
+  ProductFiltersResponse,
+  ProductListParams,
+  RegisterParams,
+  RequestPasswordResetParams,
+  ResetPasswordParams,
   StoreCredit,
+  UpdateCartParams,
+  UpdateLineItemParams,
+  UpdatePaymentSessionParams,
   Wishlist,
   WishlistItem,
-  Address,
-  Customer,
-} from './types';
+} from './types'
 
 export class StoreClient {
   /**
@@ -60,10 +61,10 @@ export class StoreClient {
    * const brands = await client.request<PaginatedResponse<Brand>>('GET', '/brands')
    * ```
    */
-  readonly request: RequestFn;
+  readonly request: RequestFn
 
   constructor(request: RequestFn) {
-    this.request = request;
+    this.request = request
   }
 
   // ============================================
@@ -90,7 +91,7 @@ export class StoreClient {
      */
     logout: (params: { refresh_token: string }, options?: RequestOptions): Promise<void> =>
       this.request<void>('POST', '/auth/logout', { ...options, body: params }),
-  };
+  }
 
   // ============================================
   // Products
@@ -102,7 +103,7 @@ export class StoreClient {
      */
     list: (
       params?: ProductListParams,
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<PaginatedResponse<Product>> =>
       this.request<PaginatedResponse<Product>>('GET', '/products', {
         ...options,
@@ -115,7 +116,7 @@ export class StoreClient {
     get: (
       idOrSlug: string,
       params?: { expand?: string[]; fields?: string[] },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Product> =>
       this.request<Product>('GET', `/products/${idOrSlug}`, {
         ...options,
@@ -128,13 +129,13 @@ export class StoreClient {
      */
     filters: (
       params?: ProductFiltersParams,
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<ProductFiltersResponse> =>
       this.request<ProductFiltersResponse>('GET', '/products/filters', {
         ...options,
         params: params as Record<string, string | number | undefined>,
       }),
-  };
+  }
 
   // ============================================
   // Categories
@@ -146,7 +147,7 @@ export class StoreClient {
      */
     list: (
       params?: CategoryListParams,
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<PaginatedResponse<Category>> =>
       this.request<PaginatedResponse<Category>>('GET', '/categories', {
         ...options,
@@ -159,13 +160,13 @@ export class StoreClient {
     get: (
       idOrPermalink: string,
       params?: { expand?: string[]; fields?: string[] },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Category> =>
       this.request<Category>('GET', `/categories/${idOrPermalink}`, {
         ...options,
         params: getParams(params),
       }),
-  };
+  }
 
   // ============================================
   // Countries, Currencies & Locales
@@ -187,13 +188,13 @@ export class StoreClient {
     get: (
       iso: string,
       params?: { expand?: string[]; fields?: string[] },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Country> =>
       this.request<Country>('GET', `/countries/${iso}`, {
         ...options,
         params: getParams(params),
       }),
-  };
+  }
 
   readonly currencies = {
     /**
@@ -201,7 +202,7 @@ export class StoreClient {
      */
     list: (options?: RequestOptions): Promise<ListResponse<Currency>> =>
       this.request<ListResponse<Currency>>('GET', '/currencies', options),
-  };
+  }
 
   readonly locales = {
     /**
@@ -209,7 +210,7 @@ export class StoreClient {
      */
     list: (options?: RequestOptions): Promise<ListResponse<Locale>> =>
       this.request<ListResponse<Locale>>('GET', '/locales', options),
-  };
+  }
 
   // ============================================
   // Policies
@@ -228,7 +229,7 @@ export class StoreClient {
      */
     get: (id: string, options?: RequestOptions): Promise<Policy> =>
       this.request<Policy>('GET', `/policies/${id}`, options),
-  };
+  }
 
   // ============================================
   // Markets
@@ -266,15 +267,8 @@ export class StoreClient {
        * List countries belonging to a market
        * @param marketId - Market prefixed ID
        */
-      list: (
-        marketId: string,
-        options?: RequestOptions
-      ): Promise<ListResponse<Country>> =>
-        this.request<ListResponse<Country>>(
-          'GET',
-          `/markets/${marketId}/countries`,
-          options
-        ),
+      list: (marketId: string, options?: RequestOptions): Promise<ListResponse<Country>> =>
+        this.request<ListResponse<Country>>('GET', `/markets/${marketId}/countries`, options),
 
       /**
        * Get a country by ISO code within a market
@@ -285,15 +279,14 @@ export class StoreClient {
         marketId: string,
         iso: string,
         params?: { expand?: string[]; fields?: string[] },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Country> =>
-        this.request<Country>(
-          'GET',
-          `/markets/${marketId}/countries/${iso}`,
-          { ...options, params: getParams(params) }
-        ),
+        this.request<Country>('GET', `/markets/${marketId}/countries/${iso}`, {
+          ...options,
+          params: getParams(params),
+        }),
     },
-  };
+  }
 
   // ============================================
   // Carts
@@ -328,11 +321,7 @@ export class StoreClient {
      * @param cartId - Cart prefixed ID
      * @param params - Cart update parameters
      */
-    update: (
-      cartId: string,
-      params: UpdateCartParams,
-      options?: RequestOptions
-    ): Promise<Cart> =>
+    update: (cartId: string, params: UpdateCartParams, options?: RequestOptions): Promise<Cart> =>
       this.request<Cart>('PATCH', `/carts/${cartId}`, {
         ...options,
         body: params,
@@ -373,7 +362,7 @@ export class StoreClient {
       create: (
         cartId: string,
         params: AddLineItemParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Cart> =>
         this.request<Cart>('POST', `/carts/${cartId}/items`, {
           ...options,
@@ -389,29 +378,20 @@ export class StoreClient {
         cartId: string,
         lineItemId: string,
         params: UpdateLineItemParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Cart> =>
-        this.request<Cart>(
-          'PATCH',
-          `/carts/${cartId}/items/${lineItemId}`,
-          { ...options, body: params }
-        ),
+        this.request<Cart>('PATCH', `/carts/${cartId}/items/${lineItemId}`, {
+          ...options,
+          body: params,
+        }),
 
       /**
        * Remove a line item from the cart.
        * Returns the updated cart with recalculated totals.
        * @param cartId - Cart prefixed ID
        */
-      delete: (
-        cartId: string,
-        lineItemId: string,
-        options?: RequestOptions
-      ): Promise<Cart> =>
-        this.request<Cart>(
-          'DELETE',
-          `/carts/${cartId}/items/${lineItemId}`,
-          options
-        ),
+      delete: (cartId: string, lineItemId: string, options?: RequestOptions): Promise<Cart> =>
+        this.request<Cart>('DELETE', `/carts/${cartId}/items/${lineItemId}`, options),
     },
 
     /**
@@ -423,11 +403,7 @@ export class StoreClient {
        * @param cartId - Cart prefixed ID
        * @param code - Promotion discount code to apply (e.g., 'SAVE10')
        */
-      apply: (
-        cartId: string,
-        code: string,
-        options?: RequestOptions
-      ): Promise<Cart> =>
+      apply: (cartId: string, code: string, options?: RequestOptions): Promise<Cart> =>
         this.request<Cart>('POST', `/carts/${cartId}/discount_codes`, {
           ...options,
           body: { code },
@@ -438,16 +414,8 @@ export class StoreClient {
        * @param cartId - Cart prefixed ID
        * @param code - The discount code string to remove (e.g., 'SAVE10')
        */
-      remove: (
-        cartId: string,
-        code: string,
-        options?: RequestOptions
-      ): Promise<Cart> =>
-        this.request<Cart>(
-          'DELETE',
-          `/carts/${cartId}/discount_codes/${code}`,
-          options
-        ),
+      remove: (cartId: string, code: string, options?: RequestOptions): Promise<Cart> =>
+        this.request<Cart>('DELETE', `/carts/${cartId}/discount_codes/${code}`, options),
     },
 
     /**
@@ -461,11 +429,7 @@ export class StoreClient {
        * @param cartId - Cart prefixed ID
        * @param code - Gift card code to apply
        */
-      apply: (
-        cartId: string,
-        code: string,
-        options?: RequestOptions
-      ): Promise<Cart> =>
+      apply: (cartId: string, code: string, options?: RequestOptions): Promise<Cart> =>
         this.request<Cart>('POST', `/carts/${cartId}/gift_cards`, {
           ...options,
           body: { code },
@@ -476,16 +440,8 @@ export class StoreClient {
        * @param cartId - Cart prefixed ID
        * @param giftCardId - Gift card prefixed ID (e.g., 'gc_abc123')
        */
-      remove: (
-        cartId: string,
-        giftCardId: string,
-        options?: RequestOptions
-      ): Promise<Cart> =>
-        this.request<Cart>(
-          'DELETE',
-          `/carts/${cartId}/gift_cards/${giftCardId}`,
-          options
-        ),
+      remove: (cartId: string, giftCardId: string, options?: RequestOptions): Promise<Cart> =>
+        this.request<Cart>('DELETE', `/carts/${cartId}/gift_cards/${giftCardId}`, options),
     },
 
     /**
@@ -501,13 +457,12 @@ export class StoreClient {
         cartId: string,
         fulfillmentId: string,
         params: { selected_delivery_rate_id: string },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Cart> =>
-        this.request<Cart>(
-          'PATCH',
-          `/carts/${cartId}/fulfillments/${fulfillmentId}`,
-          { ...options, body: params }
-        ),
+        this.request<Cart>('PATCH', `/carts/${cartId}/fulfillments/${fulfillmentId}`, {
+          ...options,
+          body: params,
+        }),
     },
 
     /**
@@ -522,13 +477,9 @@ export class StoreClient {
       create: (
         cartId: string,
         params: CreatePaymentParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Payment> =>
-        this.request<Payment>(
-          'POST',
-          `/carts/${cartId}/payments`,
-          { ...options, body: params }
-        ),
+        this.request<Payment>('POST', `/carts/${cartId}/payments`, { ...options, body: params }),
     },
 
     /**
@@ -543,27 +494,22 @@ export class StoreClient {
       create: (
         cartId: string,
         params: CreatePaymentSessionParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaymentSession> =>
-        this.request<PaymentSession>(
-          'POST',
-          `/carts/${cartId}/payment_sessions`,
-          { ...options, body: params }
-        ),
+        this.request<PaymentSession>('POST', `/carts/${cartId}/payment_sessions`, {
+          ...options,
+          body: params,
+        }),
 
       /**
        * Get a payment session by ID
        * @param cartId - Cart prefixed ID
        */
-      get: (
-        cartId: string,
-        sessionId: string,
-        options?: RequestOptions
-      ): Promise<PaymentSession> =>
+      get: (cartId: string, sessionId: string, options?: RequestOptions): Promise<PaymentSession> =>
         this.request<PaymentSession>(
           'GET',
           `/carts/${cartId}/payment_sessions/${sessionId}`,
-          options
+          options,
         ),
 
       /**
@@ -575,13 +521,12 @@ export class StoreClient {
         cartId: string,
         sessionId: string,
         params: UpdatePaymentSessionParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaymentSession> =>
-        this.request<PaymentSession>(
-          'PATCH',
-          `/carts/${cartId}/payment_sessions/${sessionId}`,
-          { ...options, body: params }
-        ),
+        this.request<PaymentSession>('PATCH', `/carts/${cartId}/payment_sessions/${sessionId}`, {
+          ...options,
+          body: params,
+        }),
 
       /**
        * Complete a payment session.
@@ -592,12 +537,12 @@ export class StoreClient {
         cartId: string,
         sessionId: string,
         params?: CompletePaymentSessionParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaymentSession> =>
         this.request<PaymentSession>(
           'PATCH',
           `/carts/${cartId}/payment_sessions/${sessionId}/complete`,
-          { ...options, body: params }
+          { ...options, body: params },
         ),
     },
 
@@ -609,11 +554,7 @@ export class StoreClient {
        * Apply store credit to the cart
        * @param cartId - Cart prefixed ID
        */
-      apply: (
-        cartId: string,
-        amount?: number,
-        options?: RequestOptions
-      ): Promise<Cart> =>
+      apply: (cartId: string, amount?: number, options?: RequestOptions): Promise<Cart> =>
         this.request<Cart>('POST', `/carts/${cartId}/store_credits`, {
           ...options,
           body: amount ? { amount } : undefined,
@@ -624,13 +565,9 @@ export class StoreClient {
        * @param cartId - Cart prefixed ID
        */
       remove: (cartId: string, options?: RequestOptions): Promise<Cart> =>
-        this.request<Cart>(
-          'DELETE',
-          `/carts/${cartId}/store_credits`,
-          options
-        ),
+        this.request<Cart>('DELETE', `/carts/${cartId}/store_credits`, options),
     },
-  };
+  }
 
   // ============================================
   // Orders (post-purchase, read-only)
@@ -644,13 +581,13 @@ export class StoreClient {
     get: (
       id: string,
       params?: { expand?: string[]; fields?: string[] },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Order> =>
       this.request<Order>('GET', `/orders/${id}`, {
         ...options,
         params: getParams(params),
       }),
-  };
+  }
 
   // ============================================
   // Customer
@@ -662,7 +599,7 @@ export class StoreClient {
      */
     create: (params: RegisterParams): Promise<AuthTokens> =>
       this.request<AuthTokens>('POST', '/customers', { body: params }),
-  };
+  }
 
   readonly customer = {
     /**
@@ -688,7 +625,7 @@ export class StoreClient {
         /** Arbitrary key-value metadata (stored, not returned in responses) */
         metadata?: Record<string, unknown>
       },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Customer> =>
       this.request<Customer>('PATCH', '/customers/me', {
         ...options,
@@ -702,15 +639,11 @@ export class StoreClient {
       /**
        * List customer addresses
        */
-      list: (
-        params?: ListParams,
-        options?: RequestOptions
-      ): Promise<PaginatedResponse<Address>> =>
-        this.request<PaginatedResponse<Address>>(
-          'GET',
-          '/customers/me/addresses',
-          { ...options, params: transformListParams({ ...params }) }
-        ),
+      list: (params?: ListParams, options?: RequestOptions): Promise<PaginatedResponse<Address>> =>
+        this.request<PaginatedResponse<Address>>('GET', '/customers/me/addresses', {
+          ...options,
+          params: transformListParams({ ...params }),
+        }),
 
       /**
        * Get an address by ID
@@ -721,10 +654,7 @@ export class StoreClient {
       /**
        * Create an address
        */
-      create: (
-        params: AddressParams,
-        options?: RequestOptions
-      ): Promise<Address> =>
+      create: (params: AddressParams, options?: RequestOptions): Promise<Address> =>
         this.request<Address>('POST', '/customers/me/addresses', {
           ...options,
           body: params,
@@ -736,7 +666,7 @@ export class StoreClient {
       update: (
         id: string,
         params: Partial<AddressParams>,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Address> =>
         this.request<Address>('PATCH', `/customers/me/addresses/${id}`, {
           ...options,
@@ -759,13 +689,12 @@ export class StoreClient {
        */
       list: (
         params?: ListParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaginatedResponse<CreditCard>> =>
-        this.request<PaginatedResponse<CreditCard>>(
-          'GET',
-          '/customers/me/credit_cards',
-          { ...options, params: transformListParams({ ...params }) }
-        ),
+        this.request<PaginatedResponse<CreditCard>>('GET', '/customers/me/credit_cards', {
+          ...options,
+          params: transformListParams({ ...params }),
+        }),
 
       /**
        * Get a credit card by ID
@@ -788,15 +717,11 @@ export class StoreClient {
        * List customer gift cards
        * Returns gift cards associated with the current user, ordered by newest first
        */
-      list: (
-        params?: ListParams,
-        options?: RequestOptions
-      ): Promise<PaginatedResponse<GiftCard>> =>
-        this.request<PaginatedResponse<GiftCard>>(
-          'GET',
-          '/customers/me/gift_cards',
-          { ...options, params: transformListParams({ ...params }) }
-        ),
+      list: (params?: ListParams, options?: RequestOptions): Promise<PaginatedResponse<GiftCard>> =>
+        this.request<PaginatedResponse<GiftCard>>('GET', '/customers/me/gift_cards', {
+          ...options,
+          params: transformListParams({ ...params }),
+        }),
 
       /**
        * Get a gift card by ID
@@ -816,13 +741,12 @@ export class StoreClient {
        */
       list: (
         params?: ListParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaginatedResponse<StoreCredit>> =>
-        this.request<PaginatedResponse<StoreCredit>>(
-          'GET',
-          '/customers/me/store_credits',
-          { ...options, params: transformListParams({ ...params }) }
-        ),
+        this.request<PaginatedResponse<StoreCredit>>('GET', '/customers/me/store_credits', {
+          ...options,
+          params: transformListParams({ ...params }),
+        }),
 
       /**
        * Get a store credit by ID
@@ -840,7 +764,7 @@ export class StoreClient {
        */
       list: (
         params?: OrderListParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaginatedResponse<Order>> =>
         this.request<PaginatedResponse<Order>>('GET', '/customers/me/orders', {
           ...options,
@@ -853,7 +777,7 @@ export class StoreClient {
       get: (
         id: string,
         params?: { expand?: string[]; fields?: string[] },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Order> =>
         this.request<Order>('GET', `/customers/me/orders/${id}`, {
           ...options,
@@ -871,19 +795,22 @@ export class StoreClient {
        */
       create: (
         params: CreatePaymentSetupSessionParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaymentSetupSession> =>
-        this.request<PaymentSetupSession>(
-          'POST',
-          '/customers/me/payment_setup_sessions',
-          { ...options, body: params }
-        ),
+        this.request<PaymentSetupSession>('POST', '/customers/me/payment_setup_sessions', {
+          ...options,
+          body: params,
+        }),
 
       /**
        * Get a payment setup session by ID
        */
       get: (id: string, options?: RequestOptions): Promise<PaymentSetupSession> =>
-        this.request<PaymentSetupSession>('GET', `/customers/me/payment_setup_sessions/${id}`, options),
+        this.request<PaymentSetupSession>(
+          'GET',
+          `/customers/me/payment_setup_sessions/${id}`,
+          options,
+        ),
 
       /**
        * Complete a payment setup session
@@ -892,16 +819,15 @@ export class StoreClient {
       complete: (
         id: string,
         params?: CompletePaymentSetupSessionParams,
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<PaymentSetupSession> =>
         this.request<PaymentSetupSession>(
           'PATCH',
           `/customers/me/payment_setup_sessions/${id}/complete`,
-          { ...options, body: params }
+          { ...options, body: params },
         ),
     },
-
-  };
+  }
 
   // ============================================
   // Password Resets
@@ -922,16 +848,9 @@ export class StoreClient {
      * Returns a JWT token on success (auto-login).
      * @param token - Password reset token from the email
      */
-    update: (
-      token: string,
-      params: ResetPasswordParams
-    ): Promise<AuthTokens> =>
-      this.request<AuthTokens>(
-        'PATCH',
-        `/password_resets/${token}`,
-        { body: params }
-      ),
-  };
+    update: (token: string, params: ResetPasswordParams): Promise<AuthTokens> =>
+      this.request<AuthTokens>('PATCH', `/password_resets/${token}`, { body: params }),
+  }
 
   // ============================================
   // Wishlists
@@ -941,10 +860,7 @@ export class StoreClient {
     /**
      * List wishlists
      */
-    list: (
-      params?: ListParams,
-      options?: RequestOptions
-    ): Promise<PaginatedResponse<Wishlist>> =>
+    list: (params?: ListParams, options?: RequestOptions): Promise<PaginatedResponse<Wishlist>> =>
       this.request<PaginatedResponse<Wishlist>>('GET', '/wishlists', {
         ...options,
         params: transformListParams({ ...params }),
@@ -956,7 +872,7 @@ export class StoreClient {
     get: (
       id: string,
       params?: { expand?: string[]; fields?: string[] },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Wishlist> =>
       this.request<Wishlist>('GET', `/wishlists/${id}`, {
         ...options,
@@ -968,7 +884,7 @@ export class StoreClient {
      */
     create: (
       params: { name: string; is_private?: boolean; is_default?: boolean },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Wishlist> =>
       this.request<Wishlist>('POST', '/wishlists', {
         ...options,
@@ -981,7 +897,7 @@ export class StoreClient {
     update: (
       id: string,
       params: { name?: string; is_private?: boolean; is_default?: boolean },
-      options?: RequestOptions
+      options?: RequestOptions,
     ): Promise<Wishlist> =>
       this.request<Wishlist>('PATCH', `/wishlists/${id}`, {
         ...options,
@@ -1004,7 +920,7 @@ export class StoreClient {
       create: (
         wishlistId: string,
         params: { variant_id: string; quantity?: number },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<WishlistItem> =>
         this.request<WishlistItem>('POST', `/wishlists/${wishlistId}/items`, {
           ...options,
@@ -1018,27 +934,18 @@ export class StoreClient {
         wishlistId: string,
         itemId: string,
         params: { quantity: number },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<WishlistItem> =>
-        this.request<WishlistItem>(
-          'PATCH',
-          `/wishlists/${wishlistId}/items/${itemId}`,
-          { ...options, body: params }
-        ),
+        this.request<WishlistItem>('PATCH', `/wishlists/${wishlistId}/items/${itemId}`, {
+          ...options,
+          body: params,
+        }),
 
       /**
        * Remove an item from a wishlist
        */
-      delete: (
-        wishlistId: string,
-        itemId: string,
-        options?: RequestOptions
-      ): Promise<void> =>
-        this.request<void>(
-          'DELETE',
-          `/wishlists/${wishlistId}/items/${itemId}`,
-          options
-        ),
+      delete: (wishlistId: string, itemId: string, options?: RequestOptions): Promise<void> =>
+        this.request<void>('DELETE', `/wishlists/${wishlistId}/items/${itemId}`, options),
     },
-  };
+  }
 }

@@ -1,14 +1,12 @@
-import type { Command } from 'commander'
 import * as p from '@clack/prompts'
-import pc from 'picocolors'
+import type { Command } from 'commander'
 import { printTable } from 'console-table-printer'
+import pc from 'picocolors'
 import { detectProject } from '../context.js'
 import { rakeTask } from '../docker.js'
 
 export function registerApiKeyCommand(program: Command): void {
-  const apiKey = program
-    .command('api-key')
-    .description('Manage API keys')
+  const apiKey = program.command('api-key').description('Manage API keys')
 
   apiKey
     .command('create')

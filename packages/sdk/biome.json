@@ -1,7 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
-  "extends": ["//"],
+  "root": false,
+  "extends": ["../../biome.json"],
   "files": {
-    "includes": ["src/**", "tests/**", "!src/types/generated/**", "!src/zod/generated/**"]
+    "includes": ["src/**", "tests/**", "!src/types/generated", "!src/zod/generated"]
   }
 }

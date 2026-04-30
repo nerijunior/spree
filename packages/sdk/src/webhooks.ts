@@ -39,9 +39,7 @@ export function verifyWebhookSignature(
   const age = Math.abs(Math.floor(Date.now() / 1000) - ts)
   if (age > toleranceSeconds) return false
 
-  const expected = createHmac('sha256', secret)
-    .update(`${timestamp}.${payload}`)
-    .digest('hex')
+  const expected = createHmac('sha256', secret).update(`${timestamp}.${payload}`).digest('hex')
 
   try {
     return timingSafeEqual(Buffer.from(signature), Buffer.from(expected))

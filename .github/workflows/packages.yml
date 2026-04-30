@@ -48,7 +48,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm turbo typecheck test build
+      - run: pnpm turbo lint typecheck test build
 
   sdk-integration:
     name: "SDK Integration Tests"

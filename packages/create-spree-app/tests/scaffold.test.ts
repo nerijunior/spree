@@ -1,7 +1,7 @@
-import { describe, it, expect, afterEach, vi } from 'vitest'
 import fs from 'node:fs'
-import path from 'node:path'
 import os from 'node:os'
+import path from 'node:path'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { scaffold } from '../src/scaffold'
 
 const FAKE_COMPOSE = `x-app: &app
@@ -203,7 +203,7 @@ describe('scaffold (no-start)', () => {
         start: false,
         packageManager: 'npm',
         port: 3000,
-      })
+      }),
     ).rejects.toThrow('process.exit called')
 
     mockExit.mockRestore()

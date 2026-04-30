@@ -1,28 +1,26 @@
 // Request infrastructure
-export { SpreeError, createRequestFn } from './request';
-export type {
-  RetryConfig,
-  RequestOptions,
-  InternalRequestOptions,
-  RequestFn,
-  RequestConfig,
-  AuthConfig,
-} from './request';
 
+export type { ResolvedRetryConfig } from './helpers'
+// Helpers
+export { getParams, resolveRetryConfig } from './helpers'
+// Params
+export { transformListParams } from './params'
+export type {
+  AuthConfig,
+  InternalRequestOptions,
+  RequestConfig,
+  RequestFn,
+  RequestOptions,
+  RetryConfig,
+} from './request'
+export { createRequestFn, SpreeError } from './request'
 // Shared types
 export type {
-  LocaleDefaults,
-  PaginationMeta,
-  ListResponse,
-  PaginatedResponse,
+  AddressParams,
   ErrorResponse,
   ListParams,
-  AddressParams,
-} from './types';
-
-// Params
-export { transformListParams } from './params';
-
-// Helpers
-export { getParams, resolveRetryConfig } from './helpers';
-export type { ResolvedRetryConfig } from './helpers';
+  ListResponse,
+  LocaleDefaults,
+  PaginatedResponse,
+  PaginationMeta,
+} from './types'

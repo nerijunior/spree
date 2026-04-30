@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
-import path from 'path';
+import path from 'node:path'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   resolve: {
@@ -16,4 +16,4 @@ export default defineConfig({
     // Run sequentially — tests share server + SQLite database
     fileParallelism: false,
   },
-});
+})

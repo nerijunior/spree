@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts'
-import type { ScaffoldOptions, PackageManager } from './types.js'
+import type { PackageManager, ScaffoldOptions } from './types.js'
 
 interface PromptFlags {
   directory?: string

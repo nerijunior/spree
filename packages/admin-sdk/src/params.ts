@@ -2,330 +2,330 @@
 // Based on the Admin API OpenAPI specification
 
 export interface StoreUpdateParams {
-  name?: string;
-  url?: string;
-  mail_from_address?: string;
-  customer_support_email?: string;
-  new_order_notifications_email?: string;
-  description?: string;
-  address?: string;
-  contact_phone?: string;
-  seo_title?: string;
-  meta_keywords?: string;
-  meta_description?: string;
-  default_currency?: string;
-  default_locale?: string;
-  supported_currencies?: string;
-  supported_locales?: string;
+  name?: string
+  url?: string
+  mail_from_address?: string
+  customer_support_email?: string
+  new_order_notifications_email?: string
+  description?: string
+  address?: string
+  contact_phone?: string
+  seo_title?: string
+  meta_keywords?: string
+  meta_description?: string
+  default_currency?: string
+  default_locale?: string
+  supported_currencies?: string
+  supported_locales?: string
 }
 
 export interface OptionTypeCreateParams {
-  name: string;
-  presentation: string;
-  position?: number;
-  filterable?: boolean;
+  name: string
+  presentation: string
+  position?: number
+  filterable?: boolean
   option_values?: Array<{
-    name?: string;
-    presentation?: string;
-    position?: number;
-  }>;
+    name?: string
+    presentation?: string
+    position?: number
+  }>
 }
 
 export interface OptionTypeUpdateParams {
-  name?: string;
-  presentation?: string;
-  position?: number;
-  filterable?: boolean;
+  name?: string
+  presentation?: string
+  position?: number
+  filterable?: boolean
   option_values?: Array<{
-    id?: string;
-    name?: string;
-    presentation?: string;
-    position?: number;
-  }>;
+    id?: string
+    name?: string
+    presentation?: string
+    position?: number
+  }>
 }
 
 export interface LineItemCreateParams {
-  variant_id: string;
-  quantity?: number;
+  variant_id: string
+  quantity?: number
 }
 
 export interface LineItemUpdateParams {
-  quantity?: number;
+  quantity?: number
 }
 
 export interface PaymentCreateParams {
-  payment_method_id: string;
-  amount?: number;
-  source_id?: string;
+  payment_method_id: string
+  amount?: number
+  source_id?: string
 }
 
 export interface RefundCreateParams {
-  payment_id: string;
-  amount: number;
-  refund_reason_id?: string;
+  payment_id: string
+  amount: number
+  refund_reason_id?: string
 }
 
 export interface FulfillmentUpdateParams {
-  tracking?: string;
-  selected_delivery_rate_id?: string;
+  tracking?: string
+  selected_delivery_rate_id?: string
 }
 
 export interface AddressInputParams {
-  first_name?: string;
-  last_name?: string;
-  address1?: string;
-  address2?: string;
-  city?: string;
-  postal_code?: string;
-  country_iso?: string;
-  state_abbr?: string;
-  phone?: string;
+  first_name?: string
+  last_name?: string
+  address1?: string
+  address2?: string
+  city?: string
+  postal_code?: string
+  country_iso?: string
+  state_abbr?: string
+  phone?: string
 }
 
 export interface OrderCreateParams {
-  email?: string;
-  customer_id?: string;
-  user_id?: string;
-  use_customer_default_address?: boolean;
-  currency?: string;
-  market_id?: string;
-  locale?: string;
-  customer_note?: string;
-  internal_note?: string;
-  metadata?: Record<string, unknown>;
-  shipping_address?: AddressInputParams;
-  shipping_address_id?: string;
-  billing_address?: AddressInputParams;
-  billing_address_id?: string;
+  email?: string
+  customer_id?: string
+  user_id?: string
+  use_customer_default_address?: boolean
+  currency?: string
+  market_id?: string
+  locale?: string
+  customer_note?: string
+  internal_note?: string
+  metadata?: Record<string, unknown>
+  shipping_address?: AddressInputParams
+  shipping_address_id?: string
+  billing_address?: AddressInputParams
+  billing_address_id?: string
   items?: Array<{
-    variant_id: string;
-    quantity: number;
-    metadata?: Record<string, unknown>;
-  }>;
-  coupon_code?: string;
+    variant_id: string
+    quantity: number
+    metadata?: Record<string, unknown>
+  }>
+  coupon_code?: string
 }
 
 export interface OrderUpdateParams {
-  email?: string;
-  customer_id?: string;
-  customer_note?: string;
-  internal_note?: string;
-  ship_address?: AddressInputParams;
-  bill_address?: AddressInputParams;
+  email?: string
+  customer_id?: string
+  customer_note?: string
+  internal_note?: string
+  ship_address?: AddressInputParams
+  bill_address?: AddressInputParams
   line_items?: Array<{
-    variant_id?: string;
-    quantity?: number;
-  }>;
+    variant_id?: string
+    quantity?: number
+  }>
 }
 
 export interface OrderCompleteParams {
-  payment_pending?: boolean;
-  notify_customer?: boolean;
+  payment_pending?: boolean
+  notify_customer?: boolean
 }
 
 export interface OrderCancelParams {
-  reason?: 'customer' | 'declined' | 'fraud' | 'inventory' | 'staff' | 'other' | 'expired';
-  note?: string;
-  restock_items?: boolean;
-  refund_payments?: boolean;
-  refund_amount?: number;
-  notify_customer?: boolean;
+  reason?: 'customer' | 'declined' | 'fraud' | 'inventory' | 'staff' | 'other' | 'expired'
+  note?: string
+  restock_items?: boolean
+  refund_payments?: boolean
+  refund_amount?: number
+  notify_customer?: boolean
 }
 
 export interface OrderApproveParams {
-  level?: string;
-  note?: string;
+  level?: string
+  note?: string
 }
 
 export interface GiftCardApplyParams {
-  code: string;
+  code: string
 }
 
 export interface StoreCreditApplyParams {
-  amount?: number;
+  amount?: number
 }
 
 export interface CustomerCreateParams {
-  email: string;
-  first_name?: string;
-  last_name?: string;
-  phone?: string;
-  accepts_email_marketing?: boolean;
-  internal_note?: string;
-  metadata?: Record<string, unknown>;
-  tags?: string[];
+  email: string
+  first_name?: string
+  last_name?: string
+  phone?: string
+  accepts_email_marketing?: boolean
+  internal_note?: string
+  metadata?: Record<string, unknown>
+  tags?: string[]
 }
 
 export interface CustomerUpdateParams {
-  email?: string;
-  first_name?: string;
-  last_name?: string;
-  phone?: string;
-  accepts_email_marketing?: boolean;
-  internal_note?: string;
-  metadata?: Record<string, unknown>;
-  tags?: string[];
+  email?: string
+  first_name?: string
+  last_name?: string
+  phone?: string
+  accepts_email_marketing?: boolean
+  internal_note?: string
+  metadata?: Record<string, unknown>
+  tags?: string[]
 }
 
 export interface CustomerAddressParams {
-  firstname?: string;
-  lastname?: string;
-  first_name?: string;
-  last_name?: string;
-  address1?: string;
-  address2?: string;
-  city?: string;
-  zipcode?: string;
-  postal_code?: string;
-  country_id?: string;
-  state_id?: string;
-  country_iso?: string;
-  state_abbr?: string;
-  phone?: string;
-  company?: string;
-  label?: string;
-  is_default_billing?: boolean;
-  is_default_shipping?: boolean;
+  firstname?: string
+  lastname?: string
+  first_name?: string
+  last_name?: string
+  address1?: string
+  address2?: string
+  city?: string
+  zipcode?: string
+  postal_code?: string
+  country_id?: string
+  state_id?: string
+  country_iso?: string
+  state_abbr?: string
+  phone?: string
+  company?: string
+  label?: string
+  is_default_billing?: boolean
+  is_default_shipping?: boolean
 }
 
 export interface CustomerStoreCreditCreateParams {
-  amount: number;
-  currency: string;
-  category_id: string;
-  memo?: string;
+  amount: number
+  currency: string
+  category_id: string
+  memo?: string
 }
 
 export interface CustomerStoreCreditUpdateParams {
-  amount?: number;
-  category_id?: string;
-  memo?: string;
+  amount?: number
+  category_id?: string
+  memo?: string
 }
 
 export interface DirectUploadCreateParams {
   blob: {
-    filename: string;
-    byte_size: number;
-    checksum: string;
-    content_type: string;
-  };
+    filename: string
+    byte_size: number
+    checksum: string
+    content_type: string
+  }
 }
 
 export interface MediaCreateParams {
-  alt?: string;
-  position?: number;
-  type?: string;
-  url?: string;
-  signed_id?: string;
+  alt?: string
+  position?: number
+  type?: string
+  url?: string
+  signed_id?: string
 }
 
 export interface MediaUpdateParams {
-  alt?: string;
-  position?: number;
+  alt?: string
+  position?: number
 }
 
 export interface ProductCreateParams {
-  name: string;
-  description?: string;
-  slug?: string;
-  status?: 'draft' | 'active' | 'archived';
-  sku?: string;
-  tax_category_id?: string;
-  category_ids?: Array<string>;
-  tags?: Array<string>;
-  variants?: VariantCreateParams[];
+  name: string
+  description?: string
+  slug?: string
+  status?: 'draft' | 'active' | 'archived'
+  sku?: string
+  tax_category_id?: string
+  category_ids?: Array<string>
+  tags?: Array<string>
+  variants?: VariantCreateParams[]
 }
 
 export interface ProductUpdateParams {
-  name?: string;
-  description?: string;
-  slug?: string;
-  status?: 'draft' | 'active' | 'archived';
-  sku?: string;
-  tax_category_id?: string;
-  category_ids?: Array<string>;
-  tags?: Array<string>;
-  variants?: VariantUpdateParams[];
+  name?: string
+  description?: string
+  slug?: string
+  status?: 'draft' | 'active' | 'archived'
+  sku?: string
+  tax_category_id?: string
+  category_ids?: Array<string>
+  tags?: Array<string>
+  variants?: VariantUpdateParams[]
 }
 
 export interface CategoryCreateParams {
-  name: string;
-  parent_id?: string;
-  position?: number;
-  description?: string;
-  permalink?: string;
-  meta_title?: string;
-  meta_description?: string;
-  meta_keywords?: string;
-  hide_from_nav?: boolean;
-  sort_order?: string;
+  name: string
+  parent_id?: string
+  position?: number
+  description?: string
+  permalink?: string
+  meta_title?: string
+  meta_description?: string
+  meta_keywords?: string
+  hide_from_nav?: boolean
+  sort_order?: string
 }
 
 export interface CategoryUpdateParams {
-  name?: string;
-  parent_id?: string;
-  position?: number;
-  description?: string;
-  permalink?: string;
-  meta_title?: string;
-  meta_description?: string;
-  meta_keywords?: string;
-  hide_from_nav?: boolean;
-  sort_order?: string;
+  name?: string
+  parent_id?: string
+  position?: number
+  description?: string
+  permalink?: string
+  meta_title?: string
+  meta_description?: string
+  meta_keywords?: string
+  hide_from_nav?: boolean
+  sort_order?: string
 }
 
 export interface VariantOptionPair {
-  name: string;
-  value: string;
+  name: string
+  value: string
 }
 
 export interface VariantPrice {
-  currency: string;
-  amount: number;
-  compare_at_amount?: number;
+  currency: string
+  amount: number
+  compare_at_amount?: number
 }
 
 export interface VariantStockItem {
-  stock_location_id: string;
-  count_on_hand: number;
-  backorderable?: boolean;
+  stock_location_id: string
+  count_on_hand: number
+  backorderable?: boolean
 }
 
 export interface VariantCreateParams {
-  sku?: string;
-  compare_at_price?: number;
-  cost_price?: number;
-  cost_currency?: string;
-  weight?: number;
-  height?: number;
-  width?: number;
-  depth?: number;
-  weight_unit?: string;
-  dimensions_unit?: string;
-  track_inventory?: boolean;
-  tax_category_id?: string;
-  position?: number;
-  barcode?: string;
-  options?: VariantOptionPair[];
-  prices?: VariantPrice[];
-  stock_items?: VariantStockItem[];
+  sku?: string
+  compare_at_price?: number
+  cost_price?: number
+  cost_currency?: string
+  weight?: number
+  height?: number
+  width?: number
+  depth?: number
+  weight_unit?: string
+  dimensions_unit?: string
+  track_inventory?: boolean
+  tax_category_id?: string
+  position?: number
+  barcode?: string
+  options?: VariantOptionPair[]
+  prices?: VariantPrice[]
+  stock_items?: VariantStockItem[]
 }
 
 export interface VariantUpdateParams {
-  sku?: string;
-  compare_at_price?: number;
-  cost_price?: number;
-  cost_currency?: string;
-  weight?: number;
-  height?: number;
-  width?: number;
-  depth?: number;
-  weight_unit?: string;
-  dimensions_unit?: string;
-  track_inventory?: boolean;
-  tax_category_id?: string;
-  position?: number;
-  barcode?: string;
-  options?: VariantOptionPair[];
-  prices?: VariantPrice[];
-  stock_items?: VariantStockItem[];
+  sku?: string
+  compare_at_price?: number
+  cost_price?: number
+  cost_currency?: string
+  weight?: number
+  height?: number
+  width?: number
+  depth?: number
+  weight_unit?: string
+  dimensions_unit?: string
+  track_inventory?: boolean
+  tax_category_id?: string
+  position?: number
+  barcode?: string
+  options?: VariantOptionPair[]
+  prices?: VariantPrice[]
+  stock_items?: VariantStockItem[]
 }

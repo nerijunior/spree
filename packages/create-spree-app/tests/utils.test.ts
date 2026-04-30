@@ -1,5 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { detectPackageManager, generateSecretKeyBase, installCommand, runCommand } from '../src/utils'
+import { beforeEach, describe, expect, it } from 'vitest'
+import {
+  detectPackageManager,
+  generateSecretKeyBase,
+  installCommand,
+  runCommand,
+} from '../src/utils'
 
 describe('detectPackageManager', () => {
   const originalEnv = process.env.npm_config_user_agent

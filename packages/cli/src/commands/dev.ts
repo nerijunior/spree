@@ -1,9 +1,9 @@
-import type { Command } from 'commander'
 import * as p from '@clack/prompts'
+import type { Command } from 'commander'
 import pc from 'picocolors'
+import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from '../constants.js'
 import { detectProject } from '../context.js'
 import { dockerCompose, streamLogs } from '../docker.js'
-import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from '../constants.js'
 
 export function registerDevCommand(program: Command): void {
   program

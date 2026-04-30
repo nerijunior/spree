@@ -1,18 +1,23 @@
-import * as p from '@clack/prompts'
-import pc from 'picocolors'
 import fs from 'node:fs'
 import path from 'node:path'
+import * as p from '@clack/prompts'
 import { execa } from 'execa'
-import type { ScaffoldOptions } from './types.js'
+import pc from 'picocolors'
+import { downloadBackend } from './backend.js'
 import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from './constants.js'
-import { generateSecretKeyBase, isDockerRunning } from './utils.js'
+import {
+  downloadStorefront,
+  installRootDeps,
+  installStorefrontDeps,
+  writeStorefrontEnv,
+} from './storefront.js'
+import { agentsMdContent, rootClaudeMdContent } from './templates/claude-md.js'
 import { envContent } from './templates/env.js'
+import { gitignoreContent } from './templates/gitignore.js'
 import { rootPackageJsonContent } from './templates/package-json.js'
 import { readmeContent } from './templates/readme.js'
-import { gitignoreContent } from './templates/gitignore.js'
-import { rootClaudeMdContent, agentsMdContent } from './templates/claude-md.js'
-import { downloadStorefront, installRootDeps, installStorefrontDeps, writeStorefrontEnv } from './storefront.js'
-import { downloadBackend } from './backend.js'
+import type { ScaffoldOptions } from './types.js'
+import { generateSecretKeyBase, isDockerRunning } from './utils.js'
 
 export async function scaffold(options: ScaffoldOptions): Promise<void> {
   const projectDir = path.resolve(options.directory)
@@ -107,7 +112,11 @@ export async function scaffold(options: ScaffoldOptions): Promise<void> {
   }
 }
 
-function printSuccessWithoutDocker(projectName: string, hasStorefront: boolean, port: number): void {
+function printSuccessWithoutDocker(
+  projectName: string,
+  hasStorefront: boolean,
+  port: number,
+): void {
   const lines: string[] = [
     '',
     `${pc.bold('Next steps:')}`,
