@@ -31,8 +31,6 @@ Current plans:
 - `6.0-rich-text-descriptions.md` — Drop ActionText storage, store HTML in text columns, sanitize on write, serve `description` + `description_html` in API
 - `5.4-store-api-naming-standardization.md` — Standardize API naming against industry (address fields, discounts, customer_note, label, brand/last4, etc.)
 - `5.4-6.0-eu-legal-compliance.md` — GDPR (data export/anonymization, consent timestamps), Omnibus (PriceHistory, lowest-in-30-days), Consumer Rights (withdrawal period). Core primitives + enterprise hooks.
-
-
 - `5.5-6.0-order-cancellation-and-approval.md` — First-class `OrderCancellation` + `OrderApproval` models, capture reasons/restock/refund decisions, polymorphic actor; 6.0 drops denormalized columns
 - `5.5-admin-api-key-scopes.md` — Shopify-style `read_*`/`write_*` scopes on `Spree::ApiKey` for Admin API authorization (apps), independent of CanCanCan (which stays for JWT users)
 - `5.4-disjunctive-option-faceting.md` — Per-option-type filter params with disjunctive facet counts (OR within option type, AND across)
@@ -51,10 +49,11 @@ Completed plans:
 |---|---|
 | `spree/core` | Ruby gem — models, services, business logic (`spree_core`) |
 | `spree/api` | Ruby gem — Store & Admin REST APIs (`spree_api`) |
-| `spree/emails` | Ruby gem — transactional emails (`spree_emails`, optional) |
+| `spree/emails` | Ruby gem — transactional emails (optional). Deprecated in 6.0 — Next.js storefront handles consumer emails via webhooks. |
+| `packages/admin` | `@spree/admin` — React SPA admin dashboard (Spree 6.0, replaces `spree/admin`) |
 | `packages/sdk` | `@spree/sdk` — TypeScript Store API client |
-| `packages/admin-sdk` | `@spree/admin-sdk` — TypeScript Admin API client (private) |
-| `packages/sdk-core` | `@spree/sdk-core` — shared HTTP/retry/error layer (private) |
+| `packages/admin-sdk` | `@spree/admin-sdk` — TypeScript Admin API client (Developer Preview) |
+| `packages/sdk-core` | `@spree/sdk-core` — shared HTTP/retry/error layer (private internal) |
 | `packages/cli` | `@spree/cli` — Docker-based project management CLI |
 | `packages/create-spree-app` | `create-spree-app` — project scaffolding |
 | `server/` | Rails app cloned from `spree/spree-starter` (.gitignored, run `pnpm server:setup`) |
@@ -94,16 +93,21 @@ Per-request context available in models, controllers, jobs, and services:
 ### Models
 
 - Inherit from `Spree.base_class`
-- Always pass `class_name` and `dependent` on associations
-- Include `Spree::Metafields` for metadata support
+- Always pass `class_name` and `dependent` on associations; use `dependent: :destroy_async` for high-fanout associations to offload deletion to a background job
+- Include `Spree::Metafields` for custom fields support (see docs/plans/5.4-6.0-custom-fields-rename.md)
+- Include `Spree::Metadata` for JSON metadata support
 - Use string columns instead of enums
-- State machines: use `state_machines-activerecord` gem, default column `status` (legacy uses `state`)
+- State machines: use `state_machines-activerecord` gem, default column `status` (legacy uses `state`, see docs/plans/6.0-normalize-state-to-status.md)
 - Never cast IDs to integer — always treat as strings (UUID support)
-- Uniqueness validations: always use `scope: spree_base_uniqueness_scope`
+- Uniqueness validations: always use `scope: spree_base_uniqueness_scope`, should be also enforced by database index
+- If needed use paranoia gem for soft delete support (via `acts_as_paranoid`)
 
 ```ruby
 class Spree::Product < Spree.base_class
   include Spree::Metafields
+  include Spree::Metadata
+
+  acts_as_paranoid
 
   has_many :variants, class_name: 'Spree::Variant', dependent: :destroy
   scope :available, -> { where(available_on: ..Time.current) }
@@ -153,11 +157,13 @@ end
 
 ### API Controllers
 
+The Store API (customer-facing) and Admin API (back-office) are two halves of the same v3 API and should follow the same conventions. The differences are in **what data is exposed**, **who can call it**, and **which actions are enabled by default** — not in routing style, parameter shape, or response format.
+
 #### Hierarchy
 
-- **Base:** `Spree::Api::V3::ResourceController` — CRUD, pagination (Pagy), Ransack, CanCanCan, prefixed ID lookups, HTTP caching
-- **Store API:** `Spree::Api::V3::Store::ResourceController` — publishable API key auth
-- **Admin API:** `Spree::Api::V3::Admin::ResourceController` — secret API key auth
+- **Base:** `Spree::Api::V3::ResourceController` — pagination (Pagy), Ransack, CanCanCan, prefixed ID lookups, HTTP caching
+- **Store API:** `Spree::Api::V3::Store::ResourceController` — publishable API key auth, **read-only by default**; opt into `create`/`update`/`destroy` per resource where it makes sense (carts, customers, addresses)
+- **Admin API:** `Spree::Api::V3::Admin::ResourceController` — secret API key auth (with scopes) **or** JWT auth (with CanCanCan), **full CRUD by default** (`index`, `show`, `create`, `update`, `destroy`); subclasses don't need to redeclare actions unless restricting
 
 #### Key overridable methods
 
@@ -165,12 +171,12 @@ end
 
 #### Flat request/response structure
 
-API v3 uses flat params — no nested Rails-style wrapping. The base controller auto-infers from `Spree::PermittedAttributes`:
+API v3 uses flat params — no nested Rails-style wrapping. **For new controllers, prefer enumerating attributes directly with `params.permit(...)`** rather than reaching into `Spree::PermittedAttributes`. Existing controllers that use the global allowlist remain valid until migrated as part of the 6.0 transition.
 
 ```ruby
 # ✅ Flat params
 def permitted_params
-  params.permit(Spree::PermittedAttributes.product_attributes)
+  params.permit(:name, :description, :slug)
 end
 
 # ❌ Nested params — not used in API v3
@@ -199,6 +205,26 @@ module Spree::Api::V3::Store
 end
 ```
 
+```ruby
+# Admin counterpart — gets full CRUD for free from the base class
+module Spree::Api::V3::Admin
+  class ProductsController < ResourceController
+    protected
+
+    def model_class
+      Spree::Product
+    end
+
+    def serializer_class
+      Spree.api.admin_product_serializer
+    end
+
+    # No need to declare index/show/create/update/destroy — inherited.
+    # Only override scope/find_resource/permitted_params when behavior differs.
+  end
+end
+```
+
 ### Prefixed IDs
 
 All API v3 uses Stripe-style prefixed IDs (e.g. `prod_86Rf07xd4z`, `variant_k5nR8xLq`):
@@ -221,10 +247,28 @@ attribute :variant_id
 
 ### Serializers (Alba)
 
-Located in `api/app/serializers/spree/api/v3/`. Store and Admin APIs have separate serializers; Admin extends Store:
+Located in `api/app/serializers/spree/api/v3/`. Store and Admin APIs have separate serializers; **Admin always extends Store** so changes to public fields propagate automatically.
+
+#### What goes where
+
+The Store API is a customer-facing surface. The Admin API is a back-office surface. Two rules govern which serializer an attribute belongs to:
+
+**Store serializer (customer-visible):**
+- Public product/category/cart/order data the customer sees in the storefront
+- Computed display values (`display_total`, `purchasable`, `in_stock`)
+- Customer-facing pricing (`price`, `compare_at_price`, `prior_price` for EU Omnibus)
+- **No timestamps** (`created_at`, `updated_at`, `deleted_at`) — these leak operational info and aren't useful to customers
+- **No internal state** — never expose `cost_price`, internal status flags, soft-delete columns, audit logs, internal notes, private metadata, or admin-only relations (vendors, fulfillment providers)
+
+**Admin serializer (back-office):**
+- Always include `created_at`, `updated_at`, and `deleted_at` (when paranoid)
+- Cost price, margins, internal notes, private metadata
+- Internal status, audit fields (`approved_by_id`, `cancelled_by_id`)
+- Operational relations (stock movements, fulfillment providers, internal customer tags)
+- Anything an admin needs to see but a customer must not
 
 ```ruby
-# Store serializer
+# Store serializer — customer-facing, no timestamps, no back-office data
 module Spree::Api::V3
   class ProductSerializer < BaseSerializer
     typelize purchasable: :boolean, in_stock: :boolean, price: 'number | null'
@@ -232,11 +276,11 @@ module Spree::Api::V3
   end
 end
 
-# Admin serializer — extends store
+# Admin serializer — extends store, adds back-office attributes + timestamps
 module Spree::Api::V3::Admin
   class ProductSerializer < V3::ProductSerializer
     typelize cost_price: 'number | null', private_metadata: 'Record<string, unknown> | null'
-    attributes :status, :cost_price, :private_metadata
+    attributes :status, :cost_price, :private_metadata, :created_at, :updated_at, :deleted_at
   end
 end
 ```
@@ -271,10 +315,18 @@ For new models, add `publishes_lifecycle_events` concern and create an event ser
 
 ### API Authentication
 
-- **Publishable keys** (`pk_xxx`) — Store API, via `X-Spree-API-Key` header
-- **Secret keys** (`sk_xxx`) — Admin API, via `X-Spree-API-Key` header
-- **JWT tokens** — user auth, via `Authorization: Bearer <token>` header
-- **Guest cart tokens** — via `X-Spree-Token` header
+Four credential types, each with its own header and authorization model:
+
+- **Publishable keys** (`pk_xxx`) — Store API, `X-Spree-API-Key` header. Identifies the store; permits public/guest endpoints. Safe to expose in client-side code.
+- **Secret keys** (`sk_xxx`) — Admin API, `X-Spree-API-Key` header. **Server-to-server only.** Each key carries a list of [Shopify-style scopes](docs/plans/5.5-admin-api-key-scopes.md) (`read_products`, `write_orders`, etc.) that gate which endpoints it can hit. Authorization is scope-based, not CanCanCan-based.
+- **JWT tokens** — user auth, `Authorization: Bearer <token>` header. Used by both Store API (logged-in customer) and Admin API (logged-in admin user). Admin JWT auth uses **CanCanCan abilities** for authorization, not scopes — this is what the admin SPA uses.
+- **Guest cart tokens** — `X-Spree-Token` header. Authorizes operations on a specific guest cart.
+
+Admin API authorization summary:
+- Secret API key + scopes → for apps and integrations (audit-friendly, fine-grained)
+- JWT + CanCanCan → for human admin users (role-based)
+
+Both code paths converge at the same controllers; the controller checks permissions appropriately based on which credential authenticated the request.
 
 ### Dependencies System
 
@@ -287,9 +339,9 @@ Spree::Dependencies.cart_add_item_service = 'Spree::Cart::AddItem'
 ### Security
 
 - CanCanCan permission checks on all actions
-- `Spree::PermittedAttributes` for parameter allowlists
+- Use Rails [`params.permit`](https://api.rubyonrails.org/classes/ActionController/Parameters.html) to whitelist parameters in controllers
 - Use `Spree.user_class` / `Spree.admin_user_class` — never reference user models directly
-- Use `spree.` route engine prefix in views and controllers
+- Declare Ransack allowlists on **models** via `whitelisted_ransackable_attributes`, `whitelisted_ransackable_associations`, and `whitelisted_ransackable_scopes` to control which attributes, associations, and scopes are queryable from API requests
 
 ### Performance
 
@@ -321,7 +373,12 @@ pnpm install          # install all workspace deps
 pnpm build            # build all packages (Turbo-cached)
 pnpm test             # run all package tests
 pnpm typecheck        # TypeScript validation across all packages
+pnpm lint             # Biome lint across all packages
+pnpm lint:fix         # Biome lint + auto-fix
+pnpm format           # Biome format-write
 ```
+
+**Linting:** All TypeScript packages use [Biome](https://biomejs.dev/) (replaces ESLint + Prettier). Root config at `biome.json`; per-package configs extend it via `"extends": ["../../biome.json"]` and set `"root": false`. CI runs `pnpm turbo lint` on every PR touching `packages/**`.
 
 ### @spree/sdk — Store API Client
 
@@ -352,7 +409,37 @@ pnpm typecheck
 
 ### @spree/admin-sdk — Admin API Client
 
-Same patterns as `@spree/sdk` but for the Admin API. Supports both secret key (server-to-server) and JWT (admin SPA) authentication. Private package.
+Same patterns as `@spree/sdk` but for the Admin API. Supports both secret key (server-to-server) and JWT (admin SPA) authentication. Published under the `next` dist-tag during the Spree 6.0 Developer Preview.
+
+### @spree/admin — Admin UI (React SPA)
+
+The Spree 6.0 admin dashboard. A Vite-built React SPA that replaces the legacy Rails `spree/admin` engine entirely. See [`packages/admin/README.md`](packages/admin/README.md) for the full tech stack, project structure, and architecture (auth flow, permissions, multi-store, extension points). Architecture decisions live in `docs/plans/6.0-admin-spa.md`.
+
+**Tech stack at a glance:** Vite, TanStack Router (file-based, type-safe), TanStack Query, React Hook Form + Zod, shadcn/ui + Base UI + Tailwind, Biome, Vitest. All API calls go through `@spree/admin-sdk`.
+
+**Running the admin UI locally:**
+
+```bash
+# 1. Boot a Spree backend (one terminal, from monorepo root)
+pnpm server:setup       # one-time: clones spree-starter into ./server
+pnpm server:dev         # Rails on http://localhost:3000
+
+# 2. Boot the admin (separate terminal)
+cd packages/admin
+pnpm dev                # http://localhost:5173 (proxies /api/* to :3000)
+```
+
+`VITE_SPREE_API_URL` overrides the backend URL for both dev and build (defaults to `http://localhost:3000`). Sign in with the seed admin user (`admin@example.com` / `spree123` by default — check your server's `db/seeds.rb`).
+
+**When implementing a new admin feature:**
+
+1. **Look at the legacy Rails admin in `spree/admin/`** for guidance on what the feature does today (data shape, business rules, edge cases). It's a useful reference for "what does this screen actually need to do."
+2. **Don't port the UX 1:1.** The legacy admin is Rails + Turbo, which constrained UX choices around server round-trips, full page navigations, and form submissions. The React SPA can do better — inline editing, optimistic updates, multi-step flows without page reloads, modal-driven workflows, real-time validation, drag-and-drop, virtualized lists. Use those patterns where they meaningfully improve the experience.
+3. **The Admin API is the only data source.** Never reach into Rails models or import server-rendered HTML.
+4. **Follow `docs/plans/6.0-admin-spa.md`** for the three extension points (table registry, navigation registry, component injection) and the shadcn copy-paste ownership model.
+5. **Wrap SDK calls in custom hooks** under `src/hooks/` (e.g., `useOrders`, `useProduct`) — never call `adminClient` directly from components.
+
+If a needed Admin API endpoint or attribute is missing, **add it to `spree/api` first** (see backend conventions above), regenerate types via the [Type Generation Pipeline](#type-generation-pipeline), then consume it from the SPA.
 
 ### @spree/sdk-core — Shared HTTP Layer
 
@@ -373,6 +460,8 @@ cd packages/sdk && pnpm test                             # 5. SDK tests
 - TypeScript types → `packages/sdk/src/types/generated/` (Store) and `packages/admin-sdk/src/types/generated/` (Admin)
 - Zod schemas → `packages/sdk/src/zod/generated/`
 - Store types: `StoreProduct`, `StoreOrder`, etc. Admin types: `AdminProduct`, `AdminOrder`, etc.
+
+A **Lefthook pre-commit hook** (`lefthook.yml`) regenerates types and Zod schemas automatically whenever `spree/api/app/serializers/**/*.rb` files are committed, then re-stages the generated output. You don't need to run steps 1 and 2 manually if you're committing serializer changes — the hook handles it. Steps 3–5 (integration tests, OpenAPI regen, SDK tests) still need to run locally before pushing.
 
 ### Changesets & Versioning
 

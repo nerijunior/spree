@@ -2,6 +2,7 @@
   "name": "@spree/sdk-core",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Shared internals for Spree Commerce SDKs",
   "type": "module",
   "main": "./dist/index.cjs",

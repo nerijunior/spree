@@ -1,73 +1,171 @@
-# React + TypeScript + Vite
+# @spree/admin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Spree Commerce admin dashboard — a React single-page application that replaces the legacy Rails `spree/admin` engine entirely. Built on the [Admin API](https://spreecommerce.org/docs/api-reference/admin-api/introduction) via `@spree/admin-sdk`, with a modern extension model (table registry, navigation registry, component injection) for plugin authors.
 
-Currently, two official plugins are available:
+> **Developer Preview.** The Admin SPA is in active development for Spree 6.0. Some routes still fall back to the Rails admin while feature parity is being reached. See [`docs/plans/6.0-admin-spa.md`](../../docs/plans/6.0-admin-spa.md) for the current scope.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech stack
 
-## React Compiler
+| Layer | Choice |
+|---|---|
+| Build & dev | [Vite](https://vitejs.dev/) |
+| Routing | [TanStack Router](https://tanstack.com/router) (file-based, type-safe) |
+| Data fetching | [TanStack Query](https://tanstack.com/query) |
+| Forms | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
+| UI primitives | [shadcn/ui](https://ui.shadcn.com/) + [Base UI](https://base-ui.com/) + [Tailwind CSS](https://tailwindcss.com/) |
+| Icons | [lucide-react](https://lucide.dev/) |
+| Charts | [Recharts](https://recharts.org/) |
+| Rich text | [Tiptap](https://tiptap.dev/) |
+| Notifications | [Sonner](https://sonner.emilkowal.ski/) |
+| Lint & format | [Biome](https://biomejs.dev/) |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting started
 
-## Expanding the ESLint configuration
+The admin needs a running Spree backend exposing the Admin API. The simplest setup:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 1. Boot a Spree server (from the monorepo root)
+pnpm server:setup   # one-time: clones spree-starter into ./server
+pnpm server:dev     # runs Rails on http://localhost:3000
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 2. In a separate terminal, run the admin dev server
+cd packages/admin
+pnpm dev            # http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Vite proxies `/api/*` to `http://localhost:3000`. The first time you load the admin, sign in with the seed admin user (default: `admin@example.com` / `spree123` — see your server's `db/seeds.rb`). If you need to reset an admin password, run `pnpm server:console` and update the user from the Rails console.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Configuration
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The dev server reads its API base URL from `VITE_SPREE_API_URL` (defaults to `http://localhost:3000`). For a custom backend:
+
+```bash
+VITE_SPREE_API_URL=https://my-spree.example.com pnpm dev
 ```
+
+For production builds, set the same env var at build time:
+
+```bash
+VITE_SPREE_API_URL=https://api.mystore.com pnpm build
+```
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `pnpm dev` | Start Vite dev server with HMR on port 5173 |
+| `pnpm build` | Type-check and build the SPA into `dist/` |
+| `pnpm preview` | Serve the production build locally |
+| `pnpm lint` | Lint with Biome |
+| `pnpm lint:fix` | Lint and auto-fix with Biome |
+| `pnpm format` | Format source with Biome |
+
+## Project structure
+
+```
+src/
+├── client.ts               # adminClient instance (configures @spree/admin-sdk)
+├── main.tsx                # app entry, providers
+├── router.tsx              # TanStack Router configuration
+├── routeTree.gen.ts        # generated by @tanstack/router-plugin (do not edit)
+├── routes/                 # file-based routes
+│   ├── __root.tsx          # router context (auth, permissions)
+│   ├── login.tsx           # public login page
+│   └── _authenticated/     # auth-guarded routes
+│       └── $storeId/       # multi-store routes (orders, products, customers, ...)
+├── components/             # app-level components
+│   └── ui/                 # shadcn/ui primitives
+├── hooks/                  # data hooks built on @spree/admin-sdk
+├── providers/              # AuthProvider, PermissionProvider, StoreProvider
+├── tables/                 # table definitions for the registry
+├── schemas/                # Zod form schemas
+└── lib/                    # utilities, query client, table registry
+```
+
+## Architecture notes
+
+### Authentication
+
+JWT-based, with automatic token refresh:
+
+- Login → `POST /api/v3/admin/auth/login` returns `{ token, refresh_token, user }`
+- Access token stored in React context + `localStorage`; refresh token in `localStorage`
+- Background refresh every 58 minutes
+- 401 responses trigger an automatic refresh via the SDK's `onUnauthorized` hook, then retry the original request
+- All concurrent refreshes are serialized to prevent double-rotation
+
+Public routes (login) sit at the root; everything else is gated by `routes/_authenticated.tsx`.
+
+### Permissions
+
+Permissions are **server-driven**. On login, `GET /api/v3/admin/me` returns the user's CanCanCan abilities serialized as JSON. The SPA mirrors them via:
+
+```tsx
+import { Can } from '@/components/can'
+import { usePermissions } from '@/providers/permission-provider'
+
+// Declarative
+<Can I="update" a="Order"><EditButton /></Can>
+
+// Imperative
+const { can } = usePermissions()
+if (can('destroy', 'Product')) { /* ... */ }
+```
+
+The server still enforces `authorize!` on every request — the SPA is UX only.
+
+### Multi-store
+
+All authenticated routes include a `$storeId` segment (e.g. `/store_abc/orders`). The `StoreProvider` configures the SDK with the active store and exposes `useStore()` to read the current store's currency, locale, and metadata. The root authenticated route redirects to the user's default store.
+
+### Extension points
+
+Three extension points are designed for plugin authors (full design in [`docs/plans/6.0-admin-spa.md`](../../docs/plans/6.0-admin-spa.md)):
+
+1. **Table registry** — register columns/filters/actions for any list view
+2. **Navigation registry** — inject sidebar menu items
+3. **Component injection** — slot points in core pages (e.g., extra cards on the order detail)
+
+The shadcn copy-paste model means UI components in `src/components/ui/` are owned by this project, not a component library. Extensions can copy-and-modify rather than fighting library abstractions.
+
+## Adding a shadcn/ui component
+
+```bash
+pnpm dlx shadcn@latest add <component-name>
+```
+
+Components land in `src/components/ui/`. Customize freely.
+
+## Working with @spree/admin-sdk
+
+All API calls go through the SDK instance configured in `src/client.ts`. Wrap calls in custom hooks under `src/hooks/`:
+
+```ts
+// src/hooks/use-orders.ts
+import { useQuery } from '@tanstack/react-query'
+import { adminClient } from '@/client'
+
+export function useOrders(params: ListOrdersParams) {
+  return useQuery({
+    queryKey: ['orders', params],
+    queryFn: () => adminClient.orders.list(params),
+  })
+}
+```
+
+Mutations follow the same pattern with `useMutation` and `queryClient.invalidateQueries(...)` to refresh affected views.
+
+## Contributing
+
+This package is private and ships as part of the Spree 6.0 release. Architecture decisions live in `docs/plans/6.0-admin-spa.md` — please read that before proposing significant changes.
+
+When changing API contracts, also update the upstream serializers in `spree/api` and regenerate types:
+
+```bash
+cd spree/api && bundle exec rake typelizer:generate
+cd packages/admin-sdk && pnpm build
+```
+
+## License
+
+MIT

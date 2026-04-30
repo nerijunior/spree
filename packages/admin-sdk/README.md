@@ -170,6 +170,38 @@ try {
 
 When a request fails because the API key lacks the required scope, the error has `code: 'access_denied'` and `details.required_scope` carries the missing scope name.
 
+## TypeScript support
+
+Full TypeScript support with generated types from the API serializers:
+
+```typescript
+import type {
+  AdminOrder,
+  AdminProduct,
+  AdminCustomer,
+  AdminFulfillment,
+  AdminPayment,
+  PaginatedResponse,
+} from '@spree/admin-sdk'
+
+const orders: PaginatedResponse<AdminOrder> = await client.orders.list()
+const product: AdminProduct = await client.products.get('prod_xxx')
+```
+
+Admin types are exported with the `Admin` prefix to distinguish them from the customer-facing `@spree/sdk` types (which use `Store` prefixes for the same domain entities). Admin types include fields and relationships hidden from the Store API.
+
+## Custom fetch
+
+You can provide a custom fetch implementation:
+
+```typescript
+const client = createAdminClient({
+  baseUrl: 'https://store.example.com',
+  secretKey: 'sk_xxx',
+  fetch: customFetchImplementation,
+})
+```
+
 ## Documentation
 
 - **Full API reference:** [spreecommerce.org/docs/api-reference/admin-api](https://spreecommerce.org/docs/api-reference/admin-api/introduction)
@@ -177,6 +209,71 @@ When a request fails because the API key lacks the required scope, the error has
 - **Errors:** [spreecommerce.org/docs/api-reference/admin-api/errors](https://spreecommerce.org/docs/api-reference/admin-api/errors)
 - **Querying:** [spreecommerce.org/docs/api-reference/admin-api/querying](https://spreecommerce.org/docs/api-reference/admin-api/querying)
 
+## Development
+
+### Setup
+
+```bash
+cd packages/admin-sdk
+pnpm install
+```
+
+### Scripts
+
+| Command | Description |
+|---|---|
+| `pnpm test` | Run tests once |
+| `pnpm test:watch` | Run tests in watch mode |
+| `pnpm typecheck` | Type-check with `tsc --noEmit` |
+| `pnpm lint` | Lint with Biome |
+| `pnpm lint:fix` | Lint and auto-fix with Biome |
+| `pnpm format` | Format source with Biome |
+| `pnpm build` | Build CJS + ESM bundles with `tsup` |
+| `pnpm dev` | Build in watch mode |
+| `pnpm generate:admin-client` | Regenerate the resource client from the OpenAPI spec |
+
+### Type generation pipeline
+
+When the upstream Admin API serializers in `spree/api` change, regenerate types from the monorepo root:
+
+```bash
+# 1. Regenerate TypeScript types from Alba serializers
+cd spree/api && bundle exec rake typelizer:generate
+
+# 2. Rebuild the SDK (consumes the generated types)
+cd packages/admin-sdk && pnpm build
+
+# 3. Run tests to confirm nothing broke
+pnpm test
+```
+
+Generated TypeScript types land in `src/types/generated/`; do not edit by hand.
+
+### Releasing
+
+This package uses [Changesets](https://github.com/changesets/changesets) for version management and publishing.
+
+**After making changes:**
+
+```bash
+pnpm changeset
+```
+
+This prompts you to select a semver bump type (patch/minor/major) and write a summary. A changeset file is created in `.changeset/`.
+
+**How releases work:**
+
+1. Changeset files are committed with your PR
+2. When merged to `main`, a GitHub Action creates a "Version Packages" PR that bumps the version and updates the CHANGELOG
+3. When that PR is merged, the package is automatically published to npm under the `next` dist-tag (Developer Preview), so `npm install @spree/admin-sdk` does not pick it up as `latest`
+
+**Manual release (if needed):**
+
+```bash
+pnpm version   # Apply changesets and bump version
+pnpm release   # Build and publish to npm
+```
+
 ## License
 
-MIT © [Vendo Connect Inc.](https://vendoconnect.com)
+MIT
