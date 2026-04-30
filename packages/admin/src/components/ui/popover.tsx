@@ -27,9 +27,7 @@ function PopoverTrigger({
   asChild?: boolean
 }) {
   if (asChild && React.isValidElement(children)) {
-    return (
-      <PopoverPrimitive.Trigger data-slot="popover-trigger" render={children} {...props} />
-    )
+    return <PopoverPrimitive.Trigger data-slot="popover-trigger" render={children} {...props} />
   }
   return (
     <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props}>
@@ -54,11 +52,7 @@ function PopoverContent({
 } & Omit<React.ComponentProps<typeof PopoverPrimitive.Popup>, 'className'>) {
   return (
     <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Positioner
-        side={side}
-        sideOffset={sideOffset}
-        align={align}
-      >
+      <PopoverPrimitive.Positioner side={side} sideOffset={sideOffset} align={align}>
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
@@ -75,10 +69,8 @@ function PopoverContent({
   )
 }
 
-function PopoverAnchor({
-  ...props
-}: React.ComponentProps<'div'>) {
+function PopoverAnchor({ ...props }: React.ComponentProps<'div'>) {
   return <div data-slot="popover-anchor" {...props} />
 }
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor }
+export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger }

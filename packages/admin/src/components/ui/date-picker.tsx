@@ -2,8 +2,8 @@ import { format, parseISO } from 'date-fns'
 import { CalendarIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Calendar } from '@/components/ui/calendar'
+import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 interface DatePickerProps {
@@ -62,16 +62,10 @@ function DatePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild disabled={disabled}>
-        <Button
-          type="button"
-          variant="outline"
-          data-empty={!isValidDate}
-        >
+        <Button type="button" variant="outline" data-empty={!isValidDate}>
           <CalendarIcon className="size-4 shrink-0 text-gray-400" />
           <span className="flex-1 truncate">
-            {isValidDate
-              ? format(date, includeTime ? 'PPP p' : 'PPP')
-              : placeholder}
+            {isValidDate ? format(date, includeTime ? 'PPP p' : 'PPP') : placeholder}
           </span>
           {isValidDate && (
             <span
@@ -94,11 +88,7 @@ function DatePicker({
         />
         {includeTime && (
           <div className="border-t border-gray-200 px-3 py-2">
-            <Input
-              type="time"
-              value={timeValue}
-              onChange={handleTimeChange}
-            />
+            <Input type="time" value={timeValue} onChange={handleTimeChange} />
           </div>
         )}
       </PopoverContent>
@@ -106,5 +96,5 @@ function DatePicker({
   )
 }
 
-export { DatePicker }
 export type { DatePickerProps }
+export { DatePicker }

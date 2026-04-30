@@ -1,11 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createHmac } from 'node:crypto'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { verifyWebhookSignature, type WebhookEvent } from '../src/webhooks'
 
 function sign(payload: string, secret: string, timestamp: number): string {
-  return createHmac('sha256', secret)
-    .update(`${timestamp}.${payload}`)
-    .digest('hex')
+  return createHmac('sha256', secret).update(`${timestamp}.${payload}`).digest('hex')
 }
 
 describe('verifyWebhookSignature', () => {
@@ -31,7 +29,9 @@ describe('verifyWebhookSignature', () => {
   it('rejects an invalid signature', () => {
     const timestamp = Math.floor(Date.now() / 1000)
 
-    expect(verifyWebhookSignature(payload, 'invalid_signature', String(timestamp), secret)).toBe(false)
+    expect(verifyWebhookSignature(payload, 'invalid_signature', String(timestamp), secret)).toBe(
+      false,
+    )
   })
 
   it('rejects a wrong secret', () => {
@@ -68,7 +68,9 @@ describe('verifyWebhookSignature', () => {
     const signature = sign(payload, secret, oldTimestamp)
 
     // Default 300s tolerance rejects it
-    expect(verifyWebhookSignature(payload, signature, String(oldTimestamp), secret, 300)).toBe(false)
+    expect(verifyWebhookSignature(payload, signature, String(oldTimestamp), secret, 300)).toBe(
+      false,
+    )
     // Custom 900s tolerance accepts it
     expect(verifyWebhookSignature(payload, signature, String(oldTimestamp), secret, 900)).toBe(true)
   })
@@ -88,7 +90,10 @@ describe('verifyWebhookSignature', () => {
 
 describe('WebhookEvent type', () => {
   it('types data field generically', () => {
-    interface OrderData { number: string; email: string }
+    interface OrderData {
+      number: string
+      email: string
+    }
 
     const event: WebhookEvent<OrderData> = {
       id: 'evt_123',

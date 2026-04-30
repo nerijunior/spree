@@ -1,3 +1,4 @@
+import { useParams } from '@tanstack/react-router'
 import {
   BarChart3Icon,
   HomeIcon,
@@ -9,7 +10,6 @@ import {
   UsersIcon,
 } from 'lucide-react'
 import type { ComponentProps } from 'react'
-import { useParams } from '@tanstack/react-router'
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
 import { StoreSwitcher } from '@/components/store-switcher'
@@ -64,7 +64,9 @@ function buildNavigation(storeId: string): NavItem[] {
       url: `${p}/promotions`,
       icon: TagIcon,
       subject: Subject.Promotion,
-      items: [{ title: 'Gift Cards', url: `${p}/promotions/gift-cards`, subject: Subject.Promotion }],
+      items: [
+        { title: 'Gift Cards', url: `${p}/promotions/gift-cards`, subject: Subject.Promotion },
+      ],
     },
     {
       title: 'Reports',

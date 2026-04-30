@@ -12,12 +12,10 @@ import {
 } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { adminClient } from '@/client'
-import { useAuth } from '@/hooks/use-auth'
 import { AddressFormDialog, type AddressParams } from '@/components/address-form-dialog'
 import { BackButton } from '@/components/back-button'
 import { useConfirm } from '@/components/confirm-dialog'
 import { TagCombobox } from '@/components/tag-combobox'
-import { useCountries } from '@/hooks/use-countries'
 import { Badge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,6 +37,8 @@ import {
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { useAuth } from '@/hooks/use-auth'
+import { useCountries } from '@/hooks/use-countries'
 import { formatRelativeTime } from '@/lib/formatters'
 
 export const Route = createFileRoute('/_authenticated/$storeId/customers/$customerId')({
@@ -49,7 +49,8 @@ function useCustomer(customerId: string) {
   const { isAuthenticated } = useAuth()
   return useQuery({
     queryKey: ['customer', customerId],
-    queryFn: () => adminClient.customers.get(customerId, { expand: ['addresses', 'store_credits'] }),
+    queryFn: () =>
+      adminClient.customers.get(customerId, { expand: ['addresses', 'store_credits'] }),
     enabled: isAuthenticated,
   })
 }
@@ -70,7 +71,8 @@ function CustomerDetailPage() {
   const { data: customer, isLoading, error } = useCustomer(customerId)
 
   if (isLoading) return <p className="text-muted-foreground">Loading customer…</p>
-  if (error || !customer) return <p className="text-destructive">Failed to load customer {customerId}.</p>
+  if (error || !customer)
+    return <p className="text-destructive">Failed to load customer {customerId}.</p>
 
   const defaultShipping = customer.addresses?.find((a) => a.is_default_shipping)
   const location = [defaultShipping?.city, defaultShipping?.country_iso].filter(Boolean).join(', ')
@@ -80,8 +82,12 @@ function CustomerDetailPage() {
       <div className="flex items-center gap-3">
         <BackButton fallback="customers" />
         <h1 className="text-2xl font-medium">{customer.full_name}</h1>
-        {location && <span className="text-base font-normal text-muted-foreground">{location}</span>}
-        {customer.tags?.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+        {location && (
+          <span className="text-base font-normal text-muted-foreground">{location}</span>
+        )}
+        {customer.tags?.map((tag) => (
+          <Badge key={tag}>{tag}</Badge>
+        ))}
       </div>
 
       <LifetimeStatsCard customer={customer} />
@@ -101,7 +107,12 @@ function CustomerBody({ customer }: { customer: Customer }) {
     <div className="grid grid-cols-12 gap-6">
       <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
         {lastCompletedOrder && <LastOrderCard order={lastCompletedOrder} />}
-        <OrdersCard customer={customer} orders={orders} totalCount={totalCount} isLoading={isLoading} />
+        <OrdersCard
+          customer={customer}
+          orders={orders}
+          totalCount={totalCount}
+          isLoading={isLoading}
+        />
         <StoreCreditsCard customer={customer} />
       </div>
 
@@ -146,7 +157,11 @@ function ProfileCard({ customer }: { customer: Customer }) {
           )}
           <div className="flex items-center gap-2 text-sm">
             <StarIcon className="size-4 text-muted-foreground" />
-            <span>{customer.accepts_email_marketing ? 'Subscribed to marketing' : 'Not subscribed to marketing'}</span>
+            <span>
+              {customer.accepts_email_marketing
+                ? 'Subscribed to marketing'
+                : 'Not subscribed to marketing'}
+            </span>
           </div>
           {customer.created_at && (
             <div className="text-xs text-muted-foreground">
@@ -171,7 +186,10 @@ function EditProfileDialog({
 }) {
   const [tags, setTags] = useState<string[]>(customer.tags ?? [])
   const mutation = useCustomerMutation(customer.id, (params: Record<string, unknown>) =>
-    adminClient.customers.update(customer.id, params as Parameters<typeof adminClient.customers.update>[1]),
+    adminClient.customers.update(
+      customer.id,
+      params as Parameters<typeof adminClient.customers.update>[1],
+    ),
   )
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -200,7 +218,13 @@ function EditProfileDialog({
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" name="email" type="email" defaultValue={customer.email} required />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  defaultValue={customer.email}
+                  required
+                />
               </Field>
               <Field>
                 <FieldLabel htmlFor="first_name">First name</FieldLabel>
@@ -220,14 +244,20 @@ function EditProfileDialog({
               </Field>
               <Field>
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" name="accepts_email_marketing" defaultChecked={customer.accepts_email_marketing} />
+                  <input
+                    type="checkbox"
+                    name="accepts_email_marketing"
+                    defaultChecked={customer.accepts_email_marketing}
+                  />
                   Subscribed to marketing
                 </label>
               </Field>
             </FieldGroup>
           </DialogBody>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? 'Saving…' : 'Save'}
             </Button>
@@ -246,9 +276,10 @@ function LifetimeStatsCard({ customer }: { customer: Customer }) {
   const orders = customer.orders_count ?? 0
   const totalSpent = Number(customer.total_spent ?? '0')
   const aov = orders > 0 ? totalSpent / orders : 0
-  const aovDisplay = orders > 0 && totalSpent > 0
-    ? customer.display_total_spent?.replace(/[\d.,]+/, aov.toFixed(2))
-    : '—'
+  const aovDisplay =
+    orders > 0 && totalSpent > 0
+      ? customer.display_total_spent?.replace(/[\d.,]+/, aov.toFixed(2))
+      : '—'
 
   return (
     <Card>
@@ -301,7 +332,7 @@ function LastOrderCard({ order }: { order: Order }) {
         <div className="border-t flex items-center justify-between px-6 py-3">
           <div>
             <Link
-              to={"/$storeId/orders/$orderId" as string}
+              to={'/$storeId/orders/$orderId' as string}
               params={{ orderId: order.id }}
               className="font-medium text-zinc-950 no-underline"
             >
@@ -312,7 +343,9 @@ function LastOrderCard({ order }: { order: Order }) {
               {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
             </span>
             {order.completed_at && (
-              <div className="text-xs text-muted-foreground mt-1">{formatRelativeTime(order.completed_at)}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {formatRelativeTime(order.completed_at)}
+              </div>
             )}
           </div>
           <div className="font-semibold">{order.display_total}</div>
@@ -355,8 +388,12 @@ function OrdersCard({
   if (isLoading) {
     return (
       <Card>
-        <CardHeader><CardTitle>Orders</CardTitle></CardHeader>
-        <CardContent><p className="text-sm text-muted-foreground">Loading orders…</p></CardContent>
+        <CardHeader>
+          <CardTitle>Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Loading orders…</p>
+        </CardContent>
       </Card>
     )
   }
@@ -371,8 +408,10 @@ function OrdersCard({
         {totalCount > orders.length && (
           <CardAction>
             <Link
-              to={"/$storeId/orders" as string}
-              search={{ filters: [{ id: '1', field: 'user_id_eq', operator: 'eq', value: customer.id }] }}
+              to={'/$storeId/orders' as string}
+              search={{
+                filters: [{ id: '1', field: 'user_id_eq', operator: 'eq', value: customer.id }],
+              }}
               className="text-sm text-primary hover:underline"
             >
               View all →
@@ -400,7 +439,7 @@ function OrdersCard({
                 <tr key={order.id} className="border-b last:border-b-0">
                   <td className="px-6 py-3">
                     <Link
-                      to={"/$storeId/orders/$orderId" as string}
+                      to={'/$storeId/orders/$orderId' as string}
                       params={{ orderId: order.id }}
                       className="font-medium text-zinc-950 no-underline"
                     >
@@ -414,10 +453,14 @@ function OrdersCard({
                     <span className="inline-flex gap-1">
                       <StatusBadge status={order.status} />
                       {order.payment_status && <StatusBadge status={order.payment_status} />}
-                      {order.fulfillment_status && <StatusBadge status={order.fulfillment_status} />}
+                      {order.fulfillment_status && (
+                        <StatusBadge status={order.fulfillment_status} />
+                      )}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-right font-medium tabular-nums">{order.display_total}</td>
+                  <td className="px-6 py-3 text-right font-medium tabular-nums">
+                    {order.display_total}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -463,21 +506,35 @@ function InternalNoteCard({ customer }: { customer: Customer }) {
               placeholder="Staff-only notes about this customer…"
             />
             <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" size="sm" onClick={() => { setEditing(false); setNote(customer.internal_note_html ?? '') }}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setEditing(false)
+                  setNote(customer.internal_note_html ?? '')
+                }}
+              >
                 Cancel
               </Button>
               <Button
                 type="button"
                 size="sm"
                 disabled={mutation.isPending}
-                onClick={() => mutation.mutate({ internal_note: note }, { onSuccess: () => setEditing(false) })}
+                onClick={() =>
+                  mutation.mutate({ internal_note: note }, { onSuccess: () => setEditing(false) })
+                }
               >
                 {mutation.isPending ? 'Saving…' : 'Save'}
               </Button>
             </div>
           </div>
         ) : customer.internal_note_html ? (
-          <div className="text-sm prose-sm" dangerouslySetInnerHTML={{ __html: customer.internal_note_html }} />
+          <div
+            className="text-sm prose-sm"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML is sanitized server-side via the rich-text pipeline
+            dangerouslySetInnerHTML={{ __html: customer.internal_note_html }}
+          />
         ) : (
           <p className="text-sm text-muted-foreground">No internal notes</p>
         )}
@@ -495,7 +552,9 @@ function AddressesCard({ customer }: { customer: Customer }) {
   const [editing, setEditing] = useState<Address | null>(null)
   const confirm = useConfirm()
   const isDefault = (a: Address) => a.is_default_billing || a.is_default_shipping
-  const addresses = [...(customer.addresses ?? [])].sort((a, b) => Number(isDefault(b)) - Number(isDefault(a)))
+  const addresses = [...(customer.addresses ?? [])].sort(
+    (a, b) => Number(isDefault(b)) - Number(isDefault(a)),
+  )
 
   const deleteMutation = useCustomerMutation(customer.id, (id: string) =>
     adminClient.customers.addresses.delete(customer.id, id),
@@ -531,10 +590,15 @@ function AddressesCard({ customer }: { customer: Customer }) {
         ) : (
           <CardContent className="flex flex-col gap-3">
             {addresses.map((addr) => (
-              <div key={addr.id} className="flex items-start justify-between gap-2 rounded-md border p-3">
+              <div
+                key={addr.id}
+                className="flex items-start justify-between gap-2 rounded-md border p-3"
+              >
                 <div className="text-sm">
                   <div className="font-medium">
-                    {[addr.first_name, addr.last_name].filter(Boolean).join(' ').trim() || addr.label || '—'}
+                    {[addr.first_name, addr.last_name].filter(Boolean).join(' ').trim() ||
+                      addr.label ||
+                      '—'}
                     <span className="ml-2 inline-flex gap-1">
                       {addr.is_default_billing && <Badge variant="info">Default billing</Badge>}
                       {addr.is_default_shipping && <Badge variant="info">Default shipping</Badge>}
@@ -543,7 +607,8 @@ function AddressesCard({ customer }: { customer: Customer }) {
                   <div className="text-muted-foreground">{addr.address1}</div>
                   {addr.address2 && <div className="text-muted-foreground">{addr.address2}</div>}
                   <div className="text-muted-foreground">
-                    {[addr.city, addr.state_abbr, addr.postal_code].filter(Boolean).join(', ')} · {addr.country_iso}
+                    {[addr.city, addr.state_abbr, addr.postal_code].filter(Boolean).join(', ')} ·{' '}
+                    {addr.country_iso}
                   </div>
                   {addr.phone && <div className="text-muted-foreground">{addr.phone}</div>}
                 </div>
@@ -559,19 +624,29 @@ function AddressesCard({ customer }: { customer: Customer }) {
                       Edit
                     </DropdownMenuItem>
                     {!addr.is_default_billing && (
-                      <DropdownMenuItem onClick={() => setDefaultMutation.mutate({ id: addr.id, kind: 'billing' })}>
+                      <DropdownMenuItem
+                        onClick={() => setDefaultMutation.mutate({ id: addr.id, kind: 'billing' })}
+                      >
                         Set as default billing
                       </DropdownMenuItem>
                     )}
                     {!addr.is_default_shipping && (
-                      <DropdownMenuItem onClick={() => setDefaultMutation.mutate({ id: addr.id, kind: 'shipping' })}>
+                      <DropdownMenuItem
+                        onClick={() => setDefaultMutation.mutate({ id: addr.id, kind: 'shipping' })}
+                      >
                         Set as default shipping
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive"
                       onClick={async () => {
-                        if (await confirm({ message: 'Delete this address?', variant: 'destructive', confirmLabel: 'Delete' })) {
+                        if (
+                          await confirm({
+                            message: 'Delete this address?',
+                            variant: 'destructive',
+                            confirmLabel: 'Delete',
+                          })
+                        ) {
                           deleteMutation.mutate(addr.id)
                         }
                       }}
@@ -599,7 +674,9 @@ function AddressesCard({ customer }: { customer: Customer }) {
         <CustomerAddressDialog
           customer={customer}
           address={editing}
-          onOpenChange={(o) => { if (!o) setEditing(null) }}
+          onOpenChange={(o) => {
+            if (!o) setEditing(null)
+          }}
           title="Edit Address"
         />
       )}
@@ -714,7 +791,13 @@ function StoreCreditsCard({ customer }: { customer: Customer }) {
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
                             onClick={async () => {
-                              if (await confirm({ message: 'Delete this store credit?', variant: 'destructive', confirmLabel: 'Delete' })) {
+                              if (
+                                await confirm({
+                                  message: 'Delete this store credit?',
+                                  variant: 'destructive',
+                                  confirmLabel: 'Delete',
+                                })
+                              ) {
                                 deleteMutation.mutate(sc.id)
                               }
                             }}
@@ -747,19 +830,24 @@ function IssueStoreCreditDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const mutation = useCustomerMutation(customerId, (params: Parameters<typeof adminClient.customers.storeCredits.create>[1]) =>
-    adminClient.customers.storeCredits.create(customerId, params),
+  const mutation = useCustomerMutation(
+    customerId,
+    (params: Parameters<typeof adminClient.customers.storeCredits.create>[1]) =>
+      adminClient.customers.storeCredits.create(customerId, params),
   )
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
-    mutation.mutate({
-      amount: Number(fd.get('amount')),
-      currency: String(fd.get('currency') ?? ''),
-      category_id: String(fd.get('category_id') ?? ''),
-      memo: (fd.get('memo') as string) || undefined,
-    }, { onSuccess: () => onOpenChange(false) })
+    mutation.mutate(
+      {
+        amount: Number(fd.get('amount')),
+        currency: String(fd.get('currency') ?? ''),
+        category_id: String(fd.get('category_id') ?? ''),
+        memo: (fd.get('memo') as string) || undefined,
+      },
+      { onSuccess: () => onOpenChange(false) },
+    )
   }
 
   return (
@@ -788,12 +876,19 @@ function IssueStoreCreditDialog({
               </Field>
               <Field>
                 <FieldLabel htmlFor="sc-memo">Memo</FieldLabel>
-                <Textarea id="sc-memo" name="memo" rows={3} placeholder="Reason for issuing this credit" />
+                <Textarea
+                  id="sc-memo"
+                  name="memo"
+                  rows={3}
+                  placeholder="Reason for issuing this credit"
+                />
               </Field>
             </FieldGroup>
           </DialogBody>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? 'Issuing…' : 'Issue Credit'}
             </Button>

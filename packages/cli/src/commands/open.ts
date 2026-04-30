@@ -1,6 +1,6 @@
+import { platform } from 'node:os'
 import type { Command } from 'commander'
 import { execaCommand } from 'execa'
-import { platform } from 'node:os'
 import { detectProject } from '../context.js'
 
 export function registerOpenCommand(program: Command): void {

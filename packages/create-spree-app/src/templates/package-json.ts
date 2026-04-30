@@ -20,5 +20,5 @@ export function rootPackageJsonContent(name: string): string {
     },
   }
 
-  return JSON.stringify(pkg, null, 2) + '\n'
+  return `${JSON.stringify(pkg, null, 2)}\n`
 }

@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { Command } from 'commander'
 import * as p from '@clack/prompts'
+import type { Command } from 'commander'
 import pc from 'picocolors'
 import { detectProject } from '../context.js'
 import { dockerCompose } from '../docker.js'

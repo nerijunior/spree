@@ -1,4 +1,4 @@
-import { STOREFRONT_PORT, DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from '../constants.js'
+import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD, STOREFRONT_PORT } from '../constants.js'
 
 export function readmeContent(name: string, hasStorefront: boolean, port: number): string {
   let content = `# ${name}

@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { adminClient } from '@/client'
-import { useAuth } from '@/hooks/use-auth'
 import {
   Combobox,
   ComboboxChip,
@@ -14,6 +13,7 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from '@/components/ui/combobox'
+import { useAuth } from '@/hooks/use-auth'
 
 export type TaggableType = 'Spree::Product' | 'Spree::Order' | 'Spree::User'
 

@@ -20,7 +20,7 @@ defineTable('orders', {
       default: true,
       render: (order) => (
         <Link
-          to={"/$storeId/orders/$orderId" as string}
+          to={'/$storeId/orders/$orderId' as string}
           params={{ orderId: order.id }}
           className="font-medium text-zinc-950 no-underline"
         >
@@ -60,7 +60,8 @@ defineTable('orders', {
         { value: 'paid', label: 'Paid' },
         { value: 'void', label: 'Void' },
       ],
-      render: (order) => (order.payment_status ? <StatusBadge status={order.payment_status} /> : '—'),
+      render: (order) =>
+        order.payment_status ? <StatusBadge status={order.payment_status} /> : '—',
     },
     {
       key: 'fulfillment_status',

@@ -3,8 +3,8 @@ import path from 'node:path'
 import { execa } from 'execa'
 import { STOREFRONT_REPO } from './constants.js'
 import { storefrontEnvContent } from './templates/env.js'
-import { installCommand } from './utils.js'
 import type { PackageManager } from './types.js'
+import { installCommand } from './utils.js'
 
 export async function downloadStorefront(projectDir: string): Promise<void> {
   const storefrontDir = path.join(projectDir, 'apps', 'storefront')

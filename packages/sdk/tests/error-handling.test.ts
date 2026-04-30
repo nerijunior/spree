@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { server } from './mocks/server';
-import { http, HttpResponse } from 'msw';
-import { SpreeError } from '../src';
-import { createTestClient, TEST_BASE_URL } from './helpers';
+import { HttpResponse, http } from 'msw'
+import { describe, expect, it } from 'vitest'
+import { SpreeError } from '../src'
+import { createTestClient, TEST_BASE_URL } from './helpers'
+import { server } from './mocks/server'
 
-const API_PREFIX = `${TEST_BASE_URL}/api/v3/store`;
+const API_PREFIX = `${TEST_BASE_URL}/api/v3/store`
 
 describe('error handling', () => {
   it('throws SpreeError with correct properties on 4xx', async () => {
@@ -17,24 +17,24 @@ describe('error handling', () => {
               message: 'Product not found',
             },
           },
-          { status: 404 }
-        )
-      )
-    );
+          { status: 404 },
+        ),
+      ),
+    )
 
-    const client = createTestClient();
+    const client = createTestClient()
     try {
-      await client.products.get('nonexistent');
-      expect.unreachable('Should have thrown');
+      await client.products.get('nonexistent')
+      expect.unreachable('Should have thrown')
     } catch (error) {
-      expect(error).toBeInstanceOf(SpreeError);
-      const spreeError = error as SpreeError;
-      expect(spreeError.code).toBe('not_found');
-      expect(spreeError.status).toBe(404);
-      expect(spreeError.message).toBe('Product not found');
-      expect(spreeError.name).toBe('SpreeError');
+      expect(error).toBeInstanceOf(SpreeError)
+      const spreeError = error as SpreeError
+      expect(spreeError.code).toBe('not_found')
+      expect(spreeError.status).toBe(404)
+      expect(spreeError.message).toBe('Product not found')
+      expect(spreeError.name).toBe('SpreeError')
     }
-  });
+  })
 
   it('throws SpreeError with details on 422', async () => {
     server.use(
@@ -45,30 +45,37 @@ describe('error handling', () => {
               code: 'unprocessable_entity',
               message: 'Validation failed',
               details: {
-                address1: ['can\'t be blank'],
-                city: ['can\'t be blank'],
+                address1: ["can't be blank"],
+                city: ["can't be blank"],
               },
             },
           },
-          { status: 422 }
-        )
-      )
-    );
+          { status: 422 },
+        ),
+      ),
+    )
 
-    const client = createTestClient();
+    const client = createTestClient()
     try {
       await client.customer.addresses.create(
-        { first_name: 'A', last_name: 'B', address1: '', city: '', postal_code: '00000', country_iso: 'US' },
-        { token: 'jwt' }
-      );
-      expect.unreachable('Should have thrown');
+        {
+          first_name: 'A',
+          last_name: 'B',
+          address1: '',
+          city: '',
+          postal_code: '00000',
+          country_iso: 'US',
+        },
+        { token: 'jwt' },
+      )
+      expect.unreachable('Should have thrown')
     } catch (error) {
-      const spreeError = error as SpreeError;
-      expect(spreeError.status).toBe(422);
-      expect(spreeError.details).toHaveProperty('address1');
-      expect(spreeError.details).toHaveProperty('city');
+      const spreeError = error as SpreeError
+      expect(spreeError.status).toBe(422)
+      expect(spreeError.details).toHaveProperty('address1')
+      expect(spreeError.details).toHaveProperty('city')
     }
-  });
+  })
 
   it('throws SpreeError on 500 server error', async () => {
     server.use(
@@ -80,21 +87,21 @@ describe('error handling', () => {
               message: 'Something went wrong',
             },
           },
-          { status: 500 }
-        )
-      )
-    );
+          { status: 500 },
+        ),
+      ),
+    )
 
-    const client = createTestClient();
+    const client = createTestClient()
     try {
-      await client.countries.list();
-      expect.unreachable('Should have thrown');
+      await client.countries.list()
+      expect.unreachable('Should have thrown')
     } catch (error) {
-      const spreeError = error as SpreeError;
-      expect(spreeError.status).toBe(500);
-      expect(spreeError.code).toBe('internal_server_error');
+      const spreeError = error as SpreeError
+      expect(spreeError.status).toBe(500)
+      expect(spreeError.code).toBe('internal_server_error')
     }
-  });
+  })
 
   it('throws SpreeError on 401 unauthorized', async () => {
     server.use(
@@ -106,25 +113,25 @@ describe('error handling', () => {
               message: 'You must be logged in',
             },
           },
-          { status: 401 }
-        )
-      )
-    );
+          { status: 401 },
+        ),
+      ),
+    )
 
-    const client = createTestClient();
+    const client = createTestClient()
     try {
-      await client.customer.get();
-      expect.unreachable('Should have thrown');
+      await client.customer.get()
+      expect.unreachable('Should have thrown')
     } catch (error) {
-      const spreeError = error as SpreeError;
-      expect(spreeError.status).toBe(401);
-      expect(spreeError.code).toBe('unauthorized');
+      const spreeError = error as SpreeError
+      expect(spreeError.status).toBe(401)
+      expect(spreeError.code).toBe('unauthorized')
     }
-  });
+  })
 
   it('handles 204 No Content responses', async () => {
-    const client = createTestClient();
-    const result = await client.carts.delete('cart_1', { token: 'jwt' });
-    expect(result).toBeUndefined();
-  });
-});
+    const client = createTestClient()
+    const result = await client.carts.delete('cart_1', { token: 'jwt' })
+    expect(result).toBeUndefined()
+  })
+})

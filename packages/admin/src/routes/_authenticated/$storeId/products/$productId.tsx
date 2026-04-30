@@ -1,4 +1,4 @@
-import type { Media, Product as BaseProduct, Variant as BaseVariant } from '@spree/admin-sdk'
+import type { Product as BaseProduct, Variant as BaseVariant, Media } from '@spree/admin-sdk'
 
 // Extended types for fields not yet in generated types
 type Variant = BaseVariant & {
@@ -12,27 +12,19 @@ type Product = Omit<BaseProduct, 'default_variant' | 'variants'> & {
   default_variant?: Variant
   variants?: Variant[]
 }
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { ImagePlusIcon, Loader2Icon, SaveIcon, TrashIcon, XIcon } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Controller, type UseFormReturn, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { BackButton } from '@/components/back-button'
 import { useConfirm } from '@/components/confirm-dialog'
 import { TagCombobox } from '@/components/tag-combobox'
-import {
-  ImagePlusIcon,
-  Loader2Icon,
-  SaveIcon,
-  TrashIcon,
-  XIcon,
-} from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Controller, useForm, type UseFormReturn } from 'react-hook-form'
-import { toast } from 'sonner'
 import { StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Input } from '@/components/ui/input'
-import { Field, FieldLabel } from '@/components/ui/field'
 import {
   Combobox,
   ComboboxChip,
@@ -45,6 +37,9 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from '@/components/ui/combobox'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import {
   Select,
@@ -56,17 +51,17 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import { useStore } from '@/providers/store-provider'
+import { useCategories } from '@/hooks/use-categories'
 import { useDirectUpload } from '@/hooks/use-direct-upload'
-import { useProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/use-product'
+import { useDeleteProduct, useProduct, useUpdateProduct } from '@/hooks/use-product'
 import {
-  useProductMedia,
   useCreateProductMedia,
   useDeleteProductMedia,
+  useProductMedia,
 } from '@/hooks/use-product-media'
 import { useTaxCategories } from '@/hooks/use-tax-categories'
-import { useCategories } from '@/hooks/use-categories'
-import { productFormSchema, type ProductFormValues } from '@/schemas/product'
+import { useStore } from '@/providers/store-provider'
+import { type ProductFormValues, productFormSchema } from '@/schemas/product'
 
 export const Route = createFileRoute('/_authenticated/$storeId/products/$productId')({
   component: ProductDetailPage,
@@ -166,12 +161,20 @@ function ProductForm({ product }: { product: Product }) {
   }
 
   const handleDelete = async () => {
-    const confirmed = await confirm({ message: 'Are you sure you want to delete this product?', variant: 'destructive', confirmLabel: 'Delete' })
+    const confirmed = await confirm({
+      message: 'Are you sure you want to delete this product?',
+      variant: 'destructive',
+      confirmLabel: 'Delete',
+    })
     if (!confirmed) return
     try {
       await deleteProduct.mutateAsync(productId)
       toast.success('Product deleted')
-      await router.navigate({ to: '/$storeId/products', params: { storeId }, search: { filters: [], columns: [] } })
+      await router.navigate({
+        to: '/$storeId/products',
+        params: { storeId },
+        search: { filters: [], columns: [] },
+      })
     } catch {
       toast.error('Failed to delete product')
     }
@@ -199,7 +202,6 @@ function ProductForm({ product }: { product: Product }) {
           </Button>
           <Button
             type="submit"
-           
             size="sm"
             disabled={updateProduct.isPending || !form.formState.isDirty}
           >
@@ -386,11 +388,7 @@ function MediaCard({ productId }: { productId: string }) {
                 key={upload.id}
                 className="relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
               >
-                <img
-                  src={upload.preview}
-                  alt=""
-                  className="size-full object-cover opacity-60"
-                />
+                <img src={upload.preview} alt="" className="size-full object-cover opacity-60" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   {upload.progress === 'error' ? (
                     <span className="text-xs text-destructive font-medium">Failed</span>
@@ -404,41 +402,31 @@ function MediaCard({ productId }: { productId: string }) {
         )}
 
         {/* Drop zone */}
-        <div
+        <button
+          type="button"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-gray-300 cursor-pointer"
+          className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-gray-300 cursor-pointer"
           onClick={() => fileInputRef.current?.click()}
-          onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-          role="button"
-          tabIndex={0}
         >
           <ImagePlusIcon className="size-8 text-gray-400" />
-          <p className="text-sm text-gray-600">
-            Drag & drop images here, or click to browse
-          </p>
+          <p className="text-sm text-gray-600">Drag & drop images here, or click to browse</p>
           <p className="text-xs text-gray-400">PNG, JPG, WebP up to 10MB</p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => e.target.files && handleFiles(e.target.files)}
-          />
-        </div>
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => e.target.files && handleFiles(e.target.files)}
+        />
       </CardContent>
     </Card>
   )
 }
 
-function MediaThumbnail({
-  mediaItem,
-  onDelete,
-}: {
-  mediaItem: Media
-  onDelete: () => void
-}) {
+function MediaThumbnail({ mediaItem, onDelete }: { mediaItem: Media; onDelete: () => void }) {
   const imageUrl = mediaItem.small_url || mediaItem.mini_url || mediaItem.original_url
 
   return (
@@ -479,14 +467,15 @@ function PricingCard({ form }: FormCardProps) {
             <tr className="border-b text-left text-muted-foreground">
               <th className="px-4 py-2 font-medium">Currency</th>
               <th className="px-4 py-2 font-medium">Amount</th>
-              <th className="px-4 py-2 font-medium">
-                Compare at amount
-              </th>
+              <th className="px-4 py-2 font-medium">Compare at amount</th>
             </tr>
           </thead>
           <tbody>
             {prices.map((_, index) => (
-              <tr key={form.getValues(`prices.${index}.currency`)} className="border-b last:border-0">
+              <tr
+                key={form.getValues(`prices.${index}.currency`)}
+                className="border-b last:border-0"
+              >
                 <td className="px-4 py-2 font-medium">
                   {form.getValues(`prices.${index}.currency`)}
                 </td>
@@ -560,11 +549,7 @@ function InventoryCard({ form }: FormCardProps) {
             name="track_inventory"
             control={form.control}
             render={({ field }) => (
-              <Switch
-                id="track_inventory"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
+              <Switch id="track_inventory" checked={field.value} onCheckedChange={field.onChange} />
             )}
           />
           <FieldLabel htmlFor="track_inventory">Track inventory</FieldLabel>
@@ -597,9 +582,7 @@ function SEOCard({ form, product }: FormCardProps & { product: Product }) {
       <CardContent className="flex flex-col gap-4">
         {/* Preview */}
         <div className="rounded-lg border border-gray-200 p-4 space-y-1">
-          <p className="text-sm font-medium text-blue-700 truncate">
-            {metaTitle || product.name}
-          </p>
+          <p className="text-sm font-medium text-blue-700 truncate">{metaTitle || product.name}</p>
           <p className="text-xs text-green-700 truncate">
             example.com/products/{slug || product.slug}
           </p>
@@ -786,7 +769,8 @@ function CategoryCombobox({
 
   // Convert string[] of IDs to CategoryOption[] for the combobox
   const selectedItems = useMemo(
-    () => value.map((id) => categories.find((c) => c.id === id)).filter(Boolean) as CategoryOption[],
+    () =>
+      value.map((id) => categories.find((c) => c.id === id)).filter(Boolean) as CategoryOption[],
     [value, categories],
   )
 
@@ -808,11 +792,7 @@ function CategoryCombobox({
       <ComboboxChips ref={anchorRef}>
         <ComboboxValue>
           {(selected: CategoryOption[]) =>
-            selected.map((c) => (
-              <ComboboxChip key={c.id}>
-                {c.pretty_name}
-              </ComboboxChip>
-            ))
+            selected.map((c) => <ComboboxChip key={c.id}>{c.pretty_name}</ComboboxChip>)
           }
         </ComboboxValue>
         <ComboboxChipsInput placeholder="Search categories..." />

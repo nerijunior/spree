@@ -1,5 +1,5 @@
-import { execaCommand } from 'execa'
 import crypto from 'node:crypto'
+import { execaCommand } from 'execa'
 import type { PackageManager } from './types.js'
 
 export function detectPackageManager(): PackageManager {
@@ -31,4 +31,3 @@ export function runCommand(pm: PackageManager): string {
   if (pm === 'yarn') return 'yarn'
   return 'pnpm'
 }
-

@@ -1,12 +1,12 @@
-import { Command } from 'commander'
 import * as p from '@clack/prompts'
-import pc from 'picocolors'
+import { Command } from 'commander'
 import getPort, { portNumbers } from 'get-port'
+import pc from 'picocolors'
+import { DEFAULT_SPREE_PORT } from './constants.js'
 import { runPrompts } from './prompts.js'
 import { scaffold } from './scaffold.js'
-import { detectPackageManager } from './utils.js'
-import { DEFAULT_SPREE_PORT } from './constants.js'
 import type { PackageManager } from './types.js'
+import { detectPackageManager } from './utils.js'
 
 const program = new Command()
   .name('create-spree-app')

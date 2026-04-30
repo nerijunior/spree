@@ -1,13 +1,11 @@
-import type { Command } from 'commander'
 import * as p from '@clack/prompts'
+import type { Command } from 'commander'
 import pc from 'picocolors'
 import { detectProject } from '../context.js'
 import { rakeTask } from '../docker.js'
 
 export function registerUserCommand(program: Command): void {
-  const user = program
-    .command('user')
-    .description('Manage admin users')
+  const user = program.command('user').description('Manage admin users')
 
   user
     .command('create')

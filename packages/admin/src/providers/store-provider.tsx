@@ -1,5 +1,5 @@
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import type { Store } from '@spree/admin-sdk'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import { adminClient } from '@/client'
 
 interface StoreContextValue {
@@ -19,6 +19,7 @@ export function StoreProvider({ storeId, children }: { storeId: string; children
   const [store, setStore] = useState<Store | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: adminClient resolves the store from the route's storeId, so we must refetch when it changes
   const fetchStore = useCallback(async () => {
     setIsLoading(true)
     try {
@@ -29,11 +30,11 @@ export function StoreProvider({ storeId, children }: { storeId: string; children
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [storeId])
 
   useEffect(() => {
     fetchStore()
-  }, [storeId, fetchStore])
+  }, [fetchStore])
 
   const currencies = store?.supported_currencies ?? []
   const locales = store?.supported_locales ?? []
@@ -41,7 +42,18 @@ export function StoreProvider({ storeId, children }: { storeId: string; children
   const defaultLocale = store?.default_locale ?? 'en'
 
   return (
-    <StoreContext.Provider value={{ store, storeId, isLoading, currencies, locales, defaultCurrency, defaultLocale, refetch: fetchStore }}>
+    <StoreContext.Provider
+      value={{
+        store,
+        storeId,
+        isLoading,
+        currencies,
+        locales,
+        defaultCurrency,
+        defaultLocale,
+        refetch: fetchStore,
+      }}
+    >
       {children}
     </StoreContext.Provider>
   )

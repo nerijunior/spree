@@ -1,7 +1,7 @@
 'use client'
 
-import { CheckIcon, ChevronRightIcon } from 'lucide-react'
 import { Menu as MenuPrimitive } from '@base-ui/react/menu'
+import { CheckIcon, ChevronRightIcon } from 'lucide-react'
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +20,14 @@ function DropdownMenu({
   modal?: boolean
 }) {
   return (
-    <MenuPrimitive.Root data-slot="dropdown-menu" open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} modal={modal} {...props}>
+    <MenuPrimitive.Root
+      data-slot="dropdown-menu"
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      modal={modal}
+      {...props}
+    >
       {children}
     </MenuPrimitive.Root>
   )
@@ -45,9 +52,7 @@ function DropdownMenuTrigger({
   asChild?: boolean
 }) {
   if (asChild && React.isValidElement(children)) {
-    return (
-      <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" render={children} {...props} />
-    )
+    return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" render={children} {...props} />
   }
   return (
     <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props}>
@@ -72,12 +77,7 @@ function DropdownMenuContent({
 } & Omit<React.ComponentProps<typeof MenuPrimitive.Popup>, 'className'>) {
   return (
     <MenuPrimitive.Portal>
-      <MenuPrimitive.Positioner
-        side={side}
-        sideOffset={sideOffset}
-        align={align}
-        className="z-50"
-      >
+      <MenuPrimitive.Positioner side={side} sideOffset={sideOffset} align={align} className="z-50">
         <MenuPrimitive.Popup
           data-slot="dropdown-menu-content"
           className={cn(
@@ -93,9 +93,7 @@ function DropdownMenuContent({
   )
 }
 
-function DropdownMenuGroup({
-  ...props
-}: React.ComponentProps<typeof MenuPrimitive.Group>) {
+function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof MenuPrimitive.Group>) {
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
 }
 
@@ -330,18 +328,18 @@ function DropdownMenuSubContent({
 
 export {
   DropdownMenu,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
-  DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 }

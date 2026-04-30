@@ -1,13 +1,13 @@
-import type { Command } from 'commander'
-import * as p from '@clack/prompts'
-import pc from 'picocolors'
-import { execaCommand } from 'execa'
-import { platform } from 'node:os'
 import fs from 'node:fs'
+import { platform } from 'node:os'
 import path from 'node:path'
+import * as p from '@clack/prompts'
+import type { Command } from 'commander'
+import { execaCommand } from 'execa'
+import pc from 'picocolors'
+import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from '../constants.js'
 import { detectProject } from '../context.js'
 import { dockerCompose, rakeTask, streamLogs } from '../docker.js'
-import { DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD } from '../constants.js'
 
 const HEALTH_CHECK_INTERVAL_MS = 3000
 const HEALTH_CHECK_TIMEOUT_MS = 120_000
@@ -109,7 +109,10 @@ export function updateStorefrontEnv(projectDir: string, apiKey: string): void {
   if (!fs.existsSync(envPath)) return
 
   const content = fs.readFileSync(envPath, 'utf-8')
-  fs.writeFileSync(envPath, content.replace(/SPREE_PUBLISHABLE_KEY=.*/, `SPREE_PUBLISHABLE_KEY=${apiKey}`))
+  fs.writeFileSync(
+    envPath,
+    content.replace(/SPREE_PUBLISHABLE_KEY=.*/, `SPREE_PUBLISHABLE_KEY=${apiKey}`),
+  )
 }
 
 async function openBrowser(url: string): Promise<void> {

@@ -1,6 +1,6 @@
-import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import { Select as SelectPrimitive } from '@base-ui/react/select'
-import * as React from 'react'
+import { CheckIcon, ChevronDownIcon } from 'lucide-react'
+import type * as React from 'react'
 import { cn } from '@/lib/utils'
 
 function Select({
@@ -13,7 +13,13 @@ function Select({
   return (
     <SelectPrimitive.Root
       data-slot="select"
-      onValueChange={onValueChange ? (value: string | null) => { if (value !== null) onValueChange(value) } : undefined}
+      onValueChange={
+        onValueChange
+          ? (value: string | null) => {
+              if (value !== null) onValueChange(value)
+            }
+          : undefined
+      }
       {...props}
     >
       {children}
@@ -64,8 +70,8 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-  position = 'item-aligned',
-  align = 'center',
+  position = 'popper',
+  align = 'start',
   side = 'bottom',
   ...props
 }: {
@@ -87,7 +93,7 @@ function SelectContent({
           data-slot="select-content"
           data-align-trigger={position === 'item-aligned'}
           className={cn(
-            'relative z-[100] max-h-[var(--available-height)] min-w-36 overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[starting-style]:opacity-0 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[ending-style]:scale-95 transition-[opacity,transform]',
+            'relative z-[100] max-h-[var(--available-height)] min-w-[var(--anchor-width)] overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[starting-style]:opacity-0 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[ending-style]:scale-95 transition-[opacity,transform]',
             position === 'popper' &&
               'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
             className,
@@ -101,7 +107,10 @@ function SelectContent({
   )
 }
 
-function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.GroupLabel>) {
+function SelectLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.GroupLabel>) {
   return (
     <SelectPrimitive.GroupLabel
       data-slot="select-label"
@@ -135,10 +144,7 @@ function SelectItem({
   )
 }
 
-function SelectSeparator({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
+function SelectSeparator({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       role="separator"

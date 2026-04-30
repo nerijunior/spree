@@ -1,9 +1,6 @@
 import type { Order, Variant } from '@spree/admin-sdk'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { AddressBlock } from '@/components/address-block'
-import { AddressFormDialog, type AddressParams } from '@/components/address-form-dialog'
-import { BackButton } from '@/components/back-button'
 import {
   CheckCircleIcon,
   CreditCardIcon,
@@ -22,10 +19,12 @@ import {
   XCircleIcon,
 } from 'lucide-react'
 import { type FormEvent, useEffect, useState } from 'react'
+import { adminClient } from '@/client'
+import { AddressBlock } from '@/components/address-block'
+import { AddressFormDialog, type AddressParams } from '@/components/address-form-dialog'
+import { BackButton } from '@/components/back-button'
 import { useConfirm } from '@/components/confirm-dialog'
 import { TagCombobox } from '@/components/tag-combobox'
-import { adminClient } from '@/client'
-import { formatRelativeTime } from '@/lib/formatters'
 import { Badge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -45,6 +44,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
   SheetContent,
@@ -53,14 +62,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/use-auth'
+import { formatRelativeTime } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/_authenticated/$storeId/orders/$orderId')({
@@ -124,7 +130,6 @@ function formatDate(iso: string | null) {
   })
 }
 
-
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
@@ -172,18 +177,10 @@ function OrderHeader({ order }: { order: Order }) {
 
   const backFallback = order.completed_at ? 'orders' : 'orders/drafts'
 
-  const cancelMutation = useOrderMutation(orderId, () =>
-    adminClient.orders.cancel(orderId),
-  )
-  const completeMutation = useOrderMutation(orderId, () =>
-    adminClient.orders.complete(orderId),
-  )
-  const approveMutation = useOrderMutation(orderId, () =>
-    adminClient.orders.approve(orderId),
-  )
-  const resumeMutation = useOrderMutation(orderId, () =>
-    adminClient.orders.resume(orderId),
-  )
+  const cancelMutation = useOrderMutation(orderId, () => adminClient.orders.cancel(orderId))
+  const completeMutation = useOrderMutation(orderId, () => adminClient.orders.complete(orderId))
+  const approveMutation = useOrderMutation(orderId, () => adminClient.orders.approve(orderId))
+  const resumeMutation = useOrderMutation(orderId, () => adminClient.orders.resume(orderId))
   const resendMutation = useOrderMutation(orderId, () =>
     adminClient.orders.resendConfirmation(orderId, {}),
   )
@@ -214,7 +211,12 @@ function OrderHeader({ order }: { order: Order }) {
             {order.status === 'draft' && (
               <DropdownMenuItem
                 onClick={async () => {
-                  if (await confirm({ message: 'Complete this draft order now?', confirmLabel: 'Complete' })) {
+                  if (
+                    await confirm({
+                      message: 'Complete this draft order now?',
+                      confirmLabel: 'Complete',
+                    })
+                  ) {
                     completeMutation.mutate(undefined)
                   }
                 }}
@@ -240,7 +242,12 @@ function OrderHeader({ order }: { order: Order }) {
             {order.status === 'canceled' && (
               <DropdownMenuItem
                 onClick={async () => {
-                  if (await confirm({ message: 'Resume this canceled order?', confirmLabel: 'Resume' })) {
+                  if (
+                    await confirm({
+                      message: 'Resume this canceled order?',
+                      confirmLabel: 'Resume',
+                    })
+                  ) {
                     resumeMutation.mutate(undefined)
                   }
                 }}
@@ -270,7 +277,13 @@ function OrderHeader({ order }: { order: Order }) {
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
                 onClick={async () => {
-                  if (await confirm({ message: 'Are you sure you want to cancel this order?', variant: 'destructive', confirmLabel: 'Cancel Order' })) {
+                  if (
+                    await confirm({
+                      message: 'Are you sure you want to cancel this order?',
+                      variant: 'destructive',
+                      confirmLabel: 'Cancel Order',
+                    })
+                  ) {
                     cancelMutation.mutate(undefined)
                   }
                 }}
@@ -388,9 +401,13 @@ function AddLineItemDialog({
               {selectedVariant && (
                 <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-sm">{selectedVariant.product_name ?? selectedVariant.sku}</div>
+                    <div className="font-medium text-sm">
+                      {selectedVariant.product_name ?? selectedVariant.sku}
+                    </div>
                     <div className="text-xs text-muted-foreground">
-                      {selectedVariant.options_text && <span>{selectedVariant.options_text} · </span>}
+                      {selectedVariant.options_text && (
+                        <span>{selectedVariant.options_text} · </span>
+                      )}
                       SKU: {selectedVariant.sku || '—'} · {selectedVariant.display_price ?? ''}
                     </div>
                   </div>
@@ -443,7 +460,6 @@ function EditQuantityDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-
   const mutation = useOrderMutation(orderId, (params: { quantity: number }) =>
     adminClient.orders.items.update(orderId, lineItemId, params),
   )
@@ -567,7 +583,9 @@ function LineItemsCard({ order }: { order: Order }) {
                       {item.display_additional_tax_total}
                     </td>
                     <td className="p-3 text-right whitespace-nowrap">
-                      {Number.parseFloat(item.discount_total) !== 0 ? item.display_discount_total : '—'}
+                      {Number.parseFloat(item.discount_total) !== 0
+                        ? item.display_discount_total
+                        : '—'}
                     </td>
                     <td className="p-3 text-right font-medium whitespace-nowrap">
                       {item.display_total}
@@ -590,7 +608,13 @@ function LineItemsCard({ order }: { order: Order }) {
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
                             onClick={async () => {
-                              if (await confirm({ message: 'Remove this item from the order?', variant: 'destructive', confirmLabel: 'Remove' })) {
+                              if (
+                                await confirm({
+                                  message: 'Remove this item from the order?',
+                                  variant: 'destructive',
+                                  confirmLabel: 'Remove',
+                                })
+                              ) {
                                 deleteMutation.mutate(item.id)
                               }
                             }}
@@ -645,7 +669,6 @@ function EditTrackingDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-
   const mutation = useOrderMutation(orderId, (params: { tracking: string }) =>
     adminClient.orders.fulfillments.update(orderId, fulfillmentId, params),
   )
@@ -747,7 +770,13 @@ function ShipmentsCard({ order }: { order: Order }) {
                     {fulfillment.status === 'ready' && (
                       <DropdownMenuItem
                         onClick={async () => {
-                          if (await confirm({ message: 'Ship this fulfillment?', variant: 'default', confirmLabel: 'Fulfill' })) {
+                          if (
+                            await confirm({
+                              message: 'Ship this fulfillment?',
+                              variant: 'default',
+                              confirmLabel: 'Fulfill',
+                            })
+                          ) {
                             fulfillMutation.mutate(fulfillment.id)
                           }
                         }}
@@ -762,7 +791,13 @@ function ShipmentsCard({ order }: { order: Order }) {
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
                           onClick={async () => {
-                            if (await confirm({ message: 'Cancel this fulfillment?', variant: 'destructive', confirmLabel: 'Cancel Fulfillment' })) {
+                            if (
+                              await confirm({
+                                message: 'Cancel this fulfillment?',
+                                variant: 'destructive',
+                                confirmLabel: 'Cancel Fulfillment',
+                              })
+                            ) {
                               cancelFulfillmentMutation.mutate(fulfillment.id)
                             }
                           }}
@@ -810,7 +845,8 @@ function ShipmentsCard({ order }: { order: Order }) {
 
               {fulfillment.fulfilled_at && (
                 <span className="text-xs text-muted-foreground">
-                  Shipped {fulfillment.fulfilled_at ? formatRelativeTime(fulfillment.fulfilled_at) : ''}
+                  Shipped{' '}
+                  {fulfillment.fulfilled_at ? formatRelativeTime(fulfillment.fulfilled_at) : ''}
                 </span>
               )}
             </div>
@@ -870,75 +906,89 @@ function PaymentsCard({ order }: { order: Order }) {
           <p className="text-center text-muted-foreground py-8">No payments yet</p>
         </CardContent>
       ) : (
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/50 text-muted-foreground">
-              <th className="p-3 pl-5 text-left font-normal">Number</th>
-              <th className="p-3 text-left font-normal">Method</th>
-              <th className="p-3 text-left font-normal">State</th>
-              <th className="p-3 text-right font-normal">Amount</th>
-              <th className="p-3 pr-5 w-10" />
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map((payment) => (
-              <tr key={payment.id} className="border-b last:border-b-0">
-                <td className="p-3 pl-5 font-medium">{payment.number}</td>
-                <td className="p-3 text-muted-foreground">{payment.payment_method?.name ?? '—'}</td>
-                <td className="p-3">
-                  <StatusBadge status={payment.status} />
-                </td>
-                <td className="p-3 text-right font-medium whitespace-nowrap">
-                  {payment.display_amount}
-                </td>
-                <td className="p-3 pr-5">
-                  {(payment.status === 'checkout' ||
-                    payment.status === 'pending' ||
-                    payment.status === 'completed') && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon-xs">
-                          <EllipsisVerticalIcon className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {(payment.status === 'checkout' || payment.status === 'pending') && (
-                          <DropdownMenuItem
-                            onClick={async () => {
-                              if (await confirm({ message: 'Capture this payment?', variant: 'default', confirmLabel: 'Capture' })) {
-                                captureMutation.mutate(payment.id)
-                              }
-                            }}
-                          >
-                            <CreditCardIcon className="size-4" />
-                            Capture
-                          </DropdownMenuItem>
-                        )}
-                        {(payment.status === 'checkout' ||
-                          payment.status === 'pending' ||
-                          payment.status === 'completed') && (
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={async () => {
-                              if (await confirm({ message: 'Void this payment?', variant: 'destructive', confirmLabel: 'Void Payment' })) {
-                                voidMutation.mutate(payment.id)
-                              }
-                            }}
-                          >
-                            <XCircleIcon className="size-4" />
-                            Void
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/50 text-muted-foreground">
+                <th className="p-3 pl-5 text-left font-normal">Number</th>
+                <th className="p-3 text-left font-normal">Method</th>
+                <th className="p-3 text-left font-normal">State</th>
+                <th className="p-3 text-right font-normal">Amount</th>
+                <th className="p-3 pr-5 w-10" />
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {payments.map((payment) => (
+                <tr key={payment.id} className="border-b last:border-b-0">
+                  <td className="p-3 pl-5 font-medium">{payment.number}</td>
+                  <td className="p-3 text-muted-foreground">
+                    {payment.payment_method?.name ?? '—'}
+                  </td>
+                  <td className="p-3">
+                    <StatusBadge status={payment.status} />
+                  </td>
+                  <td className="p-3 text-right font-medium whitespace-nowrap">
+                    {payment.display_amount}
+                  </td>
+                  <td className="p-3 pr-5">
+                    {(payment.status === 'checkout' ||
+                      payment.status === 'pending' ||
+                      payment.status === 'completed') && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon-xs">
+                            <EllipsisVerticalIcon className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {(payment.status === 'checkout' || payment.status === 'pending') && (
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                if (
+                                  await confirm({
+                                    message: 'Capture this payment?',
+                                    variant: 'default',
+                                    confirmLabel: 'Capture',
+                                  })
+                                ) {
+                                  captureMutation.mutate(payment.id)
+                                }
+                              }}
+                            >
+                              <CreditCardIcon className="size-4" />
+                              Capture
+                            </DropdownMenuItem>
+                          )}
+                          {(payment.status === 'checkout' ||
+                            payment.status === 'pending' ||
+                            payment.status === 'completed') && (
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={async () => {
+                                if (
+                                  await confirm({
+                                    message: 'Void this payment?',
+                                    variant: 'destructive',
+                                    confirmLabel: 'Void Payment',
+                                  })
+                                ) {
+                                  voidMutation.mutate(payment.id)
+                                }
+                              }}
+                            >
+                              <XCircleIcon className="size-4" />
+                              Void
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       <AddPaymentDialog order={order} open={addOpen} onOpenChange={setAddOpen} />
     </Card>
@@ -978,7 +1028,10 @@ function AddPaymentDialog({
 
   const { data: cardsData } = useQuery({
     queryKey: ['customer-credit-cards', customerId],
-    queryFn: () => customerId ? adminClient.customers.creditCards.list(customerId, { limit: 50 }) : Promise.resolve(null),
+    queryFn: () =>
+      customerId
+        ? adminClient.customers.creditCards.list(customerId, { limit: 50 })
+        : Promise.resolve(null),
     enabled: open && Boolean(customerId) && sourceRequired,
     staleTime: 30_000,
   })
@@ -1030,19 +1083,26 @@ function AddPaymentDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Payment</DialogTitle>
-          <DialogDescription>
-            Charge a payment method against this order.
-          </DialogDescription>
+          <DialogDescription>Charge a payment method against this order.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <DialogBody>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="pay-method">Payment method</FieldLabel>
-                <Select value={paymentMethodId} onValueChange={(v) => { setPaymentMethodId(v); setSourceId('') }}>
+                <Select
+                  value={paymentMethodId}
+                  onValueChange={(v) => {
+                    setPaymentMethodId(v)
+                    setSourceId('')
+                  }}
+                >
                   <SelectTrigger id="pay-method">
                     <SelectValue placeholder="Choose a payment method...">
-                      {(value) => paymentMethods.find((m) => m.id === value)?.name ?? 'Choose a payment method...'}
+                      {(value) =>
+                        paymentMethods.find((m) => m.id === value)?.name ??
+                        'Choose a payment method...'
+                      }
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
@@ -1060,7 +1120,8 @@ function AddPaymentDialog({
                   <FieldLabel htmlFor="pay-source">Source</FieldLabel>
                   {!customerId ? (
                     <p className="text-sm text-destructive">
-                      This payment method requires a saved source. Assign a customer to the order first.
+                      This payment method requires a saved source. Assign a customer to the order
+                      first.
                     </p>
                   ) : savedCards.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
@@ -1072,7 +1133,9 @@ function AddPaymentDialog({
                         <SelectValue placeholder="Choose a saved card…">
                           {(value) => {
                             const card = savedCards.find((c) => c.id === value)
-                            return card ? `${card.brand} •••• ${card.last4} (${card.month}/${card.year})` : 'Choose a saved card…'
+                            return card
+                              ? `${card.brand} •••• ${card.last4} (${card.month}/${card.year})`
+                              : 'Choose a saved card…'
                           }}
                         </SelectValue>
                       </SelectTrigger>
@@ -1099,13 +1162,14 @@ function AddPaymentDialog({
                   onChange={(e) => setAmount(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Leave blank to default to the outstanding balance ({order.display_amount_due ?? '$0.00'}).
+                  Leave blank to default to the outstanding balance (
+                  {order.display_amount_due ?? '$0.00'}).
                 </p>
               </Field>
 
               <Field>
-                <label className="flex items-center gap-2 text-sm">
-                  <Switch checked={capture} onCheckedChange={setCapture} />
+                <label className="flex items-center gap-2 text-sm" htmlFor="pay-capture">
+                  <Switch id="pay-capture" checked={capture} onCheckedChange={setCapture} />
                   Capture immediately
                 </label>
               </Field>
@@ -1115,7 +1179,10 @@ function AddPaymentDialog({
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={!canSubmit || mutation.isPending || captureMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={!canSubmit || mutation.isPending || captureMutation.isPending}
+            >
               {mutation.isPending || captureMutation.isPending ? 'Processing…' : 'Add Payment'}
             </Button>
           </DialogFooter>
@@ -1154,7 +1221,9 @@ function SummaryRow({
   )
 }
 
-function customerDisplayName(customer?: { first_name: string | null; last_name: string | null; email: string } | null): string {
+function customerDisplayName(
+  customer?: { first_name: string | null; last_name: string | null; email: string } | null,
+): string {
   if (!customer) return '—'
   const name = [customer.first_name, customer.last_name].filter(Boolean).join(' ').trim()
   return name || customer.email
@@ -1287,7 +1356,12 @@ function DiscountsCard({ order }: { order: Order }) {
                 size="sm"
                 variant="outline"
                 onClick={async () => {
-                  if (await confirm({ message: 'Remove this gift card from the order?', confirmLabel: 'Remove' })) {
+                  if (
+                    await confirm({
+                      message: 'Remove this gift card from the order?',
+                      confirmLabel: 'Remove',
+                    })
+                  ) {
                     removeGiftCardMutation.mutate(undefined)
                   }
                 }}
@@ -1324,7 +1398,12 @@ function DiscountsCard({ order }: { order: Order }) {
                 size="sm"
                 variant="outline"
                 onClick={async () => {
-                  if (await confirm({ message: 'Remove store credit from the order?', confirmLabel: 'Remove' })) {
+                  if (
+                    await confirm({
+                      message: 'Remove store credit from the order?',
+                      confirmLabel: 'Remove',
+                    })
+                  ) {
                     removeStoreCreditMutation.mutate(undefined)
                   }
                 }}
@@ -1385,7 +1464,13 @@ function ApplyGiftCardDialog({
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="gift-card-code">Code</FieldLabel>
-                <Input id="gift-card-code" name="code" placeholder="GIFT-XXXX-YYYY" required autoFocus />
+                <Input
+                  id="gift-card-code"
+                  name="code"
+                  placeholder="GIFT-XXXX-YYYY"
+                  required
+                  autoFocus
+                />
               </Field>
             </FieldGroup>
           </DialogBody>
@@ -1411,18 +1496,23 @@ function CustomerCard({ order }: { order: Order }) {
   const { orderId } = Route.useParams()
   const queryClient = useQueryClient()
   const user = order.customer
-  const [editAddress, setEditAddress] = useState<'shipping_address' | 'billing_address' | null>(null)
+  const [editAddress, setEditAddress] = useState<'shipping_address' | 'billing_address' | null>(
+    null,
+  )
 
   const addressMutation = useMutation({
-    mutationFn: (params: { type: 'shipping_address' | 'billing_address'; address: AddressParams }) =>
-      adminClient.orders.update(orderId, { [params.type]: params.address } as any),
+    mutationFn: (params: {
+      type: 'shipping_address' | 'billing_address'
+      address: AddressParams
+    }) => adminClient.orders.update(orderId, { [params.type]: params.address } as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order', orderId] })
       setEditAddress(null)
     },
   })
 
-  const editTitle = editAddress === 'shipping_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
+  const editTitle =
+    editAddress === 'shipping_address' ? 'Edit Shipping Address' : 'Edit Billing Address'
 
   return (
     <>
@@ -1481,7 +1571,9 @@ function CustomerCard({ order }: { order: Order }) {
       {editAddress && (
         <AddressFormDialog
           title={editTitle}
-          address={editAddress === 'shipping_address' ? order.shipping_address : order.billing_address}
+          address={
+            editAddress === 'shipping_address' ? order.shipping_address : order.billing_address
+          }
           open={!!editAddress}
           onOpenChange={(open) => !open && setEditAddress(null)}
           onSave={(address) => addressMutation.mutate({ type: editAddress, address })}
@@ -1537,9 +1629,7 @@ function SpecialInstructionsCard({ order }: { order: Order }) {
             </div>
           </form>
         ) : order.customer_note ? (
-          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {order.customer_note}
-          </p>
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{order.customer_note}</p>
         ) : (
           <p className="text-sm text-muted-foreground">None</p>
         )}
@@ -1566,10 +1656,14 @@ function TagsCard({ order }: { order: Order }) {
       <CardHeader>
         <CardTitle>Tags</CardTitle>
         <CardAction>
-          <Button variant="ghost" size="icon-xs" onClick={() => {
-            setTags(order.tags ?? [])
-            setEditing(!editing)
-          }}>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={() => {
+              setTags(order.tags ?? [])
+              setEditing(!editing)
+            }}
+          >
             <PencilIcon className="size-4" />
           </Button>
         </CardAction>
@@ -1594,7 +1688,9 @@ function TagsCard({ order }: { order: Order }) {
           </div>
         ) : order.tags?.length ? (
           <div className="flex flex-wrap gap-1">
-            {order.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+            {order.tags.map((tag) => (
+              <Badge key={tag}>{tag}</Badge>
+            ))}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">None</p>

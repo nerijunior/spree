@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { EditorContent, useEditor } from '@tiptap/react'
@@ -15,6 +14,7 @@ import {
   UndoIcon,
 } from 'lucide-react'
 import { useCallback, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 interface RichTextEditorProps {
   value?: string
@@ -128,11 +128,7 @@ export function RichTextEditor({
 
         <ToolbarSeparator />
 
-        <ToolbarButton
-          active={editor.isActive('link')}
-          onClick={setLink}
-          title="Link"
-        >
+        <ToolbarButton active={editor.isActive('link')} onClick={setLink} title="Link">
           <LinkIcon className="size-4" />
         </ToolbarButton>
 

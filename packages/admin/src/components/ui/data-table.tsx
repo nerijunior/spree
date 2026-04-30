@@ -57,4 +57,4 @@ function TableEmpty({ children, colSpan }: { children: ReactNode; colSpan: numbe
   )
 }
 
-export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableEmpty }
+export { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow }

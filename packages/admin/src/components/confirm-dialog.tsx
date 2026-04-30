@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -53,7 +53,9 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
       {children}
       <Dialog
         open={open}
-        onOpenChange={(o) => { if (!o) handleClose(false) }}
+        onOpenChange={(o) => {
+          if (!o) handleClose(false)
+        }}
       >
         <DialogContent showCloseButton={false}>
           <DialogHeader>

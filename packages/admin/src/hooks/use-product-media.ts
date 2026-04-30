@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminClient } from '@/client'
 
 export function useProductMedia(productId: string) {
@@ -38,8 +38,7 @@ export function useDeleteProductMedia(productId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) =>
-      adminClient.products.media.delete(productId, id),
+    mutationFn: (id: string) => adminClient.products.media.delete(productId, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products', productId, 'media'] })
       queryClient.invalidateQueries({ queryKey: ['products', productId] })

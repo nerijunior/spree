@@ -1,9 +1,9 @@
 /**
  * Keys that are passed through to the API without wrapping in q[...].
  */
-const PASSTHROUGH_KEYS = new Set(['page', 'limit', 'expand', 'sort', 'fields']);
+const PASSTHROUGH_KEYS = new Set(['page', 'limit', 'expand', 'sort', 'fields'])
 
-type ParamValue = string | number | boolean | (string | number)[] | undefined;
+type ParamValue = string | number | boolean | (string | number)[] | undefined
 
 /**
  * Transforms flat SDK params into Ransack-compatible query params.
@@ -12,34 +12,34 @@ type ParamValue = string | number | boolean | (string | number)[] | undefined;
  * - Keys already in `q[...]` format pass through (backward compat)
  * - All other keys are wrapped: `name_cont` → `q[name_cont]`
  */
-export function transformListParams(
-  params: Record<string, unknown>
-): Record<string, ParamValue> {
-  const result: Record<string, ParamValue> = {};
+export function transformListParams(params: Record<string, unknown>): Record<string, ParamValue> {
+  const result: Record<string, ParamValue> = {}
 
   for (const [key, value] of Object.entries(params)) {
-    if (value === undefined) continue;
+    if (value === undefined) continue
 
     if (PASSTHROUGH_KEYS.has(key)) {
       // Join arrays for passthrough keys (e.g., expand: ['variants', 'media'] → 'variants,media')
-      result[key] = Array.isArray(value) ? (value as (string | number)[]).join(',') : value as ParamValue;
-      continue;
+      result[key] = Array.isArray(value)
+        ? (value as (string | number)[]).join(',')
+        : (value as ParamValue)
+      continue
     }
 
     // Backward compat: already-wrapped q[...] keys pass through
     if (key.startsWith('q[')) {
-      result[key] = value as ParamValue;
-      continue;
+      result[key] = value as ParamValue
+      continue
     }
 
     // Array values get [] suffix automatically: `foo: [1,2]` → `q[foo][]`
     if (Array.isArray(value)) {
-      const base = key.endsWith('[]') ? key.slice(0, -2) : key;
-      result[`q[${base}][]`] = value as ParamValue;
+      const base = key.endsWith('[]') ? key.slice(0, -2) : key
+      result[`q[${base}][]`] = value as ParamValue
     } else {
-      result[`q[${key}]`] = value as ParamValue;
+      result[`q[${key}]`] = value as ParamValue
     }
   }
 
-  return result;
+  return result
 }

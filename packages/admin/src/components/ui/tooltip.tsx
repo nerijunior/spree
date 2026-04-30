@@ -14,11 +14,7 @@ function TooltipProvider({
   children: React.ReactNode
 } & Omit<React.ComponentProps<typeof TooltipPrimitive.Provider>, 'delay'>) {
   return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delay={delayDuration}
-      {...props}
-    >
+    <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delayDuration} {...props}>
       {children}
     </TooltipPrimitive.Provider>
   )
@@ -48,13 +44,7 @@ function TooltipTrigger({
   asChild?: boolean
 }) {
   if (asChild && React.isValidElement(children)) {
-    return (
-      <TooltipPrimitive.Trigger
-        data-slot="tooltip-trigger"
-        render={children}
-        {...props}
-      />
-    )
+    return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" render={children} {...props} />
   }
 
   return (

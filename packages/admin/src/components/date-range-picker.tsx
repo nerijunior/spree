@@ -1,6 +1,6 @@
+import { format, startOfMonth, startOfYear, subDays } from 'date-fns'
 import { CalendarIcon, ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
-import { format, subDays, startOfMonth, startOfYear } from 'date-fns'
 import type { DateRange as DayPickerDateRange } from 'react-day-picker'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -21,12 +21,36 @@ interface Preset {
 }
 
 const presets: Preset[] = [
-  { key: '7d', label: 'Last 7 days', value: () => ({ from: subDays(new Date(), 7), to: new Date() }) },
-  { key: '14d', label: 'Last 14 days', value: () => ({ from: subDays(new Date(), 14), to: new Date() }) },
-  { key: '30d', label: 'Last 30 days', value: () => ({ from: subDays(new Date(), 30), to: new Date() }) },
-  { key: '90d', label: 'Last 90 days', value: () => ({ from: subDays(new Date(), 90), to: new Date() }) },
-  { key: 'this_month', label: 'This month', value: () => ({ from: startOfMonth(new Date()), to: new Date() }) },
-  { key: 'ytd', label: 'Year to date', value: () => ({ from: startOfYear(new Date()), to: new Date() }) },
+  {
+    key: '7d',
+    label: 'Last 7 days',
+    value: () => ({ from: subDays(new Date(), 7), to: new Date() }),
+  },
+  {
+    key: '14d',
+    label: 'Last 14 days',
+    value: () => ({ from: subDays(new Date(), 14), to: new Date() }),
+  },
+  {
+    key: '30d',
+    label: 'Last 30 days',
+    value: () => ({ from: subDays(new Date(), 30), to: new Date() }),
+  },
+  {
+    key: '90d',
+    label: 'Last 90 days',
+    value: () => ({ from: subDays(new Date(), 90), to: new Date() }),
+  },
+  {
+    key: 'this_month',
+    label: 'This month',
+    value: () => ({ from: startOfMonth(new Date()), to: new Date() }),
+  },
+  {
+    key: 'ytd',
+    label: 'Year to date',
+    value: () => ({ from: startOfYear(new Date()), to: new Date() }),
+  },
 ]
 
 interface DateRangePickerProps {
@@ -39,9 +63,10 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   const [activePreset, setActivePreset] = useState<PresetKey>('30d')
   const [calendarRange, setCalendarRange] = useState<DayPickerDateRange | undefined>()
 
-  const triggerLabel = activePreset === 'custom'
-    ? `${format(value.from, 'MMM d')} – ${format(value.to, 'MMM d')}`
-    : presets.find((p) => p.key === activePreset)?.label ?? 'Last 30 days'
+  const triggerLabel =
+    activePreset === 'custom'
+      ? `${format(value.from, 'MMM d')} – ${format(value.to, 'MMM d')}`
+      : (presets.find((p) => p.key === activePreset)?.label ?? 'Last 30 days')
 
   function selectPreset(preset: Preset) {
     const range = preset.value()
@@ -105,11 +130,7 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
               numberOfMonths={2}
             />
             <div className="flex justify-end border-t pt-3">
-              <Button
-                size="sm"
-                disabled={!canApply}
-                onClick={applyCustomRange}
-              >
+              <Button size="sm" disabled={!canApply} onClick={applyCustomRange}>
                 Apply
               </Button>
             </div>

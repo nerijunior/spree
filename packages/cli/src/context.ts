@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import type { ProjectContext } from './types.js'
 import { DEFAULT_SPREE_PORT } from './constants.js'
+import type { ProjectContext } from './types.js'
 
 export function detectProject(cwd: string = process.cwd()): ProjectContext {
   const composeFile = path.join(cwd, 'docker-compose.yml')
@@ -9,7 +9,7 @@ export function detectProject(cwd: string = process.cwd()): ProjectContext {
   if (!fs.existsSync(composeFile)) {
     throw new Error(
       'Not a Spree project directory. No docker-compose.yml found.\n' +
-      'Run this command from a directory created with create-spree-app.',
+        'Run this command from a directory created with create-spree-app.',
     )
   }
 
