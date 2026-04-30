@@ -1,5 +1,5 @@
 import { ChevronsUpDownIcon, ExternalLinkIcon } from 'lucide-react'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,10 @@ export function StoreSwitcher() {
 
   if (isLoading) return <Skeleton className="h-header-height w-full rounded-xl" />
 
-  const storeInitials = store?.name.split(' ').map(name => name[0]).join('')
+  const storeInitials = store?.name
+    .split(' ')
+    .map((name) => name[0])
+    .join('')
 
   return (
     <SidebarMenu>

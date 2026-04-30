@@ -45,7 +45,10 @@ export function useDirectUpload() {
       const checksum = await computeMD5Checksum(file)
 
       // Step 1: Get presigned upload URL
-      let response: { direct_upload: { url: string; headers: Record<string, string> }; signed_id: string }
+      let response: {
+        direct_upload: { url: string; headers: Record<string, string> }
+        signed_id: string
+      }
       try {
         response = await adminClient.directUploads.create({
           blob: {

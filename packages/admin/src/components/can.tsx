@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { usePermissions } from '@/providers/permission-provider'
 import type { ActionName, SubjectName } from '@/lib/permissions'
+import { usePermissions } from '@/providers/permission-provider'
 
 interface CanProps {
   /** Action name (e.g. "update", "destroy", "manage") */

@@ -69,4 +69,4 @@ function StatusBadge({ status, className }: { status: string; className?: string
   )
 }
 
-export { Badge, StatusBadge, badgeVariants }
+export { Badge, badgeVariants, StatusBadge }

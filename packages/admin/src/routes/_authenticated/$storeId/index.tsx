@@ -1,26 +1,20 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import type { DashboardAnalytics } from '@spree/admin-sdk'
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { subDays } from 'date-fns'
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { PackageIcon } from 'lucide-react'
+import { useState } from 'react'
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 import { adminClient } from '@/client'
-import { DateRangePicker, type DateRange } from '@/components/date-range-picker'
+import { type DateRange, DateRangePicker } from '@/components/date-range-picker'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  type ChartConfig,
 } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { DashboardAnalytics } from '@spree/admin-sdk'
 
 export const Route = createFileRoute('/_authenticated/$storeId/')({
   component: DashboardPage,
@@ -100,9 +94,7 @@ function AnalyticsChart({ data }: { data: DashboardAnalytics }) {
             type="button"
             onClick={() => setActiveMetric(tab.key)}
             className={`relative flex flex-1 flex-col justify-center gap-1 px-6 py-4 text-left ${
-              activeMetric === tab.key
-                ? 'bg-muted/50'
-                : 'hover:bg-muted/25'
+              activeMetric === tab.key ? 'bg-muted/50' : 'hover:bg-muted/25'
             } sm:border-l sm:first:border-l-0`}
           >
             <span className="text-xs text-muted-foreground">{tab.label}</span>
@@ -114,7 +106,10 @@ function AnalyticsChart({ data }: { data: DashboardAnalytics }) {
         ))}
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer config={chartConfigs[activeMetric]} className="aspect-auto h-[250px] w-full">
+        <ChartContainer
+          config={chartConfigs[activeMetric]}
+          className="aspect-auto h-[250px] w-full"
+        >
           <BarChart data={data.chart_data}>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -156,11 +151,7 @@ function AnalyticsChart({ data }: { data: DashboardAnalytics }) {
   )
 }
 
-function TopProducts({
-  products,
-}: {
-  products: DashboardAnalytics['top_products']
-}) {
+function TopProducts({ products }: { products: DashboardAnalytics['top_products'] }) {
   if (products.length === 0) {
     return null
   }
@@ -230,8 +221,11 @@ function DashboardSkeleton() {
       </div>
       <Card>
         <CardHeader className="flex h-auto flex-col border-b p-0 sm:flex-row">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex flex-1 flex-col gap-2 px-6 py-4 sm:border-l sm:first:border-l-0">
+          {['stat-1', 'stat-2', 'stat-3'].map((key) => (
+            <div
+              key={key}
+              className="flex flex-1 flex-col gap-2 px-6 py-4 sm:border-l sm:first:border-l-0"
+            >
               <Skeleton className="h-3 w-20" />
               <Skeleton className="h-7 w-28" />
             </div>
@@ -248,8 +242,8 @@ function DashboardSkeleton() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="flex flex-col">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-3 border-b px-4 py-3 last:border-0">
+            {['row-1', 'row-2', 'row-3', 'row-4', 'row-5'].map((key) => (
+              <div key={key} className="flex items-center gap-3 border-b px-4 py-3 last:border-0">
                 <Skeleton className="size-10 rounded-md" />
                 <Skeleton className="h-4 w-32 flex-1" />
                 <Skeleton className="h-4 w-16" />

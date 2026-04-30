@@ -1,5 +1,5 @@
-import { XIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
+import { XIcon } from 'lucide-react'
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -19,7 +19,14 @@ function Dialog({
   modal?: boolean | 'trap-focus'
 }) {
   return (
-    <DialogPrimitive.Root data-slot="dialog" open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} modal={modal} {...props}>
+    <DialogPrimitive.Root
+      data-slot="dialog"
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      modal={modal}
+      {...props}
+    >
       {children}
     </DialogPrimitive.Root>
   )
@@ -33,9 +40,7 @@ function DialogTrigger({
   asChild?: boolean
 }) {
   if (asChild && React.isValidElement(children)) {
-    return (
-      <DialogPrimitive.Trigger data-slot="dialog-trigger" render={children} {...props} />
-    )
+    return <DialogPrimitive.Trigger data-slot="dialog-trigger" render={children} {...props} />
   }
   return (
     <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props}>
@@ -60,9 +65,7 @@ function DialogClose({
   asChild?: boolean
 }) {
   if (asChild && React.isValidElement(children)) {
-    return (
-      <DialogPrimitive.Close data-slot="dialog-close" render={children} {...props} />
-    )
+    return <DialogPrimitive.Close data-slot="dialog-close" render={children} {...props} />
   }
   return (
     <DialogPrimitive.Close data-slot="dialog-close" {...props}>
@@ -113,12 +116,15 @@ function DialogContent({
       >
         {children}
         {showCloseButton && (
-          <DialogPrimitive.Close data-slot="dialog-close" render={
-            <Button variant="ghost" className="absolute top-3 right-3" size="icon-sm">
-              <XIcon />
-              <span className="sr-only">Close</span>
-            </Button>
-          } />
+          <DialogPrimitive.Close
+            data-slot="dialog-close"
+            render={
+              <Button variant="ghost" className="absolute top-3 right-3" size="icon-sm">
+                <XIcon />
+                <span className="sr-only">Close</span>
+              </Button>
+            }
+          />
         )}
       </DialogPrimitive.Popup>
     </DialogPortal>
@@ -163,11 +169,7 @@ function DialogFooter({
       {...props}
     >
       {children}
-      {showCloseButton && (
-        <DialogPrimitive.Close render={
-          <Button>Close</Button>
-        } />
-      )}
+      {showCloseButton && <DialogPrimitive.Close render={<Button>Close</Button>} />}
     </div>
   )
 }

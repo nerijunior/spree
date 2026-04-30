@@ -53,14 +53,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearRefreshTimer()
   }, [clearRefreshTimer])
 
-  const storeTokens = useCallback((accessToken: string, refreshToken: string, authUser: AuthUser) => {
-    adminClient.setToken(accessToken)
-    setToken(accessToken)
-    setUser(authUser)
-    localStorage.setItem(TOKEN_KEY, accessToken)
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
-    localStorage.setItem(USER_KEY, JSON.stringify(authUser))
-  }, [])
+  const storeTokens = useCallback(
+    (accessToken: string, refreshToken: string, authUser: AuthUser) => {
+      adminClient.setToken(accessToken)
+      setToken(accessToken)
+      setUser(authUser)
+      localStorage.setItem(TOKEN_KEY, accessToken)
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+      localStorage.setItem(USER_KEY, JSON.stringify(authUser))
+    },
+    [],
+  )
 
   const doRefresh = useCallback(async (): Promise<boolean> => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
@@ -97,16 +100,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, REFRESH_INTERVAL_MS)
   }, [refreshAccessToken, clearRefreshTimer])
 
-  const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true)
-    try {
-      const response = await adminClient.auth.login({ email, password })
-      storeTokens(response.token, response.refresh_token!, response.user)
-      scheduleRefresh()
-    } finally {
-      setIsLoading(false)
-    }
-  }, [storeTokens, scheduleRefresh])
+  const login = useCallback(
+    async (email: string, password: string) => {
+      setIsLoading(true)
+      try {
+        const response = await adminClient.auth.login({ email, password })
+        storeTokens(response.token, response.refresh_token!, response.user)
+        scheduleRefresh()
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [storeTokens, scheduleRefresh],
+  )
 
   const logout = useCallback(() => {
     clearTokens()

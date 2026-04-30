@@ -19,7 +19,7 @@ defineTable('customers', {
       default: true,
       render: (c) => (
         <Link
-          to={"/$storeId/customers/$customerId" as string}
+          to={'/$storeId/customers/$customerId' as string}
           params={{ customerId: c.id }}
           className="font-medium text-zinc-950 no-underline"
         >
@@ -65,7 +65,8 @@ defineTable('customers', {
       label: 'Last order',
       default: true,
       className: 'text-sm text-muted-foreground whitespace-nowrap',
-      render: (c) => (c.last_order_completed_at ? formatRelativeTime(c.last_order_completed_at) : '—'),
+      render: (c) =>
+        c.last_order_completed_at ? formatRelativeTime(c.last_order_completed_at) : '—',
     },
     {
       key: 'accepts_email_marketing',

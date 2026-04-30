@@ -1,6 +1,7 @@
 import type { Customer, Variant } from '@spree/admin-sdk'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { TrashIcon, XIcon } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 import { adminClient } from '@/client'
 import { BackButton } from '@/components/back-button'
@@ -10,7 +11,6 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import { TrashIcon, XIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/$storeId/orders/new')({
   component: NewOrderPage,
@@ -85,7 +85,9 @@ function NewOrderPage() {
   function addItem(variant: Variant) {
     const existing = items.find((i) => i.variant.id === variant.id)
     if (existing) {
-      setItems(items.map((i) => i.variant.id === variant.id ? { ...i, quantity: i.quantity + 1 } : i))
+      setItems(
+        items.map((i) => (i.variant.id === variant.id ? { ...i, quantity: i.quantity + 1 } : i)),
+      )
     } else {
       setItems([...items, { variant, quantity: 1 }])
     }
@@ -94,7 +96,7 @@ function NewOrderPage() {
 
   function updateQuantity(variantId: string, quantity: number) {
     if (quantity < 1) return
-    setItems(items.map((i) => i.variant.id === variantId ? { ...i, quantity } : i))
+    setItems(items.map((i) => (i.variant.id === variantId ? { ...i, quantity } : i)))
   }
 
   function removeItem(variantId: string) {
@@ -126,7 +128,15 @@ function NewOrderPage() {
                       </div>
                     )}
                   </div>
-                  <Button type="button" size="sm" variant="outline" onClick={() => { setCustomer(null); setCustomerSearch('') }}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setCustomer(null)
+                      setCustomerSearch('')
+                    }}
+                  >
                     <XIcon className="size-4" />
                     Change
                   </Button>
@@ -146,7 +156,10 @@ function NewOrderPage() {
                           <button
                             key={c.id}
                             type="button"
-                            onClick={() => { setCustomer(c); setCustomerSearch('') }}
+                            onClick={() => {
+                              setCustomer(c)
+                              setCustomerSearch('')
+                            }}
                             className="block w-full px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors border-b last:border-0"
                           >
                             <div className="font-medium">{c.email}</div>
@@ -175,7 +188,9 @@ function NewOrderPage() {
               {customer && (
                 <div className="mt-4 flex items-center gap-3">
                   <Switch checked={useDefaultAddress} onCheckedChange={setUseDefaultAddress} />
-                  <span className="text-sm">Use customer's default billing & shipping addresses</span>
+                  <span className="text-sm">
+                    Use customer's default billing & shipping addresses
+                  </span>
                 </div>
               )}
             </CardContent>
@@ -228,7 +243,9 @@ function NewOrderPage() {
                     <tbody>
                       {items.map(({ variant, quantity }) => (
                         <tr key={variant.id} className="border-b last:border-b-0">
-                          <td className="p-3 pl-5 font-medium">{variant.product_name ?? variant.sku ?? variant.id}</td>
+                          <td className="p-3 pl-5 font-medium">
+                            {variant.product_name ?? variant.sku ?? variant.id}
+                          </td>
                           <td className="p-3 text-muted-foreground">{variant.sku}</td>
                           <td className="p-3 text-right">
                             <Input
@@ -240,7 +257,12 @@ function NewOrderPage() {
                             />
                           </td>
                           <td className="p-3 pr-5 text-right">
-                            <Button type="button" size="icon-xs" variant="ghost" onClick={() => removeItem(variant.id)}>
+                            <Button
+                              type="button"
+                              size="icon-xs"
+                              variant="ghost"
+                              onClick={() => removeItem(variant.id)}
+                            >
                               <TrashIcon className="size-4" />
                             </Button>
                           </td>
@@ -263,7 +285,9 @@ function NewOrderPage() {
             <CardContent>
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="customer-note">Customer note (visible to customer)</FieldLabel>
+                  <FieldLabel htmlFor="customer-note">
+                    Customer note (visible to customer)
+                  </FieldLabel>
                   <Textarea
                     id="customer-note"
                     rows={3}

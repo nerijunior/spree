@@ -9,6 +9,8 @@ import {
   ComboboxItem,
   ComboboxList,
 } from '@/components/ui/combobox'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import {
   Sheet,
   SheetContent,
@@ -17,13 +19,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import { useCountries } from '@/hooks/use-countries'
 
 /** Convert 2-letter ISO code to flag emoji (e.g. "US" → "🇺🇸") */
 function countryFlag(iso: string): string {
-  return [...iso.toUpperCase()].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join('')
+  return [...iso.toUpperCase()]
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join('')
 }
 
 export interface AddressParams {
@@ -132,13 +134,22 @@ export function AddressFormDialog({
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>Update the address details.</SheetDescription>
         </SheetHeader>
-        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="flex flex-col flex-1 overflow-hidden">
+        <form
+          onSubmit={handleSubmit}
+          onKeyDown={handleKeyDown}
+          className="flex flex-col flex-1 overflow-hidden"
+        >
           <div className="flex-1 overflow-y-auto p-4">
             <FieldGroup>
               {showLabel && (
                 <Field>
                   <FieldLabel htmlFor="addr-label">Label</FieldLabel>
-                  <Input id="addr-label" name="label" placeholder="e.g. Home, Office" defaultValue={address?.label ?? ''} />
+                  <Input
+                    id="addr-label"
+                    name="label"
+                    placeholder="e.g. Home, Office"
+                    defaultValue={address?.label ?? ''}
+                  />
                 </Field>
               )}
               <div className="grid grid-cols-2 gap-3">
@@ -167,7 +178,7 @@ export function AddressFormDialog({
                   onValueChange={handleCountryChange as any}
                   itemToStringLabel={(c: any) => {
                     const co = c as CountryOption
-                    return co?.iso ? `${countryFlag(co.iso)} ${co.name}` : co?.name ?? ''
+                    return co?.iso ? `${countryFlag(co.iso)} ${co.name}` : (co?.name ?? '')
                   }}
                   itemToStringValue={(c: any) => (c as CountryOption)?.iso ?? ''}
                 >
@@ -234,13 +245,21 @@ export function AddressFormDialog({
                 <>
                   <Field>
                     <label className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" name="is_default_billing" defaultChecked={address?.is_default_billing} />
+                      <input
+                        type="checkbox"
+                        name="is_default_billing"
+                        defaultChecked={address?.is_default_billing}
+                      />
                       Default billing address
                     </label>
                   </Field>
                   <Field>
                     <label className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" name="is_default_shipping" defaultChecked={address?.is_default_shipping} />
+                      <input
+                        type="checkbox"
+                        name="is_default_shipping"
+                        defaultChecked={address?.is_default_shipping}
+                      />
                       Default shipping address
                     </label>
                   </Field>

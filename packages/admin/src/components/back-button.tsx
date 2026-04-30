@@ -1,4 +1,4 @@
-import { useRouter, useParams } from '@tanstack/react-router'
+import { useParams, useRouter } from '@tanstack/react-router'
 import { ArrowLeftIcon } from 'lucide-react'
 
 interface BackButtonProps {
